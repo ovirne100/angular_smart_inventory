@@ -1,0 +1,42 @@
+<div class="container">
+  <div class="left">
+    <h1>Welcome</h1>
+    <h3 class="highlight">Smart Inventory</h3>
+    <p>
+      Aquí facilitamos la gestión de inventarios con una plataforma intuitiva que ofrece visibilidad en tiempo real
+      y análisis de datos, ayudando a las empresas a maximizar rentabilidad y reducir desperdicios.
+    </p>
+    <div class="logo">
+      <img src="https://img.icons8.com/ios-filled/500/f1c40f/combo-chart.png" alt="Logo">
+      <h2>SMART INVENTORY</h2>
+      <small>Controlando el presente, planificando el futuro</small>
+    </div>
+  </div>
+
+  <div class="right">
+    <h2>Iniciar Sesión</h2>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" id="loginForm" autocomplete="off">
+
+      <input type="text" name="fake-username" style="display:none;" autocomplete="username">
+      <input type="password" name="fake-password" style="display:none;" autocomplete="new-password">
+
+      <div class="form-group">
+        <input type="email" formControlName="email" placeholder="Introduce tu Email" required autocomplete="new-email" />
+      </div>
+
+      <div class="form-group">
+        <input type="password" formControlName="password" placeholder="Introduce tu Contraseña" required autocomplete="new-password" />
+      </div>
+
+      <button type="submit" class="ir">INGRESAR</button>
+    </form>
+    
+    <div class="social-icons">
+      <i class="fab fa-google"></i>
+      <i class="fab fa-facebook"></i>
+      <i class="fab fa-apple"></i>
+      <i class="fab fa-yahoo"></i>
+    </div>
+  </div>
+</div>
