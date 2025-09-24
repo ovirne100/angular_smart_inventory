@@ -1,0 +1,108 @@
+
+
+.menu-btn {
+  background-color: #f1c40f; /* amarillo */
+  border: none;
+  border-radius: 50%;
+  padding: 15px;
+  cursor: pointer;
+  color: black;
+  font-size: 20px;
+  display: none;
+}
+
+.navbar2{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: black;
+    color: white;
+    padding: 20px;
+}
+.logo{
+    text-align: center;
+}
+.logo img{
+    width: 100px;
+}
+.logo h2{
+    margin: 0;
+}
+.home-btn {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 24px;
+  color: black;
+}
+.cabesera {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  gap: 2em;
+}
+.fas.fa-house:hover{
+    background-color: #f1c40f;
+    color: white;
+}
+.fas.fa-house {
+    font-size: 50px;
+}
+ .cabesera1{
+    margin: 10px 0;
+ }
+
+.cabesera h1{
+    font-size: 50px;
+}
+
+.yellow{
+    background: yellow;
+    padding: 15px;
+    border: 1px solid;
+    border-radius: 15px;
+}
+.contend2{
+    display: flex;
+    justify-content: space-between;
+}
+.price{
+    margin-bottom: -15px;
+}
+.price p{
+    margin: 0;
+}
+
+.blue{
+    background: rgb(120, 120, 236);
+    padding: 10px;
+    border: 1px solid;
+    border-radius: 15px;
+    margin: 20px 0;
+}
+.blue p{
+    margin: 0;
+}
+
+
+.coffe{
+    background: coral;
+    padding: 10px;
+    border: 1px solid;
+    border-radius: 15px;
+}
+
+.coffe p{
+    margin: 0;
+}
+img{
+    width: 100%;
+}
+
+/*movil*/
+@media (max-width: 768px) {
+  .menu-btn{
+    display: block;}
+img{ width: 100%;}
+    
+}

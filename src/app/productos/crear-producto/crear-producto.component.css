@@ -1,0 +1,105 @@
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css');
+
+/* ----- HEADER ----- */
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+}
+
+header h2 {
+  font-size: 28px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.codigo_barra {
+  font-size: 40px;
+  color: #333;
+}
+
+/* ----- FORMULARIO ----- */
+.crear-producto {
+  display: flex;
+  justify-content: center;
+  padding: 40px;
+  font-family: 'Poppins', sans-serif;
+  background-color: #f9f9f9;
+}
+
+.crear-producto form {
+  background: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 600px;
+  width: 100%;
+}
+
+.crear-producto label {
+  font-weight: 500;
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+}
+
+.crear-producto input {
+  padding: 10px 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+.crear-producto button {
+  background-color: #d4af37;
+  border: none;
+  padding: 12px;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.crear-producto button:hover {
+  background-color: #c39d2c;
+  color: white;
+}
+
+.btn-guardar {
+  width: 100%;
+}
+
+/* ----- RESPONSIVE ----- */
+@media(max-width:768px) {
+  .crear-producto {
+    padding: 20px;
+  }
+
+  .crear-producto form {
+    padding: 20px;
+  }
+
+  .crear-producto input {
+    padding: 8px;
+    margin-bottom: 10px;
+  }
+
+  .btn-guardar {
+    width: 100%;
+    padding: 10px;
+  }
+
+  header h2 {
+    font-size: 20px;
+  }
+
+  .codigo_barra {
+    font-size: 28px;
+  }
+}

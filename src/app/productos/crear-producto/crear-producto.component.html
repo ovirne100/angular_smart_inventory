@@ -1,0 +1,38 @@
+<header>
+  <h2>Crear nuevo producto</h2>
+  <div class="codigo_barra">
+    <i class="fa-solid fa-barcode"></i>
+  </div>
+</header>
+
+<section class="crear-producto">
+  <form #formCrear="ngForm" (ngSubmit)="guardarProducto(formCrear)">
+
+    <label>Nombre:
+      <input type="text" name="name" ngModel required>
+    </label>
+
+    <label>Referencia:
+      <input type="text" name="reference" ngModel required>
+    </label>
+
+    <label>Unidad de medida:
+      <input type="text" name="unit" ngModel> <!-- Cambiado a "unit" -->
+    </label>
+
+    <label>Lote:
+      <input type="text" name="lote" ngModel required> <!-- Cambiado a "lote" -->
+    </label>
+
+    <label>Categoría (ID):
+      <input type="number" name="category_id" ngModel required>
+    </label>
+
+    <label>Fecha de vencimiento:
+      <input type="date" name="fechaVencimiento" ngModel required> <!-- Cambiado a "fechaVencimiento" -->
+    </label>
+
+    <button type="submit">Guardar</button>
+    <button type="button" (click)="cancelarCreacion()">Cancelar</button>
+  </form>
+</section>

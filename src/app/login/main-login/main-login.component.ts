@@ -29,7 +29,7 @@ export class MainLoginComponent{
       next: (res: any) => {
         localStorage.setItem('token', res.token); // Guardar token
         alert('Login exitoso');
-        this.router.navigate(['/register']); // Ajusta ruta destino
+        this.router.navigate(['/dashboard']); // Ajusta ruta destino
       },
       error: () => alert('Usuario o contraseña incorrectos')
     });

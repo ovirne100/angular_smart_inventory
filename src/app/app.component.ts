@@ -1,12 +1,22 @@
 import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
+import { NabvarComponent } from './register/nabvar/nabvar.component';
+import { FooterComponent } from './register/footer/footer.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  standalone: true,
+  imports: [
+    CommonModule,
+    RouterOutlet,
+    NabvarComponent,
+    FooterComponent,
+    FormsModule
+
+  ],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  styleUrls: ['./app.component.css']
 })
-export class AppComponent {
-  title = 'proyecto';
-}
+export class AppComponent {}

@@ -1,0 +1,30 @@
+<div class="btn-crear" *ngIf="!mostrarCrear">
+  <button (click)="cargarCrearProducto()" class="crear-producto">
+    Crear producto
+  </button>
+</div>
+
+
+<app-crear-producto *ngIf="mostrarCrear" (cancelar)="cancelarCrearProducto()"></app-crear-producto>
+
+<div class="busqueda" *ngIf="!mostrarCrear">
+  <input type="text" placeholder="Buscar producto..." [(ngModel)]="terminoBusqueda" />
+</div>
+
+<div *ngIf="!mostrarCrear">
+  <div *ngFor="let producto of productos" class="producto-lista">
+  <div class="producto-item">
+  <h3>{{ producto.name }}</h3>
+ 
+  <p>Und: {{ producto.unit_of_measure }}</p>
+  <p>Lote: {{ producto.batch }}</p>
+  <p>Fecha de vencimiento: {{ producto.expiration_date | date:'dd/MM/yyyy' }}</p>
+</div>
+
+    <div class="acciones">
+      <button (click)="actualizarProducto(producto)">Actualizar</button>
+      <button (click)="eliminarProducto(producto)">Eliminar</button>
+      <button (click)="verMas(producto)">Ver más</button>
+    </div>
+  </div>
+</div>

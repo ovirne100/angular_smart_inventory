@@ -1,0 +1,75 @@
+<div class="container">
+
+  <!-- Sidebar fijo -->
+  <aside class="sidebar">
+    <section class="menu">
+
+      <div class="inicio">
+        <a routerLink="inicio" routerLinkActive="active">
+          <i class="fa-solid fa-house"></i>
+          <div>
+            <h1>Inicio</h1>
+            <p>Aqui podras tener un pequeño resumen de tu inventario</p>
+          </div>
+        </a>
+      </div>
+
+      <div class="inicio">
+        <a routerLink="productos" routerLinkActive="active">
+          <i class="fa-solid fa-box"></i>
+          <div>
+            <h1>Productos</h1>
+            <p>Por medio de esta opcion podras gestionar tus productos</p>
+          </div>
+        </a>
+      </div>
+
+      <div class="inicio">
+        <a routerLink="alertas" routerLinkActive="active">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          <div>
+            <h1>Alertas</h1>
+            <p>Información sobre alertas preventivas y críticas de tus productos</p>
+          </div>
+        </a>
+      </div>
+
+      <div class="inicio">
+        <a routerLink="movimientos" routerLinkActive="active">
+          <i class="fa-solid fa-right-left"></i>
+          <div>
+            <h1>Movimientos</h1>
+            <p>Información sobre todos los movimientos realizados</p>
+          </div>
+        </a>
+      </div>
+
+      <div class="inicio">
+        <a routerLink="proveedores" routerLinkActive="active">
+          <i class="fa-solid fa-truck"></i>
+          <div>
+            <h1>Proveedores</h1>
+            <p>Mejor conexión con proveedores y automatización de pedidos según stock</p>
+          </div>
+        </a>
+      </div>
+
+      <div class="inicio">
+        <a routerLink="informes" routerLinkActive="active">
+          <i class="fa-solid fa-file-lines"></i>
+          <div>
+            <h1>Informes</h1>
+            <p>Redacción y consulta de informes de actividades</p>
+          </div>
+        </a>
+      </div>
+
+    </section>
+  </aside>
+
+  <!-- Contenido dinámico -->
+  <main class="main">
+    <router-outlet></router-outlet>
+  </main>
+
+</div>

@@ -1,0 +1,60 @@
+
+<div class="container">
+  <div class="left">
+    <h1>Welcome</h1>
+    <h3 class="highlight">Smart Inventory</h3>
+    <p>
+      Aquí facilitamos la gestión de inventarios con una plataforma intuitiva que ofrece visibilidad en tiempo real
+      y análisis de datos, ayudando a las empresas a maximizar rentabilidad y reducir desperdicios.
+    </p>
+    <div class="logo">
+      <img src="https://img.icons8.com/ios-filled/500/f1c40f/combo-chart.png" alt="Logo">
+      <h2>SMART INVENTORY</h2>
+      <small>Controlando el presente, planificando el futuro</small>
+    </div>
+  </div>
+
+
+<div class="right">
+  <h2>Regístrate</h2>
+  <!-- REGISTRO -->
+  <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" id="registroForm" autocomplete="off">
+  <div class="form-group">
+    <input type="text" formControlName="name" placeholder="Nombre" required />
+  </div>
+
+  <div class="form-group">
+    <input type="text" formControlName="lastname" placeholder="Apellido" required />
+  </div>
+
+  <div class="form-group">
+    <input type="email" formControlName="email" placeholder="Email" required />
+  </div>
+
+  <div class="form-group">
+    <input type="password" formControlName="password" placeholder="Contraseña" required />
+  </div>
+
+  <div class="form-group">
+    <input type="password" formControlName="password_confirmation" placeholder="Confirmar contraseña" required />
+  </div>
+
+  <!-- Select de roles -->
+  <div class="form-group">
+    <select formControlName="role_id" id="role" >
+      <option  value="">SELECCIONE UN ROL</option>
+      <option *ngFor="let rol of roles" [value]="rol.id">{{ rol.name }}</option>
+    </select>
+  </div>
+
+  <div class="registro">
+      <button type="submit" class="ir">REGISTRARME</button>
+    </div>
+</form>
+</div>
+<!-- Mensajes de error -->
+<div *ngFor="let key of errorKeys">
+  <span class="error">{{ errors[key]?.[0] }}</span>
+</div>
+
+
