@@ -9,10 +9,9 @@ export const routes: Routes = [
   { path: '', redirectTo: 'register', pathMatch: 'full' },
   { path: '**', redirectTo: 'register' }
 
-  
+
 ];
 */
-
 import { Routes } from '@angular/router';
 
 // Login y Register
@@ -28,6 +27,10 @@ import { MovimientosComponent } from './dashboard/pages/movimientos/movimientos.
 import { ProveedoresComponent } from './dashboard/pages/proveedores/proveedores.component';
 import { InformesComponent } from './dashboard/pages/informes/informes.component';
 
+// Hijos de movimientos
+import { EntradaComponent } from './dashboard/pages/movimientos/entrada/entrada.component';
+import { SalidaComponent } from './dashboard/pages/movimientos/salida/salida.component';
+
 export const routes: Routes = [
   // Rutas públicas
   { path: 'register', component: MainRegisterComponent },
@@ -41,7 +44,17 @@ export const routes: Routes = [
       { path: 'inicio', component: InicioComponent },
       { path: 'productos', component: ProductosComponent },
       { path: 'alertas', component: AlertasComponent },
-      { path: 'movimientos', component: MovimientosComponent },
+
+      {
+        path: 'movimientos',
+        component: MovimientosComponent,
+        children: [
+          { path: 'entrada', component: EntradaComponent },
+          { path: 'salida', component: SalidaComponent },
+          { path: '', redirectTo: 'entrada', pathMatch: 'full' } // Por defecto, muestra entradas
+        ]
+      },
+
       { path: 'proveedores', component: ProveedoresComponent },
       { path: 'informes', component: InformesComponent },
       { path: '', redirectTo: 'inicio', pathMatch: 'full' }

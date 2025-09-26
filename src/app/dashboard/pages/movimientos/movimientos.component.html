@@ -1,1 +1,23 @@
-<p>movimientos works!</p>
+<div class="movimientos-container">
+  <h2>Registro de entrada y salida</h2>
+  <p>Control de movimiento de inventario</p>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button
+      [class.active]="activeTab === 'entrada'"
+      (click)="setActive('entrada')"
+      routerLink="entrada">
+      ENTRADAS
+    </button>
+    <button
+      [class.active]="activeTab === 'salida'"
+      (click)="setActive('salida')"
+      routerLink="salida">
+      SALIDAS
+    </button>
+  </div>
+
+  <!-- Aquí se cargan EntradaComponent o SalidaComponent -->
+  <router-outlet></router-outlet>
+</div>

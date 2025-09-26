@@ -2,10 +2,14 @@ import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-movimientos',
-  imports: [],
   templateUrl: './movimientos.component.html',
-  styleUrl: './movimientos.component.css'
+  styleUrls: ['./movimientos.component.css']
 })
 export class MovimientosComponent {
+  // Puedes usar esto para cambiar dinámicamente entre "entrada" y "salida"
+  activeTab: 'entrada' | 'salida' = 'entrada';
 
+  setActive(tab: 'entrada' | 'salida') {
+    this.activeTab = tab;
+  }
 }
