@@ -1,11 +1,26 @@
 <div class="container">
 
-  <!-- Sidebar fijo -->
-  <aside class="sidebar">
+  <!-- Sidebar solo visible si showSidebar = true -->
+  <aside class="sidebar" *ngIf="showSidebar">
+    <!-- Información del usuario -->
+    <div class="user-info" *ngIf="currentUser">
+      <div class="user-avatar" [title]="getFullName()">
+        <span class="avatar-text">{{ getInitials() }}</span>
+      </div>
+      <div class="user-details">
+        <h3>{{ getFullName() }}</h3>
+        <p class="user-role">{{ getUserRole() }}</p>
+        <p class="user-email">{{ currentUser?.email }}</p>
+      </div>
+      <button class="logout-btn" (click)="logout()" title="Cerrar sesión">
+        <i class="fa-solid fa-sign-out-alt"></i>
+      </button>
+    </div>
+
     <section class="menu">
 
       <div class="inicio">
-        <a routerLink="inicio" routerLinkActive="active">
+        <a routerLink="/dashboard/inicio" routerLinkActive="active" (click)="navegar()">
           <i class="fa-solid fa-house"></i>
           <div>
             <h1>Inicio</h1>
@@ -15,7 +30,7 @@
       </div>
 
       <div class="inicio">
-        <a routerLink="productos" routerLinkActive="active">
+        <a routerLink="/dashboard/productos" routerLinkActive="active" (click)="navegar()">
           <i class="fa-solid fa-box"></i>
           <div>
             <h1>Productos</h1>
@@ -25,7 +40,7 @@
       </div>
 
       <div class="inicio">
-        <a routerLink="alertas" routerLinkActive="active">
+        <a routerLink="/dashboard/alertas" routerLinkActive="active" (click)="navegar()">
           <i class="fa-solid fa-triangle-exclamation"></i>
           <div>
             <h1>Alertas</h1>
@@ -35,7 +50,7 @@
       </div>
 
       <div class="inicio">
-        <a routerLink="movimientos" routerLinkActive="active">
+        <a routerLink="/dashboard/movimientos" routerLinkActive="active" (click)="navegar()">
           <i class="fa-solid fa-right-left"></i>
           <div>
             <h1>Movimientos</h1>
@@ -45,7 +60,7 @@
       </div>
 
       <div class="inicio">
-        <a routerLink="proveedores" routerLinkActive="active">
+        <a routerLink="/dashboard/proveedores" routerLinkActive="active" (click)="navegar()">
           <i class="fa-solid fa-truck"></i>
           <div>
             <h1>Proveedores</h1>
@@ -55,7 +70,7 @@
       </div>
 
       <div class="inicio">
-        <a routerLink="informes" routerLinkActive="active">
+        <a routerLink="/dashboard/informes" routerLinkActive="active" (click)="navegar()">
           <i class="fa-solid fa-file-lines"></i>
           <div>
             <h1>Informes</h1>
@@ -73,3 +88,8 @@
   </main>
 
 </div>
+
+<!-- Botón para volver a abrir el menú en móvil -->
+<button *ngIf="isMobile && !showSidebar" (click)="mostrarMenu()" class="btn-menu">
+  ☰ Menú
+</button>

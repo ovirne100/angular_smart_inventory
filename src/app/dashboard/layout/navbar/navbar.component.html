@@ -1,1 +1,121 @@
-<p>navbar works!</p>
+<!-- Navbar Profesional y Responsive -->
+<nav class="navbar">
+  <div class="navbar-container">
+    <!-- Logo y título -->
+    <div class="navbar-brand">
+      <div class="brand-logo">
+        <i class="fa-solid fa-warehouse"></i>
+      </div>
+      <div class="brand-text">
+        <h1 class="brand-title">SmartInventory</h1>
+        <span class="brand-subtitle">Sistema de Gestión</span>
+      </div>
+    </div>
+
+    <!-- Menú de navegación principal -->
+    <div class="navbar-menu" [class.active]="menuOpen">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a routerLink="/dashboard/inicio" class="nav-link" routerLinkActive="active">
+            <i class="fa-solid fa-home"></i>
+            <span>Inicio</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/dashboard/productos" class="nav-link" routerLinkActive="active">
+            <i class="fa-solid fa-boxes"></i>
+            <span>Productos</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/dashboard/proveedores" class="nav-link" routerLinkActive="active">
+            <i class="fa-solid fa-truck"></i>
+            <span>Proveedores</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/dashboard/movimientos" class="nav-link" routerLinkActive="active">
+            <i class="fa-solid fa-exchange-alt"></i>
+            <span>Movimientos</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/dashboard/informes" class="nav-link" routerLinkActive="active">
+            <i class="fa-solid fa-chart-bar"></i>
+            <span>Informes</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/dashboard/alertas" class="nav-link" routerLinkActive="active">
+            <i class="fa-solid fa-bell"></i>
+            <span>Alertas</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Controles del usuario -->
+    <div class="navbar-controls">
+      <!-- Búsqueda global -->
+      <div class="search-container">
+        <div class="search-box">
+          <i class="fa-solid fa-search"></i>
+          <input type="text" placeholder="Buscar..." class="search-input">
+        </div>
+      </div>
+
+      <!-- Notificaciones -->
+      <div class="notifications">
+        <button class="notification-btn" (click)="toggleNotifications()">
+          <i class="fa-solid fa-bell"></i>
+          <span class="notification-badge" *ngIf="notificationCount > 0">{{ notificationCount }}</span>
+        </button>
+      </div>
+
+      <!-- Perfil del usuario -->
+      <div class="user-profile">
+        <div class="user-avatar">
+          <img src="assets/default-avatar.png" alt="Usuario" class="avatar-img">
+        </div>
+        <div class="user-info">
+          <span class="user-name">Usuario Admin</span>
+          <span class="user-role">Administrador</span>
+        </div>
+        <div class="user-menu">
+          <button class="user-menu-btn" (click)="toggleUserMenu()">
+            <i class="fa-solid fa-chevron-down"></i>
+          </button>
+          <div class="user-dropdown" [class.active]="userMenuOpen">
+            <a href="#" class="dropdown-item">
+              <i class="fa-solid fa-user"></i>
+              Mi Perfil
+            </a>
+            <a href="#" class="dropdown-item">
+              <i class="fa-solid fa-cog"></i>
+              Configuración
+            </a>
+            <a href="#" class="dropdown-item">
+              <i class="fa-solid fa-question-circle"></i>
+              Ayuda
+            </a>
+            <hr class="dropdown-divider">
+            <a href="#" class="dropdown-item logout" (click)="logout()">
+              <i class="fa-solid fa-sign-out-alt"></i>
+              Cerrar Sesión
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botón móvil -->
+      <button class="mobile-menu-btn" (click)="toggleMenu()">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Overlay para móvil -->
+  <div class="navbar-overlay" [class.active]="menuOpen" (click)="closeMenu()"></div>
+</nav>

@@ -1,0 +1,202 @@
+:root{
+  --bg-backdrop: rgba(7, 12, 20, 0.6);
+  --card-bg: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  --glass-border: rgba(255,255,255,0.06);
+  --accent: #6c8cff;        /* color principal */
+  --accent-600: #4163f2;
+  --muted: #9aa4b2;
+  --text: #e6eef8;
+  --danger: #ff6b6b;
+  --radius-lg: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 8px 30px rgba(2,6,23,0.6);
+  --input-height: 44px;
+  --gap: 14px;
+  --max-width: 720px;
+}
+
+/* Backdrop */
+.modal-backdrop{
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: var(--bg-backdrop);
+  z-index: 2000;
+  padding: 28px;
+  backdrop-filter: blur(6px) saturate(120%);
+}
+
+/* Modal card */
+.modal{
+  width: 100%;
+  max-width: var(--max-width);
+  background: var(--card-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  color: var(--text);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  -webkit-font-smoothing: antialiased;
+  transform: translateY(6px);
+  animation: popIn .18s cubic-bezier(.2,.9,.3,1) forwards;
+}
+
+/* Header */
+.modal h2{
+  margin: 0 0 14px 0;
+  font-size: 1.25rem;
+  letter-spacing: -0.2px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* Form grid */
+form{
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--gap);
+  align-items: start;
+}
+
+/* Full-width items (make inputs span 2 columns when needed) */
+.form-group{
+  display: flex;
+  flex-direction: column;
+}
+
+/* allow helper class to force full width */
+.form-group.full{
+  grid-column: 1 / -1;
+}
+
+/* Labels */
+.form-group label{
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+/* Inputs */
+.form-group input[type="text"],
+.form-group input[type="date"],
+.form-group input[type="number"],
+.form-group input[type="email"],
+.form-group input[type="password"]{
+  height: var(--input-height);
+  padding: 0 12px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.04);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  outline: none;
+  transition: box-shadow .15s ease, border-color .12s ease, transform .08s ease;
+  font-size: 0.95rem;
+}
+
+/* Placeholder */
+.form-group input::placeholder{
+  color: rgba(255,255,255,0.16);
+}
+
+/* Focus state (accessible) */
+.form-group input:focus{
+  border-color: var(--accent);
+  box-shadow: 0 6px 18px rgba(65,99,242,0.12), 0 0 0 4px rgba(108,140,255,0.08);
+  transform: translateY(-1px);
+}
+
+/* Disabled / invalid */
+.form-group input:disabled{
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+input.ng-invalid.ng-touched {
+  border-color: var(--danger);
+  box-shadow: 0 4px 14px rgba(255,107,107,0.08);
+}
+
+/* Buttons container */
+.modal-buttons{
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 6px;
+}
+
+/* Buttons */
+.modal-buttons button{
+  min-width: 110px;
+  height: 44px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  letter-spacing: .2px;
+  transition: transform .08s ease, box-shadow .12s ease, opacity .12s ease;
+}
+
+/* Primary */
+.modal-buttons button[type="submit"]{
+  background: linear-gradient(180deg, var(--accent), var(--accent-600));
+  color: white;
+  box-shadow: 0 8px 24px rgba(65,99,242,0.16);
+}
+
+/* Secondary */
+.modal-buttons button[type="button"]{
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid rgba(255,255,255,0.04);
+}
+
+/* Hover states */
+.modal-buttons button:hover:not(:disabled){
+  transform: translateY(-2px);
+}
+
+/* Disabled submit */
+.modal-buttons button:disabled{
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Small screens: stack layout */
+@media (max-width: 720px){
+  form{
+    grid-template-columns: 1fr;
+  }
+  .modal{
+    padding: 18px;
+    border-radius: 10px;
+  }
+  .modal-buttons{
+    justify-content: stretch;
+    flex-direction: column-reverse;
+  }
+  .modal-buttons button{
+    width: 100%;
+  }
+}
+
+/* subtle animation */
+@keyframes popIn{
+  from { opacity: 0; transform: translateY(12px) scale(.995); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce){
+  .modal { animation: none; transform: none; }
+  .modal-buttons button:hover { transform: none; }
+}
+
+/* Small utility classes (optional) */
+.text-muted { color: var(--muted); font-size: .85rem; }
+.w-100 { width: 100%; }
+.mb-6 { margin-bottom: 6px; }

@@ -1,1 +1,137 @@
-<p>proveedores works!</p>
+<!-- Modales -->
+<app-crear-proveedor
+  *ngIf="mostrarCrear"
+  (cancelar)="cancelarCrear()"
+  (proveedorCreado)="onProveedorCreado()">
+</app-crear-proveedor>
+
+<app-editar-proveedor
+  *ngIf="mostrarEditar && proveedorEnEdicion"
+  [proveedor]="proveedorEnEdicion"
+  (cancelar)="cancelarEditar()"
+  (proveedorActualizado)="onProveedorActualizado($event)">
+</app-editar-proveedor>
+
+<!-- Header con botón de crear proveedor -->
+<div *ngIf="!mostrarCrear && !mostrarEditar" class="proveedores-header">
+  <h2>Gestión de Proveedores</h2>
+  <button class="btn-crear-principal" (click)="abrirCrear()">
+    <i class="fa-solid fa-plus"></i>
+    Crear Nuevo Proveedor
+  </button>
+</div>
+
+<!-- Lista de proveedores -->
+<div *ngIf="!mostrarCrear && !mostrarEditar" class="proveedores-container">
+  <!-- Búsqueda -->
+  <div class="search-section">
+    <input
+      [(ngModel)]="search"
+      (ngModelChange)="filter()"
+      placeholder="Buscar proveedor..."
+      class="search-input"
+    />
+  </div>
+
+  <!-- Mensaje cuando no hay proveedores -->
+  <div *ngIf="suppliers.length === 0" class="no-proveedores">
+    <div class="no-proveedores-content">
+      <i class="fa-solid fa-truck"></i>
+      <h3>No hay proveedores registrados</h3>
+      <p>Comienza agregando tu primer proveedor</p>
+    </div>
+  </div>
+
+  <!-- Lista de proveedores existentes -->
+  <div *ngIf="suppliers.length > 0" class="proveedores-lista">
+    <div *ngFor="let supplier of suppliers" class="proveedor-item">
+      <div class="proveedor-info">
+        <div class="proveedor-header">
+          <h3>{{ supplier.name }}</h3>
+          <span class="proveedor-id">ID: {{ supplier.supplier_id }}</span>
+        </div>
+        <div class="proveedor-details">
+          <div class="detail-row" *ngIf="supplier.email">
+            <span class="detail-label">
+              <i class="fa-solid fa-envelope"></i>
+              Email:
+            </span>
+            <span class="detail-value">{{ supplier.email }}</span>
+          </div>
+          <div class="detail-row" *ngIf="supplier.phone">
+            <span class="detail-label">
+              <i class="fa-solid fa-phone"></i>
+              Teléfono:
+            </span>
+            <span class="detail-value">{{ supplier.phone }}</span>
+          </div>
+          <div class="detail-row" *ngIf="supplier.address">
+            <span class="detail-label">
+              <i class="fa-solid fa-map-marker-alt"></i>
+              Dirección:
+            </span>
+            <span class="detail-value">{{ supplier.address }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="acciones">
+        <button class="btn ver" (click)="verProductos(supplier)" title="Ver productos">
+          <i class="fa-solid fa-eye"></i>
+          <span>Productos</span>
+        </button>
+        <button class="btn actualizar" (click)="abrirEditar(supplier)" title="Editar proveedor">
+          <i class="fa-solid fa-edit"></i>
+          <span>Editar</span>
+        </button>
+        <button class="btn eliminar" (click)="eliminarProveedor(supplier)" title="Eliminar proveedor">
+          <i class="fa-solid fa-trash"></i>
+          <span>Eliminar</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Panel de productos del proveedor seleccionado -->
+<div *ngIf="proveedorSeleccionado && !mostrarCrear && !mostrarEditar" class="productos-panel">
+  <div class="productos-header">
+    <h3>Productos de {{ proveedorSeleccionado.name }}</h3>
+    <div class="header-actions">
+      <button class="btn-asociar" (click)="abrirAsociar()">
+        <i class="fa-solid fa-plus"></i> Asociar producto
+      </button>
+      <button class="btn-cerrar" (click)="cerrarProductos()">
+        <i class="fa-solid fa-times"></i>
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="productosProveedor.length === 0" class="no-productos">
+    <p>Este proveedor no tiene productos asociados</p>
+  </div>
+
+  <div *ngIf="productosProveedor.length > 0" class="productos-lista">
+    <div *ngFor="let producto of productosProveedor" class="producto-item">
+      <div class="producto-info">
+        <h4>{{ producto.name }}</h4>
+        <div class="producto-details">
+          <span *ngIf="producto.pivot && producto.pivot.unit_cost !== undefined" class="costo">
+            <strong>Costo:</strong> ${{ producto.pivot.unit_cost }}
+          </span>
+          <span *ngIf="producto.pivot && producto.pivot.supplier_reference" class="referencia">
+            <strong>Ref:</strong> {{ producto.pivot.supplier_reference }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para asociar producto -->
+<app-asociar-producto
+  *ngIf="mostrarAsociar"
+  [proveedor]="proveedorSeleccionado"
+  [productos]="todosLosProductos"
+  (guardar)="asociarProductoDesdeModal($event)"
+  (cancelar)="cancelarAsociar()">
+</app-asociar-producto>

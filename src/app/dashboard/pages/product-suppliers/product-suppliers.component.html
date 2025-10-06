@@ -1,0 +1,85 @@
+<div class="container">
+  <h2>Relaciones Producto-Proveedor</h2>
+
+  <!-- Formulario -->
+  <div class="form-section">
+    <h3>{{ editingId ? 'Editar Relación' : 'Nueva Relación' }}</h3>
+    <form (ngSubmit)="submit()">
+      <div class="form-group">
+        <label for="supplier_id">Proveedor:</label>
+        <select id="supplier_id" name="supplier_id" [(ngModel)]="form.supplier_id" required>
+          <option value="0">Seleccionar proveedor</option>
+          <option *ngFor="let supplier of suppliers" [value]="supplier.supplier_id">
+            {{ supplier.name }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="product_id">Producto:</label>
+        <select id="product_id" name="product_id" [(ngModel)]="form.product_id" required>
+          <option value="0">Seleccionar producto</option>
+          <option *ngFor="let product of products" [value]="product.id">
+            {{ product.name }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="unit_cost">Costo Unitario:</label>
+        <input
+          type="number"
+          id="unit_cost"
+          name="unit_cost"
+          [(ngModel)]="form.unit_cost"
+          step="0.01"
+          placeholder="0.00"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="supplier_reference">Referencia del Proveedor:</label>
+        <input
+          type="text"
+          id="supplier_reference"
+          name="supplier_reference"
+          [(ngModel)]="form.supplier_reference"
+          placeholder="Código del proveedor"
+        />
+      </div>
+
+      <div class="form-actions">
+        <button type="submit">{{ editingId ? 'Actualizar' : 'Crear' }}</button>
+        <button type="button" (click)="resetForm()">Limpiar</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Lista de relaciones -->
+  <div class="list-section">
+    <h3>Relaciones Existentes</h3>
+    <div *ngIf="relationships.length === 0" class="no-data">
+      <p>No hay relaciones registradas</p>
+    </div>
+
+    <div *ngIf="relationships.length > 0" class="relationships-list">
+      <div *ngFor="let rel of relationships" class="relationship-item">
+        <div class="relationship-info">
+          <h4>{{ getProductName(rel.product_id) }} ↔ {{ getSupplierName(rel.supplier_id) }}</h4>
+          <div class="details">
+            <span *ngIf="rel.unit_cost" class="cost">
+              <strong>Costo:</strong> ${{ rel.unit_cost }}
+            </span>
+            <span *ngIf="rel.supplier_reference" class="reference">
+              <strong>Ref. Proveedor:</strong> {{ rel.supplier_reference }}
+            </span>
+          </div>
+        </div>
+        <div class="actions">
+          <button (click)="edit(rel)" class="btn-edit">Editar</button>
+          <button (click)="delete(rel.id!)" class="btn-delete">Eliminar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

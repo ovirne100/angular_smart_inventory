@@ -1,47 +1,80 @@
-// src/app/services/productos.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Producto } from '../../interfaces/producto'; // 👈 interfaz
+import { map } from 'rxjs/operators';
+import { Producto } from '../../interfaces/producto';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProductosService {
-  private apiUrl = 'http://127.0.0.1:8000/api/products'; // 👈 Ajusta según tu backend
+  private apiUrl = 'http://smart_inventory/api/products';
 
   constructor(private http: HttpClient) {}
 
-  // ✅ Obtener todos los productos
-  getProductos(): Observable<Producto[]> {
-    return this.http.get<Producto[]>(this.apiUrl);
+  private getAuthHeaders(): HttpHeaders {
+    const token = localStorage.getItem('token');
+    return new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+      Accept: 'application/json'
+    });
   }
 
-  // ✅ Obtener un producto por ID
-  getProductoById(id: number): Observable<Producto> {
-    return this.http.get<Producto>(`${this.apiUrl}/${id}`);
+  // Obtener todos los productos
+  getProducts(): Observable<Producto[]> {
+    return this.http.get<any>(this.apiUrl, { headers: this.getAuthHeaders() }).pipe(
+      map(response => {
+        const productos = response.data || response;
+        return productos.map((item: any) => ({
+          ...item,
+          categoria: item.categoria || { name: 'Sin categoría' },
+          image_url: item.image ? `http://smart_inventory/${item.image}` : null
+        }));
+      })
+    );
   }
 
-  // ✅ Crear producto
- /*
-  crearProducto(data: Producto): Observable<Producto> {
-    return this.http.post<Producto>(this.apiUrl, data);
-  }
-*/
-//crear producto con auth
-crearProducto(producto: any): Observable<any> {
-  return this.http.post<any>(this.apiUrl, producto);
+// Obtener producto por ID
+getProducto(id: number): Observable<Producto> {
+  return this.http.get<Producto>(`${this.apiUrl}/${id}`, { headers: this.getAuthHeaders() }).pipe(
+    map((p: Producto) => {
+      return {
+        ...p,
+        expiration_date: p.expiration_date ? (p.expiration_date as string).substring(0, 10) : null,
+        image_url: p.image ? `http://smart_inventory/${p.image}` : null
+      };
+    })
+  );
 }
 
-
-
-  // ✅ Actualizar producto
-  actualizarProducto(id: number, data: Producto): Observable<Producto> {
-    return this.http.put<Producto>(`${this.apiUrl}/${id}`, data);
+  // Crear producto
+  crearProducto(producto: Partial<Producto>): Observable<Producto> {
+    return this.http.post<any>(this.apiUrl, producto, { headers: this.getAuthHeaders() }).pipe(
+      map(res => {
+        const p = res.producto || res;
+        return {
+          ...p,
+          categoria: p.categoria || null,
+          image_url: p.image ? `http://smart_inventory/${p.image}` : null
+        };
+      })
+    );
   }
 
-  // ✅ Eliminar producto
+ // Actualizar producto
+actualizarProducto(producto: Producto): Observable<Producto> {
+  return this.http.put<Producto>(`${this.apiUrl}/${producto.id}`, producto, { headers: this.getAuthHeaders() }).pipe(
+    map((p: Producto) => {
+      return {
+        ...p,
+        image_url: p.image ? `http://smart_inventory/${p.image}` : null
+      };
+    })
+  );
+}
+
+  // Eliminar producto
   eliminarProducto(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+    return this.http.delete<void>(`${this.apiUrl}/${id}`, { headers: this.getAuthHeaders() });
   }
 }

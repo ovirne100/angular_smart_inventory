@@ -1,0 +1,84 @@
+<!-- actualizar-producto.component.html -->
+<div class="modal-backdrop">
+  <div class="modal">
+    <h2>Actualizar Producto</h2>
+
+    <form *ngIf="producto" #formProducto="ngForm" (ngSubmit)="guardarCambios()">
+
+      <!-- Nombre -->
+      <div class="form-group">
+        <label for="name">Nombre</label>
+        <input
+          type="text"
+          id="name"
+          name="name"
+          [(ngModel)]="producto.name"
+          required
+        />
+      </div>
+
+      <!-- Referencia -->
+      <div class="form-group">
+        <label for="reference">Referencia</label>
+        <input
+          type="text"
+          id="reference"
+          name="reference"
+          [(ngModel)]="producto.reference"
+        />
+      </div>
+
+      <!-- Unidad de medida -->
+      <div class="form-group">
+        <label for="unit_measurement">Unidad de medida</label>
+        <input
+          type="text"
+          id="unit_measurement"
+          name="unit_measurement"
+          [(ngModel)]="producto.unit_measurement"
+        />
+      </div>
+
+      <!-- Lote -->
+      <div class="form-group">
+        <label for="batch">Lote</label>
+        <input
+          type="text"
+          id="batch"
+          name="batch"
+          [(ngModel)]="producto.batch"
+          required
+        />
+      </div>
+
+      <!-- Fecha de expiración -->
+      <div class="form-group">
+        <label for="expiration_date">Fecha de expiración</label>
+        <input
+          type="date"
+          id="expiration_date"
+          name="expiration_date"
+          [(ngModel)]="producto.expiration_date"
+        />
+      </div>
+
+      <!-- Categoría -->
+      <div class="form-group">
+        <label for="category_id">Categoría</label>
+        <input
+          type="number"
+          id="category_id"
+          name="category_id"
+          [(ngModel)]="producto.category_id"
+        />
+      </div>
+
+      <!-- Botones -->
+      <div class="modal-buttons">
+        <button type="submit" [disabled]="formProducto.invalid">Guardar</button>
+        <button type="button" (click)="cancelar.emit()">Cancelar</button>
+      </div>
+
+    </form>
+  </div>
+</div>

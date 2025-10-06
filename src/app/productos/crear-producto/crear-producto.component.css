@@ -1,105 +1,281 @@
+/* ===== FORMULARIO MODERNO Y RESPONSIVE ===== */
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css');
 
-/* ----- HEADER ----- */
-header {
+:root {
+  --primary-color: #007bff;
+  --danger-color: #e74c3c;
+  --success-color: #2ecc71;
+  --gray-100: #f4f4f4;
+  --gray-300: #dcdcdc;
+  --gray-500: #999;
+  --light-gray: #e0e0e0;
+  --light-blue: #f1f7ff;
+  --white: #fff;
+  --border-radius: 8px;
+  --shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* === CONTENEDOR PRINCIPAL === */
+.crear-producto-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2rem;
+  background-color: var(--gray-100);
+  min-height: 100vh;
+}
+.info-img{
+  display: flex;
+}
+/* === CARD PRINCIPAL === */
+.crear-producto-card {
+  background: var(--white);
+  box-shadow: var(--shadow);
+  border-radius: 16px;
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 950px;
+  transition: all 0.3s ease;
+}
+
+.crear-producto-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
+}
+
+/* === ENCABEZADO === */
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.header h2 {
+  color: var(--primary-color);
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.header p {
+  color: var(--gray-500);
+  font-size: 1rem;
+}
+
+/* === FORMULARIO === */
+.form-producto {
+  width: 100%;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+/* === CAMPOS === */
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* === CAMPOS === */
+.form-input {
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--light-gray);
+  border-radius: var(--border-radius);
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  color: #333; /* Asegura que el texto sea oscuro y legible */
+  background-color: var(--white);
+}
+
+.form-input::placeholder {
+  color: var(--gray-500); /* Placeholder más visible pero sutil */
+  opacity: 1; /* Garantiza que no se vea muy transparente */
+}
+
+.form-input:focus {
+  border-color: var(--primary-color);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+
+
+/* === SELECT DE CATEGORÍAS === */
+.category-select-container {
+  position: relative;
+  width: 100%;
+}
+
+.category-search {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--light-gray);
+  border-radius: var(--border-radius);
+  font-size: 1rem;
+  background: var(--white);
+  transition: all 0.3s ease;
+}
+
+.category-search:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+
+/* === Dropdown con scroll mejorado === */
+.category-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: var(--white);
+  border: 2px solid var(--light-gray);
+  border-radius: 0.5rem;
+  max-height: 220px;
+  overflow-y: auto;
+  z-index: 1000;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary-color) var(--light-gray);
+}
+
+/* Scrollbar personalizado */
+.category-dropdown::-webkit-scrollbar {
+  width: 8px;
+}
+
+.category-dropdown::-webkit-scrollbar-thumb {
+  background-color: var(--primary-color);
+  border-radius: 10px;
+}
+
+.category-option {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  border-bottom: 1px solid var(--gray-100);
+  transition: background 0.2s;
+}
+
+.category-option:hover {
+  background: var(--light-blue);
+  color: var(--primary-color);
+}
+
+.category-id {
+  background: var(--primary-color);
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-right: 0.75rem;
+}
+
+.selected-category {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px;
+  background: var(--light-blue);
+  border: 2px solid var(--primary-color);
+  border-radius: var(--border-radius);
+  margin-top: 0.5rem;
+  padding: 0.75rem 1rem;
 }
 
-header h2 {
-  font-size: 28px;
-  font-weight: 600;
-  margin: 0;
+.selected-id {
+  background: var(--primary-color);
+  color: #fff;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  margin-right: 0.75rem;
 }
 
-.codigo_barra {
-  font-size: 40px;
-  color: #333;
+.clear-category {
+  background: var(--danger-color);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 1.5rem;
+  height: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s ease;
 }
 
-/* ----- FORMULARIO ----- */
-.crear-producto {
+.clear-category:hover {
+  transform: scale(1.1);
+}
+
+/* === BOTONES DE ACCIÓN (debajo de fecha de vencimiento) === */
+.form-actions {
+  grid-column: 1 / -1;
   display: flex;
   justify-content: center;
-  padding: 40px;
-  font-family: 'Poppins', sans-serif;
-  background-color: #f9f9f9;
+  gap: 1.5rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid var(--gray-100);
 }
 
-.crear-producto form {
-  background: #fff;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  max-width: 600px;
-  width: 100%;
-}
-
-.crear-producto label {
-  font-weight: 500;
-  color: #333;
-  display: flex;
-  flex-direction: column;
-  font-size: 14px;
-}
-
-.crear-producto input {
-  padding: 10px 14px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 14px;
-  margin-top: 5px;
-}
-
-.crear-producto button {
-  background-color: #d4af37;
-  border: none;
-  padding: 12px;
-  font-weight: bold;
-  border-radius: 8px;
+.btn-guardar,
+.btn-cancelar {
+  padding: 0.9rem 2rem;
+  border-radius: var(--border-radius);
+  font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.crear-producto button:hover {
-  background-color: #c39d2c;
-  color: white;
+  transition: all 0.3s ease;
+  border: none;
 }
 
 .btn-guardar {
-  width: 100%;
+  background: var(--primary-color);
+  color: var(--white);
 }
 
-/* ----- RESPONSIVE ----- */
-@media(max-width:768px) {
-  .crear-producto {
-    padding: 20px;
+.btn-guardar:hover {
+  background: #0056b3;
+  transform: translateY(-1px);
+}
+
+.btn-cancelar {
+  background: var(--danger-color);
+  color: var(--white);
+}
+
+.btn-cancelar:hover {
+  background: #c0392b;
+  transform: translateY(-1px);
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+  .crear-producto-card {
+    padding: 1.5rem;
   }
 
-  .crear-producto form {
-    padding: 20px;
+  .form-actions {
+    flex-direction: column;
+    align-items: stretch;
   }
 
-  .crear-producto input {
-    padding: 8px;
-    margin-bottom: 10px;
-  }
-
-  .btn-guardar {
+  .btn-guardar,
+  .btn-cancelar {
     width: 100%;
-    padding: 10px;
-  }
-
-  header h2 {
-    font-size: 20px;
-  }
-
-  .codigo_barra {
-    font-size: 28px;
   }
 }

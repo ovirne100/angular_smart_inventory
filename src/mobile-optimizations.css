@@ -1,0 +1,314 @@
+/* ===== OPTIMIZACIONES MÓVILES ESPECÍFICAS ===== */
+
+/* Viewport y configuración base para móviles */
+@media (max-width: 768px) {
+  /* Ajustes para el body en móviles */
+  body {
+    padding-top: 60px; /* Altura del navbar móvil */
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* Mejoras de touch para botones */
+  .btn, button, .nav-link, .sidebar-toggle {
+    min-height: 44px; /* Tamaño mínimo recomendado para touch */
+    min-width: 44px;
+    padding: 12px 16px;
+  }
+
+  /* Mejoras de scroll en móviles */
+  .productos-container,
+  .sidebar,
+  .navbar-menu {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+
+  /* Optimización de animaciones para móviles */
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  /* Mejoras de rendimiento */
+  .producto-item,
+  .nav-link,
+  .btn {
+    will-change: transform;
+    backface-visibility: hidden;
+    perspective: 1000px;
+  }
+
+  /* Optimización de fuentes para móviles */
+  h1, h2, h3, h4, h5, h6 {
+    font-size: clamp(1.2rem, 4vw, 2rem);
+    line-height: 1.3;
+  }
+
+  p, span, div {
+    font-size: clamp(0.9rem, 3vw, 1rem);
+  }
+}
+
+/* Optimizaciones específicas para pantallas muy pequeñas */
+@media (max-width: 480px) {
+  /* Ajustes de espaciado */
+  .container {
+    padding: 0 1rem;
+  }
+
+  /* Botones más grandes para touch */
+  .btn {
+    min-height: 48px;
+    font-size: 1rem;
+    padding: 14px 20px;
+  }
+
+  /* Mejoras en formularios */
+  .form-input {
+    min-height: 48px;
+    font-size: 16px; /* Previene zoom en iOS */
+    padding: 14px 16px;
+  }
+
+  /* Optimización de grid para móviles */
+  .productos-lista {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  /* Mejoras en tarjetas */
+  .producto-item {
+    margin: 0;
+    border-radius: 12px;
+  }
+
+  .producto-info {
+    padding: 1.5rem;
+  }
+
+  .acciones {
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1rem;
+  }
+
+  .acciones .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Optimizaciones para tablets */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .productos-lista {
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 2rem;
+  }
+
+  .navbar-container {
+    padding: 0 2rem;
+  }
+
+  .sidebar {
+    width: 260px;
+  }
+}
+
+/* Mejoras de accesibilidad móvil */
+@media (max-width: 768px) {
+  /* Focus visible mejorado */
+  *:focus-visible {
+    outline: 3px solid var(--primary-color);
+    outline-offset: 2px;
+  }
+
+  /* Mejoras de contraste */
+  .nav-link,
+  .btn,
+  .form-input {
+    border: 2px solid transparent;
+  }
+
+  .nav-link:focus,
+  .btn:focus,
+  .form-input:focus {
+    border-color: var(--primary-color);
+  }
+}
+
+/* Optimizaciones de rendimiento */
+@media (max-width: 768px) {
+  /* Reducir animaciones complejas en móviles */
+  .producto-item::after,
+  .btn::before,
+  .nav-link::before {
+    display: none;
+  }
+
+  /* Simplificar efectos hover en móviles */
+  .producto-item:hover {
+    transform: translateY(-2px);
+  }
+
+  .btn:hover {
+    transform: translateY(-1px);
+  }
+}
+
+/* Mejoras de scroll y navegación */
+@media (max-width: 768px) {
+  /* Scroll suave */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Mejoras en el navbar móvil */
+  .navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+  }
+
+  /* Sidebar móvil optimizado */
+  .sidebar {
+    position: fixed;
+    top: 60px;
+    left: 0;
+    height: calc(100vh - 60px);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+
+  .sidebar.mobile-open {
+    transform: translateX(0);
+  }
+}
+
+/* Optimizaciones de carga */
+@media (max-width: 768px) {
+  /* Lazy loading visual */
+  .producto-item {
+    opacity: 0;
+    animation: fadeInUp 0.6s ease forwards;
+  }
+
+  /* Reducir efectos de sombra en móviles */
+  .producto-item,
+  .card,
+  .btn {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .producto-item:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+}
+
+/* Mejoras de tipografía móvil */
+@media (max-width: 768px) {
+  /* Ajustes de tamaño de fuente responsivos */
+  .brand-title {
+    font-size: clamp(1.2rem, 5vw, 1.8rem);
+  }
+
+  .producto-header h3 {
+    font-size: clamp(1.1rem, 4vw, 1.4rem);
+  }
+
+  .nav-text {
+    font-size: clamp(0.9rem, 3vw, 1rem);
+  }
+
+  /* Mejoras en botones */
+  .btn {
+    font-size: clamp(0.85rem, 3vw, 0.9rem);
+  }
+}
+
+/* Optimizaciones de memoria */
+@media (max-width: 768px) {
+  /* Reducir el uso de pseudo-elementos complejos */
+  .producto-item::before,
+  .producto-item::after {
+    content: none;
+  }
+
+  /* Simplificar gradientes */
+  .btn-primary,
+  .btn-guardar {
+    background: var(--primary-color);
+  }
+
+  .btn-primary:hover,
+  .btn-guardar:hover {
+    background: var(--primary-dark);
+  }
+}
+
+/* Mejoras de usabilidad táctil */
+@media (max-width: 768px) {
+  /* Área de toque mínima */
+  .nav-link,
+  .btn,
+  .sidebar-toggle,
+  .notification-btn {
+    min-height: 44px;
+    min-width: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Espaciado entre elementos táctiles */
+  .acciones .btn + .btn {
+    margin-top: 0.5rem;
+  }
+
+  .nav-item + .nav-item {
+    margin-top: 0.25rem;
+  }
+}
+
+/* Optimizaciones de red */
+@media (max-width: 768px) {
+  /* Preload de fuentes críticas */
+  @font-face {
+    font-family: 'Inter';
+    font-display: swap;
+  }
+
+  /* Optimización de imágenes */
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* Mejoras de batería */
+@media (max-width: 768px) {
+  /* Reducir animaciones en modo de ahorro de batería */
+  @media (prefers-reduced-motion: reduce) {
+    .producto-item,
+    .btn,
+    .nav-link {
+      animation: none;
+      transition: none;
+    }
+  }
+
+  /* Optimización de GPU */
+  .producto-item,
+  .btn,
+  .sidebar {
+    transform: translateZ(0);
+    will-change: auto;
+  }
+}
+
