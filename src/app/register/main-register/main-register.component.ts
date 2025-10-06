@@ -76,13 +76,11 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { RolesService } from '../../services/roles.service';
-import { NabvarComponent } from '../nabvar/nabvar.component';
-import { FooterComponent } from '../footer/footer.component';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, NabvarComponent, FooterComponent],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './main-register.component.html',
   styleUrls: ['./main-register.component.css']
 })

@@ -1,1 +1,50 @@
-<p>alertas works!</p>
+<div class="alertas-container">
+  <h2>⚠️ Gestión de Alertas</h2>
+
+  <div class="filter-buttons">
+    <button (click)="loadAlerts('all')" [class.active]="selected === 'all'">Todas</button>
+    <button (click)="loadAlerts('low_stock')" [class.active]="selected === 'low_stock'">Stock Bajo</button>
+    <button (click)="loadAlerts('critical')" [class.active]="selected === 'critical'">Críticas</button>
+    <button (click)="loadAlerts('resolved')" [class.active]="selected === 'resolved'">Resueltas</button>
+    <button class="refresh-btn" (click)="refresh()">🔄 Refrescar</button>
+  </div>
+
+  <div *ngIf="loading" class="loading">⏳ Cargando alertas...</div>
+
+  <div *ngIf="!loading && viewAlerts.length > 0; else noAlerts">
+    <div class="alerts-grid">
+      <div *ngFor="let alert of viewAlerts" class="alert-card"
+           [ngClass]="{
+             'low-stock': (alert.alert_type || '').toLowerCase() === 'low_stock',
+             'critical': (alert.alert_type || '').toLowerCase() === 'critical',
+             'resolved': (alert.status || '').toLowerCase() === 'resolved'
+           }">
+
+        <div class="alert-header">
+          <span class="badge">{{ getAlertBadgeText(alert) }}</span>
+        </div>
+
+        <div class="alert-body">
+          <!-- 🏷️ Nombre del producto -->
+          <p class="product-name">
+            🏷️ <strong>{{ alert.inventory?.product?.name || 'Producto desconocido' }}</strong>
+          </p>
+
+          <!-- Mensaje de la alerta -->
+          <p class="message">{{ alert.message || 'Sin mensaje' }}</p>
+
+          <!-- Fecha -->
+          <small class="date">📅 {{ alert.created_at | date:'short' }}</small>
+        </div>
+
+        <div class="alert-footer" *ngIf="(alert.status || '').toLowerCase() === 'active'">
+          <button class="resolve-btn" (click)="goToMovements(alert)">📦 Gestionar Entrada</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #noAlerts>
+    <p class="no-alerts">✅ No hay alertas disponibles.</p>
+  </ng-template>
+</div>

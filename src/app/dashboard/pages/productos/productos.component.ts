@@ -48,7 +48,7 @@ export class ProductosComponent implements OnInit {
     icono1: 'fas fa-eraser borrador-rosado',
     icono2: 'fas fa-eraser borrador-gris',
     icono3: 'fas fa-eraser borrador-naranja',
-  
+
   },
   {
     id:4,
@@ -59,7 +59,7 @@ export class ProductosComponent implements OnInit {
     icono1: 'fas fa-ruler regla-amarilla',
     icono2: 'fas fa-ruler-horizontal regla-gris',
     icono3: 'fas fa-ruler-combined regla-verde',
-  
+
   }
 ];
 

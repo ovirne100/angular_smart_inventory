@@ -8,7 +8,7 @@ import { Producto } from '../../interfaces/producto'; // 👈 interfaz
   providedIn: 'root'
 })
 export class ProductosService {
-  private apiUrl = 'http://127.0.0.1:8000/api/products'; // 👈 Ajusta según tu backend
+  private apiUrl = 'http://SMART_INVENTORY.api.test/api/products';
 
   constructor(private http: HttpClient) {}
 
