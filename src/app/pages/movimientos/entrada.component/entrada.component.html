@@ -1,0 +1,25 @@
+<h3>Nueva Entrada de Producto</h3>
+<form (ngSubmit)="guardarEntrada()">
+  <label>Producto ID:</label>
+  <input [(ngModel)]="entrada.product_id" name="product_id" required />
+
+  <label>Cantidad:</label>
+  <input type="number" [(ngModel)]="entrada.quantity" name="quantity" required />
+
+  <label>Unidad:</label>
+  <input [(ngModel)]="entrada.unit" name="unit" />
+
+  <label>Lote:</label>
+  <input [(ngModel)]="entrada.lot" name="lot" />
+
+  <label>Proveedor ID:</label>
+  <input [(ngModel)]="entrada.supplier_id" name="supplier_id" required />
+
+  <label>Usuario ID:</label>
+  <input [(ngModel)]="entrada.user_id" name="user_id" required />
+
+  <label>Inventario ID:</label>
+  <input [(ngModel)]="entrada.inventory_id" name="inventory_id" required />
+
+  <button type="submit">Guardar Entrada</button>
+</form>

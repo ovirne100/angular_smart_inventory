@@ -1,0 +1,66 @@
+<div class="form-container">
+  <button (click)="toggleForm()" class="btn-toggle">➕ Nueva Entrada</button>
+
+  <div *ngIf="successMessage" class="alert success">{{ successMessage }}</div>
+  <div *ngIf="errorMessage" class="alert error">{{ errorMessage }}</div>
+  <div *ngIf="warningMessage" class="alert warning">{{ warningMessage }}</div>
+
+  <form *ngIf="showForm" [formGroup]="entradaForm" (ngSubmit)="onSubmit()" class="form-box" novalidate>
+    <h3>📥 Registrar Entrada</h3>
+
+    <!-- Producto -->
+    <div class="form-group">
+      <label>Producto *</label>
+      <select formControlName="product_id">
+        <option value="">Seleccione un producto</option>
+        <option *ngFor="let p of productos" [value]="p.id">{{ p.name }}</option>
+      </select>
+    </div>
+
+    <!-- Cantidad -->
+    <div class="form-group">
+      <label>Cantidad *</label>
+      <input type="number" formControlName="quantity" placeholder="Ej: 50" />
+    </div>
+
+    <!-- Unidad -->
+    <div class="form-group">
+      <label>Unidad</label>
+      <input type="text" formControlName="unit" placeholder="unidad, caja, paquete..." />
+    </div>
+
+    <!-- Lote -->
+    <div class="form-group">
+      <label>Lote</label>
+      <input type="text" formControlName="lot" placeholder="Ej: L-2025-A" />
+    </div>
+
+    <!-- Proveedor -->
+    <div class="form-group">
+      <label>Proveedor *</label>
+      <select formControlName="supplier_id">
+        <option value="">Seleccione un proveedor</option>
+        <option *ngFor="let s of proveedores" [value]="s.id">{{ s.name }}</option>
+      </select>
+    </div>
+
+    <!-- Usuario -->
+    <div class="form-group">
+      <label>Usuario *</label>
+      <select formControlName="user_id">
+        <option value="">Seleccione un usuario</option>
+        <option *ngFor="let u of usuarios" [value]="u.id">{{ u.name }}</option>
+      </select>
+    </div>
+
+    <!-- Inventario -->
+    <div class="form-group">
+      <label>Inventario ID *</label>
+      <input type="number" formControlName="inventory_id" placeholder="Ej: 1" />
+    </div>
+
+    <button type="submit" class="btn-submit" [disabled]="saving">
+      {{ saving ? 'Guardando...' : '✅ Guardar' }}
+    </button>
+  </form>
+</div>
