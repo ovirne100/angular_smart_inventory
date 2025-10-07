@@ -1,0 +1,144 @@
+.alertas-container {
+  background: #f9fafb;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.05);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.alertas-container h2 {
+  margin-bottom: 20px;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.filter-buttons {
+  margin-bottom: 25px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.filter-buttons button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  background: #e5e7eb;
+  color: #111827;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.filter-buttons button:hover {
+  background: #d1d5db;
+}
+
+.filter-buttons button.active {
+  background: #2563eb;
+  color: #fff;
+}
+
+.refresh-btn {
+  background: #10b981 !important;
+  color: white !important;
+}
+
+.refresh-btn:hover {
+  background: #059669 !important;
+}
+
+.loading {
+  text-align: center;
+  font-size: 1.1rem;
+  color: #6b7280;
+}
+
+.alerts-grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+.alert-card {
+  background: white;
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease;
+}
+
+.alert-card:hover {
+  transform: translateY(-3px);
+}
+
+.alert-header {
+  margin-bottom: 10px;
+}
+
+.badge {
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #fff;
+}
+
+.low-stock .badge {
+  background: #f59e0b;
+}
+
+.critical .badge {
+  background: #ef4444;
+}
+
+.resolved .badge {
+  background: #10b981;
+}
+
+.alert-body .message {
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0 0 5px 0;
+  color: #1f2937;
+}
+
+.date {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.alert-footer {
+  margin-top: 12px;
+}
+
+.resolve-btn {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  background: #2563eb;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.resolve-btn:hover {
+  background: #1e40af;
+}
+
+.no-alerts {
+  text-align: center;
+  font-size: 1rem;
+  color: #6b7280;
+  padding: 25px;
+}
+.product-name {
+  font-size: 1rem;
+  color: #2b2b2b;
+  margin-bottom: 5px;
+}

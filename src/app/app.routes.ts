@@ -1,4 +1,3 @@
-/*
 import { Routes } from '@angular/router';
 import { MainLoginComponent } from './login/main-login/main-login.component';
 import { MainRegisterComponent } from './register/main-register/main-register.component';
@@ -19,7 +18,7 @@ import { Routes } from '@angular/router';
 import { MainLoginComponent } from './login/main-login/main-login.component';
 import { MainRegisterComponent } from './register/main-register/main-register.component';
 
-// Dashboard y sus páginas
+// 📊 Dashboard principal y sus páginas
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { InicioComponent } from './dashboard/pages/inicio/inicio.component';
 import { ProductosComponent } from './dashboard/pages/productos/productos.component';
@@ -34,8 +33,12 @@ import { VerMasProductoComponent } from './productos/ver-mas-producto/ver-mas-pr
 
 
 
+// 🚚 Submódulos de movimientos
+import { EntradaComponent } from './dashboard/pages/movimientos/entrada/entrada.component';
+import { SalidaComponent } from './dashboard/pages/movimientos/salida/salida.component';
+
 export const routes: Routes = [
-  // Rutas públicas
+  // ✅ Rutas públicas
   { path: 'register', component: MainRegisterComponent },
   { path: 'login', component: MainLoginComponent },
 
@@ -44,6 +47,7 @@ export const routes: Routes = [
     path: 'dashboard',
     component: DashboardComponent,
     children: [
+      // Página principal del dashboard
       { path: 'inicio', component: InicioComponent },
       {
         path: 'productos',
@@ -55,10 +59,24 @@ export const routes: Routes = [
         ]
       },
       { path: 'alertas', component: AlertasComponent },
-      { path: 'movimientos', component: MovimientosComponent },
+
+      // 📦 Módulo de movimientos (con hijos)
+      {
+        path: 'movimientos',
+        component: MovimientosComponent,
+        children: [
+          { path: 'entradas', component: EntradaComponent },
+          { path: 'salidas', component: SalidaComponent },
+          { path: '', redirectTo: 'entradas', pathMatch: 'full' } // Default
+        ]
+      },
+
+      // Módulo de proveedores
       { path: 'proveedores', component: ProveedoresComponent },
       { path: 'product-suppliers', component: ProductSuppliersComponent },
       { path: 'informes', component: InformesComponent },
+
+      // Redirección interna al inicio del dashboard
       { path: '', redirectTo: 'inicio', pathMatch: 'full' }
     ]
   },

@@ -1,0 +1,62 @@
+<div class="form-container">
+  <div class="btn-container">
+    <button class="btn-toggle" type="button" (click)="toggleFormulario()">
+      ➖ Nueva Salida
+    </button>
+  </div>
+
+  <!-- Formulario solo se muestra si mostrarFormulario es true -->
+  <div class="form-box" *ngIf="mostrarFormulario">
+    <h4>📦 Registrar Salida</h4>
+
+    <form [formGroup]="salidaForm" (ngSubmit)="registrarSalida()">
+      <div class="form-group">
+        <label for="product_id">Producto *</label>
+        <select id="product_id" formControlName="product_id">
+          <option value="">Seleccione un producto</option>
+          <option *ngFor="let producto of productos" [value]="producto.id">
+            {{ producto.name }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="quantity">Cantidad *</label>
+        <input type="number" id="quantity" formControlName="quantity" placeholder="Ej: 10" />
+      </div>
+
+      <div class="form-group">
+        <label for="unit">Unidad</label>
+        <input type="text" id="unit" formControlName="unit" placeholder="unidad, caja, paquete..." />
+      </div>
+
+      <div class="form-group">
+        <label for="lot">Motivo o destino *</label>
+        <input type="text" id="lot" formControlName="lot" placeholder="Ej: venta, traslado, devolución..." />
+      </div>
+
+      <div class="form-group">
+        <label for="user_id">Usuario *</label>
+        <select id="user_id" formControlName="user_id">
+          <option value="">Seleccione un usuario</option>
+          <option *ngFor="let usuario of usuarios" [value]="usuario.id">
+            {{ usuario.name }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="inventory_id">Inventario ID *</label>
+        <input type="number" id="inventory_id" formControlName="inventory_id" placeholder="Ej: 1" />
+      </div>
+
+      <button type="submit" class="btn-submit" [disabled]="salidaForm.invalid">
+        💾 Guardar
+      </button>
+
+      <div *ngIf="mensaje" class="alert" [ngClass]="tipoMensaje">
+        {{ mensaje }}
+      </div>
+    </form>
+  </div>
+</div>
