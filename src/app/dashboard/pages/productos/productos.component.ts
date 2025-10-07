@@ -1,65 +1,86 @@
 
+/*
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms'; // 👈 IMPORTANTE
+import { FormsModule } from '@angular/forms';
 import { ProductosService } from '../../../services/productos/products.service';
 import { Producto } from '../../../interfaces/producto';
 import { CrearProductoComponent } from '../../../productos/crear-producto/crear-producto.component';
+import { ActualizarProductoComponent } from '../../../productos/actualizar-producto/actualizar-producto.component';
+import { VerMasProductoComponent } from '../../../productos/ver-mas-producto/ver-mas-producto.component';
 
 @Component({
   selector: 'app-productos',
   standalone: true,
-  imports: [CommonModule, FormsModule, CrearProductoComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    CrearProductoComponent,
+    ActualizarProductoComponent,
+    VerMasProductoComponent
+  ],
   templateUrl: './productos.component.html',
   styleUrls: ['./productos.component.css']
 })
 export class ProductosComponent implements OnInit {
 
   terminoBusqueda: string = '';
-  mostrarCrear: boolean = false; // 👈 inicia en false para mostrar lista
 
-  productos: Producto[] = [
+  // Modales
+mostrarCrear = false;    // 🔹 para actualizar
+mostrarVerMas = false;          // 🔹 para ver más
+productoEnEdicion: Producto | null = null;
+productoEnDetalle: Producto | null = null;
+mostrarEditar: boolean = false;
+
+productos: Producto[] = [
   {
-    id:1,
-    name: 'Bolígrafo Carton Mini',
-    unit_of_measure: 'pieza',
-    batch: 'A001',
-    expiration_date: '2025-06-29',
-    icono1: 'fas fa-pen pen black',
-    icono2: 'fas fa-pen pen blue',
-    icono3: 'fas fa-pen pen red'
+    id: 1,
+    category_id: 1,
+    name: 'Laptop Dell',
+    reference: 'LD1234',
+    unit_measurement: 'unidad',
+    batch: 'B001',
+    expiration_date: null,
+    icono1: '💻',
+    icono2: '🔋',
+    icono3: '🖱️'
   },
   {
-    id:2,
-    name: 'Cuaderno Escolar',
-    unit_of_measure: 'pieza',
+    id: 2,
+    category_id: 2,
+    name: 'Mouse Logitech',
+    reference: 'ML5678',
+    unit_measurement: 'unidad',
     batch: 'B002',
-    expiration_date: '2025-09-15',
-    icono1: 'fas fa-book cuaderno-azul',
-    icono2: 'fas fa-book-open cuaderno-verde',
-    icono3: 'fas fa-journal-whills cuaderno-rojo'
+    expiration_date: null,
+    icono1: '🖱️',
+    icono2: '⚡',
+    icono3: '🔧'
   },
   {
-    id:3,
-    name: 'Borrador Escolar',
-    unit_of_measure: 'pieza',
-    batch: 'C003',
-    expiration_date: '2025-06-29',
-    icono1: 'fas fa-eraser borrador-rosado',
-    icono2: 'fas fa-eraser borrador-gris',
-    icono3: 'fas fa-eraser borrador-naranja',
-
+    id: 3,
+    category_id: 3,
+    name: 'Teclado Mecánico',
+    reference: 'TM9012',
+    unit_measurement: 'unidad',
+    batch: 'B003',
+    expiration_date: null,
+    icono1: '⌨️',
+    icono2: '🎹',
+    icono3: '⚡'
   },
   {
-    id:4,
-    name: 'Regla Escolar',
-    unit_of_measure: 'pieza',
-    batch: 'D004',
-    expiration_date: '2025-06-29',
-    icono1: 'fas fa-ruler regla-amarilla',
-    icono2: 'fas fa-ruler-horizontal regla-gris',
-    icono3: 'fas fa-ruler-combined regla-verde',
-
+    id: 4,
+    category_id: 4,
+    name: 'Monitor 24"',
+    reference: 'M24123',
+    unit_measurement: 'unidad',
+    batch: 'B004',
+    expiration_date: null,
+    icono1: '🖥️',
+    icono2: '🔌',
+    icono3: '📺'
   }
 ];
 
@@ -70,63 +91,122 @@ export class ProductosComponent implements OnInit {
     this.cargarProductos();
   }
 
-  cargarProductos() {
-    // De momento no tocamos this.mostrarCrear
-    // Más adelante aquí se puede consumir la API:
-    // this.productosService.getProductos().subscribe((res) => this.productos = res);
-  }
+  // =========================
+  // Cargar productos desde API
+  // =========================
+cargarProductos() {
+  this.productosService.getProductos().subscribe({
+    next: res => {
+      // aquí res ya es un array
+      this.productos = Array.isArray(res) ? res : [];
+    },
+    error: err => console.error('Error cargando productos', err)
+  });
+}
 
- // 👉 llamado por el botón "Crear producto"
-  cargarCrearProducto() {
-    this.mostrarCrear = true;
-  }
 
-  // 👉 llamado por (cancelar) del <app-crear-producto>
-  cancelarCrearProducto() {
-    this.mostrarCrear = false;
-    this.cargarProductos(); // refresca lista después de crear
-  }
-  actualizarProducto(producto: Producto) {
-    console.log('Actualizar producto', producto);
-  }
+  // =========================
+  // Crear producto
+  // =========================
+  cargarCrearProducto() { this.mostrarCrear = true; }
+  cancelarCrearProducto() { this.mostrarCrear = false; }
 
+  // =========================
+  // Actualizar producto
+  // =========================
+onProductoActualizado(producto: Producto) {
+  // Llamar al servicio para actualizar en la DB
+  this.productosService.actualizarProducto(producto).subscribe({
+    next: (res) => {
+      console.log('Producto actualizado:', res);
+      this.cargarProductos();    // recargar la lista de productos
+      this.cerrarEditar();       // cerrar el modal
+    },
+    error: (err) => console.error('Error actualizando producto', err)
+  });
+}
+
+
+abrirEditar(producto: Producto) {
+  this.productoEnEdicion = { ...producto }; // clonar para no modificar directamente la lista
+  this.mostrarEditar = true;
+}
+cerrarEditar() {
+  this.mostrarEditar = false;
+  this.productoEnEdicion = null;
+}
+
+
+
+  // =========================
+  // Ver más producto
+  // =========================
+
+abrirVerMas(producto: Producto) {
+  this.productoEnDetalle = producto;
+  this.mostrarVerMas = true;
+}
+
+cerrarVerMas() {
+  this.mostrarVerMas = false;
+  this.productoEnDetalle = null;
+}
+  // =========================
+  // Eliminar producto
+  // =========================
   eliminarProducto(producto: Producto) {
-    if (confirm(`¿Seguro que deseas eliminar el producto ${producto.name}?`)) {
-      if (producto.id) {
-        this.productosService.eliminarProducto(producto.id).subscribe({
-          next: () => {
-            console.log('Producto eliminado');
-            this.cargarProductos();
-          },
-          error: (err) => console.error('Error al eliminar', err)
-        });
-      }
+    if (!producto.id) return;
+    if (confirm(`¿Seguro que deseas eliminar el producto "${producto.name}"?`)) {
+      this.productosService.eliminarProducto(producto.id).subscribe({
+        next: () => this.cargarProductos(),
+        error: err => console.error('Error al eliminar', err)
+      });
     }
   }
 
-  verMas(producto: Producto) {
-    console.log('Ver más detalles', producto);
+  // =========================
+  // Filtrar búsqueda
+  // =========================
+  get productosFiltrados() {
+    if (!this.terminoBusqueda) return this.productos;
+    return this.productos.filter(p => p.name.toLowerCase().includes(this.terminoBusqueda.toLowerCase()));
   }
 }
-/*
+*/
+
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProductosService } from '../../../services/productos/products.service';
 import { Producto } from '../../../interfaces/producto';
 import { CrearProductoComponent } from '../../../productos/crear-producto/crear-producto.component';
+import { ActualizarProductoComponent } from '../../../productos/actualizar-producto/actualizar-producto.component';
+import { VerMasProductoComponent } from '../../../productos/ver-mas-producto/ver-mas-producto.component';
 
 @Component({
   selector: 'app-productos',
-  standalone: true,
-  imports: [CommonModule, FormsModule, CrearProductoComponent],
   templateUrl: './productos.component.html',
-  styleUrls: ['./productos.component.css']
+ imports: [
+    CommonModule,
+    FormsModule,
+    CrearProductoComponent,
+    ActualizarProductoComponent,
+    VerMasProductoComponent
+  ],
+
 })
 export class ProductosComponent implements OnInit {
+
   productos: Producto[] = [];
-  mostrarCrear: boolean = false;
-  terminoBusqueda: string = '';
+  productosFiltrados: Producto[] = [];
+
+  // Modales
+  mostrarCrear = false;
+  mostrarEditar = false;
+  mostrarVerMas = false;
+
+  productoEnEdicion: Producto | null = null;
+  productoEnDetalle: Producto | null = null;
 
   constructor(private productosService: ProductosService) {}
 
@@ -134,37 +214,71 @@ export class ProductosComponent implements OnInit {
     this.cargarProductos();
   }
 
+  // Cargar productos desde la DB
   cargarProductos() {
-    this.productosService.getProductos().subscribe({
-      next: (data) => this.productos = data,
+    this.productosService.getProducts().subscribe({
+      next: (res: Producto[]) => {
+        this.productos = res; // ✅ Datos reales desde la API
+        this.productosFiltrados = [...this.productos];
+      },
       error: (err) => console.error('Error al cargar productos', err)
     });
   }
 
+  // Abrir modal de edición
+  abrirEditar(producto: Producto) {
+    this.productoEnEdicion = { ...producto }; // Hacemos copia
+    this.mostrarEditar = true;
+  }
+
+  cerrarEditar() {
+    this.mostrarEditar = false;
+    this.productoEnEdicion = null;
+  }
+
+  onProductoActualizado(producto: Producto) {
+    // Actualizamos la lista local y cerramos modal
+    this.cargarProductos();
+    this.cerrarEditar();
+  }
+
+  // Abrir modal Ver Más
+  abrirVerMas(producto: Producto) {
+    this.productoEnDetalle = producto;
+    this.mostrarVerMas = true;
+  }
+
+  cerrarVerMas() {
+    this.mostrarVerMas = false;
+    this.productoEnDetalle = null;
+  }
+
+  // Abrir modal Crear
   cargarCrearProducto() {
     this.mostrarCrear = true;
-  }
-
-  actualizarProducto(producto: Producto) {
-    console.log('Actualizar producto', producto);
-  }
-
-  eliminarProducto(producto: Producto) {
-    if (!producto.id) return;
-    if (confirm(`¿Seguro que deseas eliminar ${producto.nombre}?`)) {
-      this.productosService.eliminarProducto(producto.id).subscribe({
-        next: () => this.cargarProductos(),
-        error: (err) => console.error('Error al eliminar', err)
-      });
-    }
-  }
-
-  verMas(producto: Producto) {
-    console.log('Ver más detalles', producto);
   }
 
   cancelarCrearProducto() {
     this.mostrarCrear = false;
   }
+
+  // Eliminar producto
+  eliminarProducto(producto: Producto) {
+    if (!confirm(`¿Deseas eliminar el producto ${producto.name}?`)) return;
+    this.productosService.eliminarProducto(producto.id!).subscribe({
+      next: () => this.cargarProductos(),
+      error: (err) => console.error(err)
+    });
+  }
+
+  // TrackBy para mejorar rendimiento
+  trackByProducto(index: number, producto: Producto): number {
+    return producto.id || index;
+  }
+
+  // Método para manejar cuando se crea un producto
+  onProductoCreado() {
+    this.cargarProductos(); // Recargar la lista
+    this.cancelarCrearProducto(); // Cerrar el modal
+  }
 }
-*/

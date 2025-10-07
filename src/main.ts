@@ -17,7 +17,7 @@ bootstrapApplication(AppComponent, {
     importProvidersFrom(
       FormsModule,
       ReactiveFormsModule,
-      RouterModule.forRoot(routes) // Rutas globales
+      RouterModule.forRoot(routes, {bindToComponentInputs: true}) // para binding directo con standalone
     )
   ]
 });

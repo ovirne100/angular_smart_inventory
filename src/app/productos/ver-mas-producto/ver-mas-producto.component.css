@@ -1,0 +1,95 @@
+/* Fondo: cubre toda la pantalla y centra el contenido */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(6px) saturate(120%);
+  z-index: 2000;
+  padding: 20px;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Contenido del modal */
+.modal {
+  background: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+  padding: 25px 20px;
+  color: #333;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  width: 100%;
+  max-width: 500px;
+  box-sizing: border-box;
+  transform: translateY(10px);
+  animation: popIn 0.3s ease-out forwards;
+  position: relative;
+}
+
+/* Título */
+.modal h2 {
+  margin-top: 0;
+  font-size: 1.5rem;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Texto */
+.modal p {
+  font-size: 1rem;
+  color: #555;
+  margin: 10px 0;
+  word-wrap: break-word;
+}
+
+/* Botón cerrar */
+.modal .btn.cancelar {
+  display: block;
+  margin: 25px auto 0;
+  padding: 10px 20px;
+  background-color: #ff5252;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+  width: 50%;
+  text-align: center;
+}
+
+.modal .btn.cancelar:hover {
+  background-color: #ff1744;
+  transform: scale(1.05);
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: translateY(20px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Responsive */
+@media (max-width: 400px) {
+  .modal {
+    padding: 20px 15px;
+  }
+
+  .modal h2 {
+    font-size: 1.3rem;
+  }
+
+  .modal .btn.cancelar {
+    width: 70%;
+    font-size: 0.95rem;
+  }
+}

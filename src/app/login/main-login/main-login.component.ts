@@ -27,9 +27,20 @@ export class MainLoginComponent{
 
     this.auth.login(this.loginForm.value).subscribe({
       next: (res: any) => {
-        localStorage.setItem('token', res.token); // Guardar token
-        alert('Login exitoso');
-        this.router.navigate(['/dashboard']); // Ajusta ruta destino
+        // Cargar información del usuario después del login
+        this.auth.loadUserInfo().subscribe({
+          next: (user) => {
+            console.log('Usuario cargado:', user);
+            alert('Login exitoso');
+            this.router.navigate(['/dashboard']);
+          },
+          error: (err) => {
+            console.error('Error cargando usuario:', err);
+            // Aún así navegar al dashboard si el login fue exitoso
+            alert('Login exitoso');
+            this.router.navigate(['/dashboard']);
+          }
+        });
       },
       error: () => alert('Usuario o contraseña incorrectos')
     });
