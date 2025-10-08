@@ -25,15 +25,10 @@
         </div>
 
         <div class="alert-body">
-          <!-- 🏷️ Nombre del producto -->
           <p class="product-name">
             🏷️ <strong>{{ alert.inventory?.product?.name || 'Producto desconocido' }}</strong>
           </p>
-
-          <!-- Mensaje de la alerta -->
           <p class="message">{{ alert.message || 'Sin mensaje' }}</p>
-
-          <!-- Fecha -->
           <small class="date">📅 {{ alert.created_at | date:'short' }}</small>
         </div>
 

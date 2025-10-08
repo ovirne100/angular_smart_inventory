@@ -5,6 +5,11 @@
     </button>
   </div>
 
+  <!-- Mensaje visible incluso si el formulario se oculta -->
+  <div *ngIf="mensaje" class="alert" [ngClass]="tipoMensaje">
+    {{ mensaje }}
+  </div>
+
   <!-- Formulario solo se muestra si mostrarFormulario es true -->
   <div class="form-box" *ngIf="mostrarFormulario">
     <h4>📦 Registrar Salida</h4>
@@ -53,10 +58,6 @@
       <button type="submit" class="btn-submit" [disabled]="salidaForm.invalid">
         💾 Guardar
       </button>
-
-      <div *ngIf="mensaje" class="alert" [ngClass]="tipoMensaje">
-        {{ mensaje }}
-      </div>
     </form>
   </div>
 </div>

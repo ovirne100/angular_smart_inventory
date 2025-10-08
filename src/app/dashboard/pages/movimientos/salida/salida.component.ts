@@ -58,6 +58,9 @@ export class SalidaComponent implements OnInit {
         this.mensaje = res.message || 'Salida registrada correctamente';
         this.tipoMensaje = 'success';
         this.salidaForm.reset();
+
+        // 👇 Se oculta el formulario automáticamente después de guardar
+        this.mostrarFormulario = false;
       },
       error: (err) => {
         this.mensaje = err.error?.message || 'Error al registrar la salida';

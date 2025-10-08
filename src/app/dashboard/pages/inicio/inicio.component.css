@@ -1,108 +1,118 @@
-
-
-.menu-btn {
-  background-color: #f1c40f; /* amarillo */
-  border: none;
-  border-radius: 50%;
-  padding: 15px;
-  cursor: pointer;
-  color: black;
-  font-size: 20px;
-  display: none;
+/* Estilos generales */
+.dashboard-container {
+  padding: 30px;
+  font-family: 'Poppins', sans-serif;
+  background-color: #f5f6fa;
+  min-height: 100vh;
 }
 
-.navbar2{
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background-color: black;
-    color: white;
-    padding: 20px;
+.title {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 30px;
+  font-weight: 600;
+  color: #2c3e50;
 }
-.logo{
-    text-align: center;
+
+/* Grid de tarjetas */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 25px;
 }
-.logo img{
-    width: 100px;
-}
-.logo h2{
-    margin: 0;
-}
-.home-btn {
-  background-color: transparent;
-  border: none;
-  cursor: pointer;
-  font-size: 24px;
-  color: black;
-}
-.cabesera {
+
+/* Tarjeta base */
+.card {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  padding: 25px;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  padding: 20px;
-  gap: 2em;
-}
-.fas.fa-house:hover{
-    background-color: #f1c40f;
-    color: white;
-}
-.fas.fa-house {
-    font-size: 50px;
-}
- .cabesera1{
-    margin: 10px 0;
- }
-
-.cabesera h1{
-    font-size: 50px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.yellow{
-    background: yellow;
-    padding: 15px;
-    border: 1px solid;
-    border-radius: 15px;
-}
-.contend2{
-    display: flex;
-    justify-content: space-between;
-}
-.price{
-    margin-bottom: -15px;
-}
-.price p{
-    margin: 0;
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
 }
 
-.blue{
-    background: rgb(120, 120, 236);
-    padding: 10px;
-    border: 1px solid;
-    border-radius: 15px;
-    margin: 20px 0;
-}
-.blue p{
-    margin: 0;
+/* Iconos */
+.icon {
+  font-size: 40px;
+  margin-bottom: 12px;
 }
 
-
-.coffe{
-    background: coral;
-    padding: 10px;
-    border: 1px solid;
-    border-radius: 15px;
+/* Contenido */
+.content {
+  text-align: center;
 }
 
-.coffe p{
-    margin: 0;
-}
-img{
-    width: 100%;
+.content h2 {
+  font-size: 1.2rem;
+  color: #444;
+  margin-bottom: 10px;
 }
 
-/*movil*/
+.value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 5px;
+}
+
+small {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* Colores temáticos */
+.card.blue {
+  border-top: 6px solid #3498db;
+}
+
+.card.orange {
+  border-top: 6px solid #f39c12;
+}
+
+.card.green {
+  border-top: 6px solid #2ecc71;
+}
+
+.card.violet {
+  border-top: 6px solid #9b59b6;
+}
+
+/* Tendencias */
+.trend {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.trend.up {
+  color: #2ecc71;
+}
+
+.trend.down {
+  color: #e74c3c;
+}
+
+/* Responsividad */
 @media (max-width: 768px) {
-  .menu-btn{
-    display: block;}
-img{ width: 100%;}
-    
+  .title {
+    font-size: 1.6rem;
+  }
+
+  .card {
+    padding: 20px;
+  }
+
+  .icon {
+    font-size: 35px;
+  }
+
+  .value {
+    font-size: 1.3rem;
+  }
 }
