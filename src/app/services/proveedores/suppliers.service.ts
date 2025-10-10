@@ -65,9 +65,9 @@ export class SuppliersService {
     return this.http.post(`${this.baseUrl}/suppliers/${id}/products/attach`, { products });
   }
 
-  syncProducts(id: number, products: Array<{ product_id: number; unit_cost?: number; supplier_reference?: string }>): Observable<any> {
-    return this.http.post(`${this.baseUrl}/suppliers/${id}/products`, { products });
-  }
+//  syncProducts(id: number, products: Array<{ product_id: number; unit_cost?: number; supplier_reference?: string }>): Observable<any> {
+  //  return this.http.post(`${this.baseUrl}/suppliers/${id}/products`, { products });
+  //}
 
   detachProduct(id: number, productId: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/suppliers/${id}/products/${productId}`);
@@ -76,7 +76,7 @@ export class SuppliersService {
   //asociar producto a proveedor
   attachProduct(data: any) {
     const { supplier_id, ...productData } = data;
-    return this.http.post(`${this.baseUrl}/suppliers/${supplier_id}/products`, {
+    return this.http.post(`${this.baseUrl}/suppliers/${supplier_id}/products/attach`, {
       products: [productData]
     });
   }

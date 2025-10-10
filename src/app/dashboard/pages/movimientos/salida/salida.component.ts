@@ -38,7 +38,7 @@ export class SalidaComponent implements OnInit {
   }
 
   cargarDatos() {
-    this.http.get('http://localhost:8000/api/outputs/form-data').subscribe({
+    this.http.get('http://smart_inventory/api/outputs/form-data').subscribe({
       next: (data: any) => {
         this.productos = data.productos || [];
         this.usuarios = data.usuarios || [];
@@ -53,7 +53,7 @@ export class SalidaComponent implements OnInit {
   registrarSalida() {
     if (this.salidaForm.invalid) return;
 
-    this.http.post('http://localhost:8000/api/outputs', this.salidaForm.value).subscribe({
+    this.http.post('http://smart_inventory/api/outputs', this.salidaForm.value).subscribe({
       next: (res: any) => {
         this.mensaje = res.message || 'Salida registrada correctamente';
         this.tipoMensaje = 'success';

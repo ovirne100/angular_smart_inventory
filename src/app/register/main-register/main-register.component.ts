@@ -107,12 +107,12 @@ private rolesService: RolesService
 
     // Cargar roles públicos
     this.rolesService.getPublicRoles().subscribe({
-  next: (data) => {
-    console.log('Roles recibidos:', data); // <-- añade este log
-    this.roles = data;
-  },
-  error: (err) => console.error('Error cargando roles', err)
-});
+      next: (data) => {
+        console.log('Roles recibidos:', data); // <-- añade este log
+        this.roles = data;
+      },
+      error: (err) => console.error('Error cargando roles', err)
+    });
   }
 
   get errorKeys(): string[] {

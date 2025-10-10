@@ -70,7 +70,7 @@ export class MovimientosService {
   }
 
   refreshEntriesCount(): void {
-    this.http.get<any>(`${this.apiUrl}/entries/summary`, {
+    this.http.get<any>(`${this.apiUrl}/entries/form-data`, {
       headers: { 'Accept': 'application/json' }
     }).subscribe({
       next: (res) => {
@@ -101,7 +101,7 @@ export class MovimientosService {
   }
 
   refreshOutputsCount(): void {
-    this.http.get<any>(`${this.apiUrl}/outputs/summary`, {
+    this.http.get<any>(`${this.apiUrl}/outputs/form-data`, {
       headers: { 'Accept': 'application/json' }
     }).subscribe({
       next: (res) => {
