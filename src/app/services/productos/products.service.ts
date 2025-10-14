@@ -8,7 +8,7 @@ import { Producto } from '../../interfaces/producto';
   providedIn: 'root'
 })
 export class ProductosService {
-  private apiUrl = 'http://smart_inventory/api/products';
+  private apiUrl = 'http://127.0.0.1:8000/api/products';
 
   constructor(private http: HttpClient) {}
 
@@ -43,7 +43,7 @@ export class ProductosService {
         const productosMapeados = data.map((item: any) => ({
           ...item,
           categoria: item.categoria || { name: 'Sin categoría' },
-          image_url: item.image ? `http://smart_inventory/${item.image}` : null
+          image_url: item.image ? `http://127.0.0.1:8000/${item.image}` : null
         }));
 
         // si es paginación, conserva meta e info
@@ -60,7 +60,7 @@ export class ProductosService {
       map((p: Producto) => ({
         ...p,
         expiration_date: p.expiration_date ? (p.expiration_date as string).substring(0, 10) : null,
-        image_url: p.image ? `http://smart_inventory/${p.image}` : null
+        image_url: p.image ? `http://127.0.0.1:8000/${p.image}` : null
       }))
     );
   }
@@ -73,7 +73,7 @@ export class ProductosService {
         return {
           ...p,
           categoria: p.categoria || null,
-          image_url: p.image ? `http://smart_inventory/${p.image}` : null
+          image_url: p.image ? `http://127.0.0.1:8000/${p.image}` : null
         };
       })
     );
@@ -84,7 +84,7 @@ export class ProductosService {
     return this.http.put<Producto>(`${this.apiUrl}/${producto.id}`, producto, { headers: this.getAuthHeaders() }).pipe(
       map((p: Producto) => ({
         ...p,
-        image_url: p.image ? `http://smart_inventory/${p.image}` : null
+        image_url: p.image ? `http://127.0.0.1:8000/${p.image}` : null
       }))
     );
   }

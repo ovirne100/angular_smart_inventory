@@ -1,3 +1,4 @@
+
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -5,13 +6,11 @@ import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-entrada',
-  imports:[CommonModule, ReactiveFormsModule],
   standalone: true,
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './entrada.component.html',
   styleUrls: ['./entrada.component.css']
-
 })
-
 export class EntradaComponent implements OnInit {
   entradaForm!: FormGroup;
   showForm = false;
@@ -19,8 +18,6 @@ export class EntradaComponent implements OnInit {
   successMessage = '';
   errorMessage = '';
   warningMessage = '';
-
-
   currentUser: any;
   productos: any[] = [];
   usuarios: any[] = [];
@@ -35,21 +32,14 @@ export class EntradaComponent implements OnInit {
   }
 
   loadCurrentUser() {
-    this.http.get<any>('http://smart_inventory/api/user', { withCredentials: true }).subscribe({
+    this.http.get<any>('http://localhost:8000/api/user', { withCredentials: true }).subscribe({
       next: (res) => {
         this.currentUser = res;
         console.log('Usuario logueado:', this.currentUser);
-
-        this.entradaForm.patchValue({
-          user_id: this.currentUser.id
-        });
       },
       error: (err) => console.error('Error cargando usuario', err)
     });
   }
-
-  
-
 
   initForm() {
     this.entradaForm = this.fb.group({
@@ -58,8 +48,10 @@ export class EntradaComponent implements OnInit {
       unit: [''],
       lot: [''],
       supplier_id: ['', Validators.required],
-      user_id: ['', Validators.required],
-      inventory_id: ['', Validators.required]
+      // 🔹 Nuevos campos
+      ubicacion_interna: ['', Validators.required],
+      stock: ['', [Validators.required, Validators.min(0)]],
+      stock_min: ['', [Validators.required, Validators.min(0)]],
     });
   }
 
@@ -71,12 +63,11 @@ export class EntradaComponent implements OnInit {
   }
 
   loadFormData() {
-    this.http.get<any>('http://smart_inventory/api/entries/form-data').subscribe({
+    this.http.get<any>('http://localhost:8000/api/entries/form-data').subscribe({
       next: (res) => {
         this.productos = res.productos || [];
         this.usuarios = res.usuarios || [];
         this.proveedores = res.proveedores || [];
-        this.usuarios = res.usuarios || [];
       },
       error: (err) => {
         console.error('Error cargando datos del formulario', err);
@@ -91,7 +82,8 @@ export class EntradaComponent implements OnInit {
     }
 
     this.saving = true;
-    this.http.post('http://smart_inventory/api/entries', this.entradaForm.value).subscribe({
+
+    this.http.post('http://localhost:8000/api/entries', this.entradaForm.value).subscribe({
       next: (res: any) => {
         this.successMessage = res.message || '✅ Entrada creada correctamente.';
         this.entradaForm.reset();

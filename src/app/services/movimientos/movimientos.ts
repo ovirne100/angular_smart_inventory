@@ -1,9 +1,8 @@
-// src/app/dashboard/pages/movimientos/servicios/movimientos.service.ts
+
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { environment } from '../../../environments/environment';
 
 export interface ApiResponse<T> {
   message: string;
@@ -16,22 +15,29 @@ export interface Entrada {
   id?: number;
   product_id: number;
   quantity: number;
-  reason?: string;
-
+  unit?: string;
+  lot?: string;
+  supplier_id?: number;
+  ubicacion_interna?: string;
+  stock?: number;
+  stock_min?: number;
 }
 
 export interface Salida {
   id?: number;
   product_id: number;
   quantity: number;
-  reason?: string;
+  unit?: string;
+  lot?: string;
+  user_id?: number;
+  inventory_id?: number;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class MovimientosService {
-    private apiUrl = environment.apiUrl; ;
+    private apiUrl = 'http://127.0.0.1:8000/api';
 
   // ================== 📊 ENTRADAS ==================
   private entriesCountSubject = new BehaviorSubject<number>(0);
@@ -57,22 +63,19 @@ export class MovimientosService {
 
   // ================== ENTRADAS ==================
   getEntradas(params: any = {}): Observable<ApiResponse<Entrada[]>> {
-    return this.http.get<ApiResponse<Entrada[]>>(`${this.apiUrl}/entries`, {
-      params,
-      headers: { 'Accept': 'application/json' }
-    }).pipe(catchError(this.handleError));
+    return this.http
+      .get<ApiResponse<Entrada[]>>(`${this.apiUrl}/entries`, { params })
+      .pipe(catchError(this.handleError));
   }
 
   createEntrada(data: Entrada): Observable<ApiResponse<Entrada>> {
-    return this.http.post<ApiResponse<Entrada>>(`${this.apiUrl}/entries`, data, {
-      headers: { 'Accept': 'application/json' }
-    }).pipe(catchError(this.handleError));
+    return this.http
+      .post<ApiResponse<Entrada>>(`${this.apiUrl}/entries`, data)
+      .pipe(catchError(this.handleError));
   }
 
   refreshEntriesCount(): void {
-    this.http.get<any>(`${this.apiUrl}/entries/form-data`, {
-      headers: { 'Accept': 'application/json' }
-    }).subscribe({
+    this.http.get<any>(`${this.apiUrl}/entries/summary`).subscribe({
       next: (res) => {
         this.entriesCountSubject.next(res.total_entries ?? 0);
         this.entriesQuantitySubject.next(res.total_quantity ?? 0);
@@ -88,22 +91,26 @@ export class MovimientosService {
 
   // ================== SALIDAS ==================
   getSalidas(params: any = {}): Observable<ApiResponse<Salida[]>> {
-    return this.http.get<ApiResponse<Salida[]>>(`${this.apiUrl}/outputs`, {
-      params,
-      headers: { 'Accept': 'application/json' }
-    }).pipe(catchError(this.handleError));
+    return this.http
+      .get<ApiResponse<Salida[]>>(`${this.apiUrl}/outputs`, { params })
+      .pipe(catchError(this.handleError));
   }
 
   createSalida(data: Salida): Observable<ApiResponse<Salida>> {
-    return this.http.post<ApiResponse<Salida>>(`${this.apiUrl}/outputs`, data, {
-      headers: { 'Accept': 'application/json' }
-    }).pipe(catchError(this.handleError));
+    return this.http
+      .post<ApiResponse<Salida>>(`${this.apiUrl}/outputs`, data)
+      .pipe(catchError(this.handleError));
+  }
+
+  // ✅ Nuevo método centralizado para cargar datos del formulario de salidas
+  getSalidaFormData(): Observable<{ productos: any[]; usuarios: any[] }> {
+    return this.http
+      .get<{ productos: any[]; usuarios: any[] }>(`${this.apiUrl}/outputs/form-data`)
+      .pipe(catchError(this.handleError));
   }
 
   refreshOutputsCount(): void {
-    this.http.get<any>(`${this.apiUrl}/outputs/form-data`, {
-      headers: { 'Accept': 'application/json' }
-    }).subscribe({
+    this.http.get<any>(`${this.apiUrl}/outputs/summary`).subscribe({
       next: (res) => {
         this.outputsCountSubject.next(res.total_outputs ?? 0);
         this.outputsQuantitySubject.next(res.total_quantity ?? 0);

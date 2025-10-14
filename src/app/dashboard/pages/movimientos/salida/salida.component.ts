@@ -1,7 +1,8 @@
+
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
+import { MovimientosService,Salida } from '../../../../services/movimientos/movimientos';
 
 @Component({
   selector: 'app-salida',
@@ -18,7 +19,7 @@ export class SalidaComponent implements OnInit {
   tipoMensaje = '';
   mostrarFormulario = false; // 👈 formulario oculto por defecto
 
-  constructor(private fb: FormBuilder, private http: HttpClient) {}
+  constructor(private fb: FormBuilder, private movimientosService: MovimientosService) {}
 
   ngOnInit() {
     this.salidaForm = this.fb.group({
@@ -34,12 +35,13 @@ export class SalidaComponent implements OnInit {
   }
 
   toggleFormulario() {
-    this.mostrarFormulario = !this.mostrarFormulario; // 👈 alterna visibilidad
+    this.mostrarFormulario = !this.mostrarFormulario;
   }
 
   cargarDatos() {
-    this.http.get('http://smart_inventory/api/outputs/form-data').subscribe({
-      next: (data: any) => {
+    // ✅ Ahora se usa el servicio centralizado correctamente
+    this.movimientosService.getSalidaFormData().subscribe({
+      next: (data) => {
         this.productos = data.productos || [];
         this.usuarios = data.usuarios || [];
       },
@@ -53,15 +55,20 @@ export class SalidaComponent implements OnInit {
   registrarSalida() {
     if (this.salidaForm.invalid) return;
 
-    this.http.post('http://smart_inventory/api/outputs', this.salidaForm.value).subscribe({
-      next: (res: any) => {
+    const salida: Salida = this.salidaForm.value;
+
+    // ✅ Usa el servicio centralizado
+    this.movimientosService.createSalida(salida).subscribe({
+      next: (res) => {
         this.mensaje = res.message || 'Salida registrada correctamente';
         this.tipoMensaje = 'success';
         this.salidaForm.reset();
+        this.movimientosService.refreshOutputsCount(); // 🔄 refresca contadores
       },
       error: (err) => {
         this.mensaje = err.error?.message || 'Error al registrar la salida';
         this.tipoMensaje = 'error';
+        console.error('❌ Error al registrar salida:', err);
       }
     });
   }

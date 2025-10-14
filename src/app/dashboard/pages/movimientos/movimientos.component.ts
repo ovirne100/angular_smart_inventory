@@ -1,3 +1,4 @@
+
 // src/app/dashboard/pages/movimientos/movimientos.component.ts
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';

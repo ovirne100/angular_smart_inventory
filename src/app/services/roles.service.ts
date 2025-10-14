@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class RolesService {
-  private apiUrl = 'http://smart_inventory/api/';
+  private apiUrl = 'http://127.0.0.1:8000/api/';
 
   constructor(private http: HttpClient) {}
 

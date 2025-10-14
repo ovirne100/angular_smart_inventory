@@ -27,7 +27,7 @@ export interface ProductSupplier {
   providedIn: 'root'
 })
 export class ProductSupplierService {
-  private apiUrl = 'http://smart_inventory/api/product-suppliers';
+  private apiUrl = 'http://127.0.0.1:8000/api/product-suppliers';
 
   constructor(private http: HttpClient) {}
 
