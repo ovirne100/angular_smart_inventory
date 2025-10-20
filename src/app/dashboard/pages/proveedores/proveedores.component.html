@@ -1,4 +1,4 @@
-<!-- Modales -->
+<!-- ===================== MODALES ===================== -->
 <app-crear-proveedor
   *ngIf="mostrarCrear"
   (cancelar)="cancelarCrear()"
@@ -12,7 +12,7 @@
   (proveedorActualizado)="onProveedorActualizado($event)">
 </app-editar-proveedor>
 
-<!-- Header con botón de crear proveedor -->
+<!-- ===================== HEADER ===================== -->
 <div *ngIf="!mostrarCrear && !mostrarEditar" class="proveedores-header">
   <h2>Gestión de Proveedores</h2>
   <button class="btn-crear-principal" (click)="abrirCrear()">
@@ -21,7 +21,7 @@
   </button>
 </div>
 
-<!-- Lista de proveedores -->
+<!-- ===================== LISTA DE PROVEEDORES ===================== -->
 <div *ngIf="!mostrarCrear && !mostrarEditar" class="proveedores-container">
   <!-- Búsqueda -->
   <div class="search-section">
@@ -53,27 +53,26 @@
         <div class="proveedor-details">
           <div class="detail-row" *ngIf="supplier.email">
             <span class="detail-label">
-              <i class="fa-solid fa-envelope"></i>
-              Email:
+              <i class="fa-solid fa-envelope"></i> Email:
             </span>
             <span class="detail-value">{{ supplier.email }}</span>
           </div>
           <div class="detail-row" *ngIf="supplier.phone">
             <span class="detail-label">
-              <i class="fa-solid fa-phone"></i>
-              Teléfono:
+              <i class="fa-solid fa-phone"></i> Teléfono:
             </span>
             <span class="detail-value">{{ supplier.phone }}</span>
           </div>
           <div class="detail-row" *ngIf="supplier.address">
             <span class="detail-label">
-              <i class="fa-solid fa-map-marker-alt"></i>
-              Dirección:
+              <i class="fa-solid fa-map-marker-alt"></i> Dirección:
             </span>
             <span class="detail-value">{{ supplier.address }}</span>
           </div>
         </div>
       </div>
+
+      <!-- Botones de acciones de proveedor -->
       <div class="acciones">
         <button class="btn ver" (click)="verProductos(supplier)" title="Ver productos">
           <i class="fa-solid fa-eye"></i>
@@ -88,46 +87,21 @@
           <span>Eliminar</span>
         </button>
       </div>
-    </div>
-  </div>
-</div>
+    </div> <!-- Fin proveedor-item -->
+  </div> <!-- Fin proveedores-lista -->
+</div> <!-- Fin proveedores-container -->
 
-<!-- Panel de productos del proveedor seleccionado -->
-<div *ngIf="proveedorSeleccionado && !mostrarCrear && !mostrarEditar" class="productos-panel">
-  <div class="productos-header">
-    <h3>Productos de {{ proveedorSeleccionado.name }}</h3>
-    <div class="header-actions">
-      <button class="btn-asociar" (click)="abrirAsociar()">
-        <i class="fa-solid fa-plus"></i> Asociar producto
-      </button>
-      <button class="btn-cerrar" (click)="cerrarProductos()">
-        <i class="fa-solid fa-times"></i>
-      </button>
-    </div>
-  </div>
+<!-- ===================== PANEL DE PRODUCTOS (COMPONENTE HIJO) ===================== -->
+<app-productos-panel
+  *ngIf="proveedorSeleccionado && !mostrarCrear && !mostrarEditar"
+  [proveedorSeleccionado]="proveedorSeleccionado"
+  [productosProveedor]="productosProveedor"
+  (eliminarProducto)="eliminarProductoDelProveedor($event)"
+  (cerrar)="cerrarProductos()"
+  (abrirAsociarProducto)="abrirAsociar(proveedorSeleccionado)">
+</app-productos-panel>
 
-  <div *ngIf="productosProveedor.length === 0" class="no-productos">
-    <p>Este proveedor no tiene productos asociados</p>
-  </div>
-
-  <div *ngIf="productosProveedor.length > 0" class="productos-lista">
-    <div *ngFor="let producto of productosProveedor" class="producto-item">
-      <div class="producto-info">
-        <h4>{{ producto.name }}</h4>
-        <div class="producto-details">
-          <span *ngIf="producto.pivot && producto.pivot.unit_cost !== undefined" class="costo">
-            <strong>Costo:</strong> ${{ producto.pivot.unit_cost }}
-          </span>
-          <span *ngIf="producto.pivot && producto.pivot.supplier_reference" class="referencia">
-            <strong>Ref:</strong> {{ producto.pivot.supplier_reference }}
-          </span>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Modal para asociar producto -->
+<!-- ===================== MODAL PARA ASOCIAR PRODUCTO ===================== -->
 <app-asociar-producto
   *ngIf="mostrarAsociar"
   [proveedor]="proveedorSeleccionado"

@@ -51,8 +51,4 @@ export class ProductSupplierService {
     return this.http.put<ProductSupplier>(`${this.apiUrl}/${id}`, data);
   }
 
-  // Eliminar relación
-  deleteRelationship(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
-  }
 }

@@ -49,7 +49,7 @@
       <label>Usuario *</label>
       <select formControlName="user_id">
         <option value="">Seleccione un usuario</option>
-        <option *ngFor="let u of usuarios" [value]="u.id">{{ u.name }} {{u.role.name}}</option>
+        <option *ngFor="let u of usuarios" [value]="u.id">{{ u.name }} {{u.role?.name}}</option>
       </select>
     </div>
 

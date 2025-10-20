@@ -75,10 +75,15 @@
             </span>
           </div>
         </div>
-        <div class="actions">
-          <button (click)="edit(rel)" class="btn-edit">Editar</button>
-          <button (click)="delete(rel.id!)" class="btn-delete">Eliminar</button>
-        </div>
+       <div class="actions">
+  <button (click)="edit(rel)" class="btn-edit">Editar</button>
+  <button class="btn btn-danger" type="button"
+    (click)="deleteRelationship(rel)">
+    Eliminar
+  </button>
+</div>
+
+
       </div>
     </div>
   </div>

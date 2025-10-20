@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Producto } from '../../../../interfaces/producto';
@@ -11,9 +11,9 @@ import { SuppliersService } from '../../../../services/proveedores/suppliers.ser
   templateUrl: './asociar-producto.component.html',
   styleUrls: ['./asociar-producto.component.css']
 })
-export class AsociarProductoComponent {
+export class AsociarProductoComponent implements OnChanges {
   @Input() proveedor!: any | null;
-  @Input() productos: Producto[] = [];
+  @Input() productos: Producto[] | any = [];
 
   @Output() guardar = new EventEmitter<any>();
   @Output() cancelar = new EventEmitter<void>();
@@ -25,6 +25,14 @@ export class AsociarProductoComponent {
     unit_cost: null,
     supplier_reference: ''
   };
+
+  ngOnChanges(changes: SimpleChanges): void {
+    // Si el backend devuelve { data: [...] }
+    if (this.productos && this.productos.data) {
+      this.productos = this.productos.data as Producto[];
+    }
+  }
+
 
   guardarProducto() {
     if (!this.proveedor) {

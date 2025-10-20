@@ -88,14 +88,33 @@ export class ProductSuppliersComponent implements OnInit {
     this.editingId = relationship.id;
   }
 
-  delete(id: number): void {
+ /* delete(id: number): void {
     if (confirm('¿Eliminar esta relación?')) {
       this.productSupplierService.deleteRelationship(id).subscribe({
         next: () => this.loadData(),
         error: (err) => console.error('Error eliminando relación', err)
       });
     }
+  }*/
+deleteRelationship(rel: any): void {
+  console.log('🟢 Click detectado', rel);
+
+  const supplier_id = rel.supplier_id;
+  const product_id = rel.product_id;
+
+  if (!supplier_id || !product_id) {
+    console.warn('⚠️ Faltan IDs', rel);
+    return;
   }
+
+  this.suppliersService.detachProduct({ supplier_id, product_id }).subscribe({
+    next: (res: any) => {
+      console.log('✅ Eliminado correctamente', res);
+      this.loadData();
+    },
+    error: (err) => console.error('❌ Error eliminando relación', err)
+  });
+}
 
   resetForm(): void {
     this.form = {
@@ -116,4 +135,6 @@ export class ProductSuppliersComponent implements OnInit {
     const supplier = this.suppliers.find(s => s.supplier_id === id);
     return supplier ? supplier.name : 'N/A';
   }
+
+  
 }

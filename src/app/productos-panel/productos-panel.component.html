@@ -1,0 +1,38 @@
+<div class="productos-panel">
+  <div class="productos-header">
+    <h3>Productos de {{ proveedorSeleccionado.name }}</h3>
+    <div class="header-actions">
+      <button class="btn-asociar" (click)="onAbrirAsociar()">
+        <i class="fa-solid fa-plus"></i> Asociar producto
+      </button>
+      <button class="btn-cerrar" (click)="onCerrar()">
+          <i class="fa-solid fa-circle-xmark"></i> cerrar
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="productosProveedor.length === 0" class="no-productos">
+    <p>Este proveedor no tiene productos asociados</p>
+  </div>
+
+  <div *ngIf="productosProveedor.length > 0" class="productos-lista">
+    <div *ngFor="let producto of productosProveedor; trackBy: trackByProductId" class="producto-item">
+
+      <div class="producto-info">
+        <h4>{{ producto.name }}</h4>
+        <div class="producto-details">
+          <span *ngIf="producto.pivot?.unit_cost !== undefined" class="costo">
+            <strong>Costo:</strong> ${{ producto.pivot.unit_cost }}
+          </span>
+          <span *ngIf="producto.pivot?.supplier_reference" class="referencia">
+            <strong>Ref:</strong> {{ producto.pivot.supplier_reference }}
+          </span>
+        </div>
+           <button class="btn-menu" (click)="onEliminar(producto)" title="Eliminar producto">
+      <i class="fa-solid fa-trash"></i>
+      <span>Eliminar</span>
+    </button>
+      </div>
+
+  </div>
+</div>

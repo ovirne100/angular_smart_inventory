@@ -63,11 +63,63 @@
 
 /* Form grid */
 form{
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--gap);
+
   align-items: start;
 }
+
+#role{
+  padding: 12px;
+  border-radius: 10px;
+  width: 100%;
+    padding: 0.7rem;
+    border: none;
+    border-radius: 8px;
+    background-color: #2c2c2c;
+    color: #cac2c2;
+    outline: none;
+}
+
+/*estilo de del boton crear producto nuevo*/
+.btn-crear-principal {
+  background: linear-gradient(135deg, #ffbf00, #ff8c00);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+
+.input-busqueda{
+   background: linear-gradient(135deg, #ffbf00, #ff8c00);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  border-radius: 10px;
+}
+
+/*stilos de input de busqueda y crear producto*/
+#crear_busqueda_producto{
+  display: flex;
+  gap: 10px;
+}
+
+
+/*estilos */
+
 
 /* Full-width items (make inputs span 2 columns when needed) */
 .form-group{
@@ -75,6 +127,76 @@ form{
   flex-direction: column;
 }
 
+
+/*estilos de los botones del crud al crar el producto*/
+.btn_actualizar{
+/* Editar */
+ background-color: #3B82F6;
+ padding: 5px;
+     border: none;
+    border-radius: 5px;
+
+}
+.btn_actualizar:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+    background-color: #2563EB;
+     color: #fff;
+     box-shadow: 0 0 12px #2563EB;
+
+}
+/* Ver más */
+.btn-ver {
+  background-color: #10B981;
+  padding: 5px;
+  margin: 5px;
+      border: none;
+    border-radius: 5px;
+}
+.btn-ver:hover {
+  background-color: #059669;
+  transform: scale(1.05);
+   color: #fff;
+   box-shadow: 0 0 12px #059669;
+}
+
+.btn-eliminar {
+   background-color: #EF4444;
+   padding: 5px;
+       border: none;
+    border-radius: 5px;
+}
+.btn-eliminar:hover {
+  background-color: #EF4444;
+  color: #fff;
+  box-shadow: 0 0 12px #EF4444;
+}
+
+
+.btn-asociar{
+  padding: 10px;
+   background: linear-gradient(135deg, #f6b53b, #e6d70a);
+       border: none;
+    border-radius: 5px;
+
+}
+.btn-asociar:hover{
+  background: linear-gradient(135deg, #f6b53b, #e6d70a);
+  color: white;
+  box-shadow: 0 0 12px #EF4444;
+}
+.btn-cerrar{
+   padding: 10px;
+   background: linear-gradient(135deg, #f6b53b, #e6d70a);
+   margin: 0 10px;
+       border: none;
+    border-radius: 5px;
+
+}
+.btn-cerrar:hover{
+  color: white;
+  box-shadow: 0 0 12px #EF4444;
+}
 /* allow helper class to force full width */
 .form-group.full{
   grid-column: 1 / -1;
@@ -658,3 +780,26 @@ a:hover {
     border: 1px solid black;
   }
 }
+
+.btn-menu {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: linear-gradient(135deg, #ffbf00, #ff8c00);
+  color: #fff;
+  border: none;
+  padding: 12px 18px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 1.1rem;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+  z-index: 99999; /* 👈 Esto lo saca encima de todo */
+}
+
+.btn-menu:hover {
+  transform: scale(1.05);
+  background: linear-gradient(135deg, #ff8c00, #ffbf00);
+}
+

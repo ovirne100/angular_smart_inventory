@@ -68,11 +68,11 @@ export class SuppliersService {
 //  syncProducts(id: number, products: Array<{ product_id: number; unit_cost?: number; supplier_reference?: string }>): Observable<any> {
   //  return this.http.post(`${this.baseUrl}/suppliers/${id}/products`, { products });
   //}
-
+/*
   detachProduct(id: number, productId: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/suppliers/${id}/products/${productId}`);
   }
-
+*/
   //asociar producto a proveedor
   attachProduct(data: any) {
     const { supplier_id, ...productData } = data;
@@ -80,5 +80,14 @@ export class SuppliersService {
       products: [productData]
     });
   }
+
+  detachProduct(payload: { supplier_id: number; product_id: number }) {
+    return this.http.post(`${this.baseUrl}/suppliers/detach-product`, payload);
+  }
+
+deleteRelationship(supplierId: number, productId: number) {
+  return this.http.delete(`${this.baseUrl}/suppliers/${supplierId}/products/${productId}`);
+}
+
 
 }

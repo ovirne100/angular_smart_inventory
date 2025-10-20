@@ -20,24 +20,25 @@
   (cerrar)="cerrarVerMas()">
 </app-ver-mas-producto>
 
-<!-- Header con botón de crear producto -->
+<!-- Header con botón-->
 <div *ngIf="!mostrarCrear && !mostrarEditar && !mostrarVerMas" class="productos-header">
   <h2>Gestión de Productos</h2>
-  <button class="btn-crear-principal" (click)="cargarCrearProducto()">
-    <i class="fa-solid fa-plus"></i>
-    Crear Nuevo Producto
-  </button>
 </div>
 
-<!-- 🔍 Barra de búsqueda fija -->
+<!-- 🔍 Barra de búsqueda fija con crear producto-->
+ <div id="crear_busqueda_producto">
 <div class="filtro-fijo">
   <input
     type="text"
     placeholder="Buscar producto..."
     [(ngModel)]="search"
     (input)="onBuscar()"
-    class="input-busqueda"
-  />
+    class="input-busqueda"/>
+</div>
+<button class="btn-crear-principal" (click)="cargarCrearProducto()">
+    <i class="fa-solid fa-plus"></i>
+    Crear Nuevo Producto
+  </button>
 </div>
 
 <!-- Lista de productos -->
@@ -87,13 +88,13 @@
       </div>
 
       <div class="acciones">
-        <button class="btn actualizar" (click)="abrirEditar(producto)">
+        <button class="btn_actualizar" (click)="abrirEditar(producto)">
           <i class="fa-solid fa-edit"></i> Editar
         </button>
-        <button class="btn ver" (click)="abrirVerMas(producto)">
+        <button class="btn-ver" (click)="abrirVerMas(producto)">
           <i class="fa-solid fa-eye"></i> Ver más
         </button>
-        <button class="btn eliminar" (click)="eliminarProducto(producto)">
+        <button class="btn-eliminar" (click)="eliminarProducto(producto)">
           <i class="fa-solid fa-trash"></i> Eliminar
         </button>
       </div>

@@ -39,20 +39,7 @@ body {
   font-size: 1.8rem;
 }
 
-.btn-crear-principal {
-  background: linear-gradient(135deg, #ffbf00, #ff8c00);
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
+
 
 .btn-crear-principal:hover {
   transform: translateY(-2px);
@@ -61,6 +48,7 @@ body {
 
 .btn-crear-principal i {
   font-size: 1.1rem;
+
 }
 
 /* Estilos para cuando no hay productos */
@@ -117,6 +105,8 @@ body {
   padding: var(--spacing-lg);
   margin-top: var(--spacing-lg);
 }
+
+
 
 /* Grid adaptativo para diferentes tamaños */
 @media (min-width: 1200px) {
@@ -1347,3 +1337,17 @@ margin-bottom: 1em;
   background: var(--gray-400);
 }
 
+.producto-item::before,
+.producto-item::after {
+  pointer-events: none !important;
+}
+.acciones,
+.acciones .btn {
+  position: relative;
+  z-index: 10;
+}
+
+.btn_actualizar{
+      border: none;
+    border-radius: 5px;
+}
