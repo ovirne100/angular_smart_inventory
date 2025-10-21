@@ -1,1 +1,74 @@
-<p>informes works!</p>
+<div class="card p-4">
+  <h2>Informes</h2>
+
+  <div class="controls">
+    <label>Tipo</label>
+    <select [(ngModel)]="tipo">
+      <option value="productos">Movimientos de productos</option>
+      <option value="alertas">Alertas</option>
+      <option value="inventario">Inventario actual</option>
+    </select>
+
+    <label>Desde</label>
+    <input type="date" [(ngModel)]="fechaInicio">
+
+    <label>Hasta</label>
+    <input type="date" [(ngModel)]="fechaFin">
+
+    <div class="quick">
+      <button (click)="setQuick('today')">Hoy</button>
+      <button (click)="setQuick('week')">Última semana</button>
+      <button (click)="setQuick('month')">Mes</button>
+    </div>
+
+    <button (click)="generar()">Generar</button>
+
+    <div class="exports" *ngIf="tipo">
+      <button (click)="exportExcel()">Exportar CSV/Excel</button>
+      <button (click)="exportPdf()">Exportar PDF (server)</button>
+      <button (click)="exportPdfClient()">Exportar PDF (cliente)</button>
+    </div>
+  </div>
+
+  <div class="mt-4" *ngIf="tipo === 'productos' && datos.length">
+<!--
+    <canvas baseChart
+            [data]="barChartData"
+            [options]="barChartOptions"
+            chartType="bar">
+    </canvas>
+-->
+    <table class="mt-4">
+      <thead><tr><th>Producto</th><th>Entradas</th><th>Salidas</th></tr></thead>
+      <tbody>
+        <tr *ngFor="let d of datos">
+          <td>{{ d.name }}</td>
+          <td>{{ d.total_entradas }}</td>
+          <td>{{ d.total_salidas }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div *ngIf="tipo === 'alertas' && datos.length">
+    <table>
+      <thead><tr><th>Tipo</th><th>Total</th></tr></thead>
+      <tbody>
+        <tr *ngFor="let a of datos"><td>{{ a.type }}</td><td>{{ a.total }}</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div *ngIf="tipo === 'inventario' && datos.length">
+    <table>
+      <thead><tr><th>Producto</th> <th>Referencia</th>
+      <th>Lote</th><th>Entradas</th><th>Salidas</th><th>Stock</th></tr></thead>
+      <tbody>
+        <tr *ngFor="let i of datos">
+          <td>{{ i.producto }}</td><td>{{ i.referencia }}</td><td>{{ i.lote }}</td><td>{{ i.entradas }}</td><td>{{ i.salidas }}</td><td>{{ i.stock }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+

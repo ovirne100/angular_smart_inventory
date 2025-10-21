@@ -1,50 +1,45 @@
 <div class="alertas-container">
-  <h2>⚠️ Gestión de Alertas</h2>
+  <h2>🚨 Gestión de Alertas</h2>
 
-  <div class="filter-buttons">
-    <button (click)="loadAlerts('all')" [class.active]="selected === 'all'">Todas</button>
-    <button (click)="loadAlerts('low_stock')" [class.active]="selected === 'low_stock'">Stock Bajo</button>
-    <button (click)="loadAlerts('critical')" [class.active]="selected === 'critical'">Críticas</button>
-    <button (click)="loadAlerts('resolved')" [class.active]="selected === 'resolved'">Resueltas</button>
-    <button class="refresh-btn" (click)="refresh()">🔄 Refrescar</button>
+  <div class="filtros">
+    <button [class.activo]="filtroActivo==='todas'" (click)="obtenerAlertas()">📋 Todas</button>
+    <button [class.activo]="filtroActivo==='resueltas'" (click)="filtrarPor('resueltas')">✅ Resueltas</button>
+    <button [class.activo]="filtroActivo==='bajo'" (click)="filtrarPor('bajo')">📉 Stock Bajo</button>
+    <button [class.activo]="filtroActivo==='sin'" (click)="filtrarPor('sin')">🚫 Sin Stock</button>
   </div>
 
-  <div *ngIf="loading" class="loading">⏳ Cargando alertas...</div>
+  <div *ngIf="cargando" class="cargando">
+    <p>Cargando alertas...</p>
+  </div>
 
-  <div *ngIf="!loading && viewAlerts.length > 0; else noAlerts">
-    <div class="alerts-grid">
-      <div *ngFor="let alert of viewAlerts" class="alert-card"
-           [ngClass]="{
-             'low-stock': (alert.alert_type || '').toLowerCase() === 'low_stock',
-             'critical': (alert.alert_type || '').toLowerCase() === 'critical',
-             'resolved': (alert.status || '').toLowerCase() === 'resolved'
-           }">
+  <div *ngIf="error" class="error-mensaje">
+    <p>{{ error }}</p>
+  </div>
 
-        <div class="alert-header">
-          <span class="badge">{{ getAlertBadgeText(alert) }}</span>
-        </div>
+  <div *ngIf="!cargando && !error" class="lista-alertas">
+    <div *ngIf="alertas.length===0" class="sin-alertas">
+      <p>✨ No hay alertas para mostrar</p>
+    </div>
 
-        <div class="alert-body">
-          <!-- 🏷️ Nombre del producto -->
-          <p class="product-name">
-            🏷️ <strong>{{ alert.inventory?.product?.name || 'Producto desconocido' }}</strong>
-          </p>
+    <div *ngFor="let alerta of alertas" class="alerta-card" [ngClass]="getAlertClass(alerta)">
+      <div class="alerta-header">
+        <h4>{{ alerta.product?.name || 'Producto no disponible' }}</h4>
+      </div>
 
-          <!-- Mensaje de la alerta -->
-          <p class="message">{{ alert.message || 'Sin mensaje' }}</p>
+      <p class="alerta-mensaje">{{ alerta.message }}</p>
 
-          <!-- Fecha -->
-          <small class="date">📅 {{ alert.created_at | date:'short' }}</small>
-        </div>
-
-        <div class="alert-footer" *ngIf="(alert.status || '').toLowerCase() === 'active'">
-          <button class="resolve-btn" (click)="goToMovements(alert)">📦 Gestionar Entrada</button>
-        </div>
+      <div class="alerta-info">
+        <p><strong>Tipo:</strong>
+          <span [ngClass]="{
+            'tipo-bajo': alerta.alert_type==='bajo_stock',
+            'tipo-sin': alerta.alert_type==='sin_stock'
+          }">
+            {{ alerta.alert_type==='bajo_stock' ? '📉 Stock Bajo' : '🚫 Sin Stock' }}
+          </span>
+        </p>
+        <p><strong>Fecha:</strong> {{ alerta.date | date:'short' }}</p>
+        <p *ngIf="alerta.resolved_at"><strong>Resuelta:</strong> {{ alerta.resolved_at | date:'short' }}</p>
       </div>
     </div>
   </div>
-
-  <ng-template #noAlerts>
-    <p class="no-alerts">✅ No hay alertas disponibles.</p>
-  </ng-template>
 </div>

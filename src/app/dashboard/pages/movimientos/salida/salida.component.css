@@ -78,11 +78,13 @@
   background-color: #0056b3;
 }
 
+/* 🔹 Estilo del mensaje (alert) fuera del formulario */
 .alert {
   padding: 10px;
-  margin-bottom: 10px;
+  margin: 15px auto;
   border-radius: 8px;
   text-align: center;
+  max-width: 500px;
 }
 
 .alert.success {
@@ -108,5 +110,80 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* 📱 RESPONSIVE DESIGN */
+
+/* Para tablets y pantallas medianas */
+@media (max-width: 768px) {
+  .form-container {
+    padding: 15px;
+    max-width: 90%;
+  }
+
+  .btn-toggle {
+    width: 100%;
+    font-size: 1rem;
+    padding: 10px 20px;
+  }
+
+  .form-box {
+    padding: 15px;
+  }
+
+  .form-group input,
+  .form-group select {
+    font-size: 0.9rem;
+    padding: 8px;
+  }
+
+  .btn-submit {
+    width: 100%;
+    padding: 12px;
+    font-size: 1rem;
+  }
+
+  h4 {
+    font-size: 1.1rem;
+  }
+}
+
+/* Para móviles pequeños */
+@media (max-width: 480px) {
+  .form-container {
+    margin: 15px;
+    padding: 10px;
+  }
+
+  .btn-toggle {
+    font-size: 0.95rem;
+    padding: 10px;
+    border-radius: 20px;
+  }
+
+  .form-box {
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .form-group label {
+    font-size: 0.9rem;
+  }
+
+  .form-group input,
+  .form-group select {
+    font-size: 0.85rem;
+  }
+
+  .btn-submit {
+    font-size: 0.9rem;
+    padding: 10px;
+  }
+
+  .alert {
+    max-width: 100%;
+    font-size: 0.9rem;
   }
 }

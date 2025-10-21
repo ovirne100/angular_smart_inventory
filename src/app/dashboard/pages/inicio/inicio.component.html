@@ -1,38 +1,41 @@
-<header>
-    <div class="cabesera">  
-          <button class="home-btn">
-  <i class="fas fa-house"></i>
-</button>  
-<h1>Inicio</h1>
+<div class="dashboard-container">
+  <h1 class="title">Panel de Inventario</h1>
+
+  <div class="cards-grid">
+
+    <!-- Tarjeta: Producto con más stock -->
+    <div class="card cyan">
+      <div class="icon">📦</div>
+      <div class="content">
+        <h2>Producto con más stock</h2>
+        <p class="value">{{ stats.productoStock?.nombre || '—' }}</p>
+        <small>{{ stats.productoStock?.cantidad || 0 | number }} und</small>
+      </div>
     </div>
-</header>
 
+    <!-- Tarjeta: Producto con más salida -->
+    <div class="card pink">
+      <div class="icon">🚚</div>
+      <div class="content">
+        <h2>Producto con más salida</h2>
+        <p class="value">{{ stats.productoSalida?.nombre || '—' }}</p>
+        <small>{{ stats.productoSalida?.cantidad || 0 | number }} und</small>
+      </div>
+    </div>
 
-    <div class="contend">
-        <div class="yellow">
-            <p>Producto con mas salidas del mes en curso</p>
-            <div class="contend2">
-            <div class="price">
-                <p><strong>600</strong>und</p> <br><p> Boligrafos </p>
-            </div>
-            <div class="feccha"><p><strong>29\06\2025</strong></p></div>
-            </div>
-        </div>
+    <!-- Tarjeta: Comparación mensual -->
+    <div class="card violet">
+      <div class="icon">📊</div>
+      <div class="content">
+        <h2>Comparativa Mes Anterior</h2>
+        <p class="value">
+          Salidas: {{ stats.salidasMesActual || 0 | number }} → {{ stats.salidasMesAnterior || 0 | number }}
+        </p>
+        <p class="value">
+          Entradas: {{ stats.entradasMesActual || 0 | number }} → {{ stats.entradasMesAnterior || 0 | number }}
+        </p>
+      </div>
+    </div>
 
-        <div class="blue">
-            <p>total salidas en curso</p>
-            <div class="contend3">
-            <div class="price3">
-                <p><strong>1.842</strong>und</p> <br><p> Respeto al mes anterior </p> <br><p>+15%</p>
-            </div>
-        </div>
+  </div>
 </div>
-        <div class="coffe">
-            <p>Total devoluciones mes en curso</p>
-            <div class="contend4">
-            <div class="price4">
-                <p><strong>600</strong>und</p> <br><p> Respeto al mes anterior</p> <br> <p>+15%</p>
-            </div>
-        </div>
-    </div>
-

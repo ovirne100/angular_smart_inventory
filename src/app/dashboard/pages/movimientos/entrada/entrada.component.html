@@ -20,7 +20,7 @@
     <!-- Cantidad -->
     <div class="form-group">
       <label>Cantidad *</label>
-      <input type="number" formControlName="quantity" placeholder="Ej: 50" />
+      <input type="number" formControlName="quantity" placeholder="Ej: 50" min="1" />
     </div>
 
     <!-- Unidad -->
@@ -44,22 +44,27 @@
       </select>
     </div>
 
-    <!-- Usuario -->
+    <!-- Ubicación interna -->
     <div class="form-group">
+<<<<<<< HEAD
       <label>Usuario *</label>
       <select formControlName="user_id">
         <option value="">Seleccione un usuario</option>
         <option *ngFor="let u of usuarios" [value]="u.id">{{ u.name }} {{u.role?.name}}</option>
       </select>
+=======
+      <label>Ubicación Interna *</label>
+      <input type="text" formControlName="ubicacion_interna" placeholder="Ej: Almacén A-3" />
+>>>>>>> 7b9678809b776d45ae469b0cbba53ab709774817
     </div>
 
-    <!-- Inventario -->
+    <!-- Stock mínimo -->
     <div class="form-group">
-      <label>Inventario ID *</label>
-      <input type="number" formControlName="inventory_id" placeholder="Ej: 1" />
+      <label>Stock Mínimo *</label>
+      <input type="number" formControlName="min_stock" placeholder="Ej: 10" min="0" />
     </div>
 
-    <button type="submit" class="btn-submit" [disabled]="saving">
+    <button type="submit" class="btn-submit" [disabled]="saving || entradaForm.invalid">
       {{ saving ? 'Guardando...' : '✅ Guardar' }}
     </button>
   </form>

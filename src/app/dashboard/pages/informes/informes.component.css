@@ -1,0 +1,150 @@
+/* Contenedor principal */
+.card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  padding: 24px;
+  max-width: 1200px;
+  margin: 20px auto;
+  font-family: 'Inter', sans-serif;
+  height: 80%; /* ya lo tienes */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Controles de filtrado */
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.controls label {
+  font-weight: 600;
+  font-size: 16px;
+  color: #374151;
+  margin-right: 6px;
+}
+
+.controls select,
+.controls input[type="date"] {
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-size: 16px;
+  color: #111827;
+  min-width: 180px;
+}
+
+/* Botones rápidos (Hoy / Semana / Mes) */
+.controls .quick {
+  display: flex;
+  gap: 12px;
+}
+
+.controls .quick button {
+  padding: 10px 20px;
+  font-size: 15px;
+  border-radius: 8px;
+  border: none;
+  background: #e5e7eb;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.controls .quick button:hover {
+  background: #3b82f6;
+  color: white;
+}
+
+/* Botón Generar */
+.controls > button {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.controls > button:hover {
+  background: #2563eb;
+}
+
+/* Botones de exportación */
+.exports {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.exports button {
+  padding: 10px 20px;
+  font-size: 15px;
+  font-weight: 500;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background: #f9fafb;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.exports button:hover {
+  background: #3b82f6;
+  color: white;
+  border-color: #2563eb;
+}
+
+/* Tablas: ocupan todo el espacio disponible dentro de la card */
+.card table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 16px; /* Más grande */
+  margin-top: 16px;
+}
+
+.card thead tr {
+  background: #f3f4f6;
+}
+
+.card th, .card td {
+  text-align: left;
+  padding: 14px 16px; /* Más grande */
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.card tbody tr:hover {
+  background: #f1f5f9;
+}
+
+/* Para que la tabla y divs ocupen todo el espacio restante */
+.card > div.mt-4,
+.card > div[data-type] {
+  flex: 1 1 auto; /* Crece y ocupa espacio vertical */
+  overflow-y: auto; /* Scroll si hay muchos datos */
+}
+
+/* Responsividad */
+@media (max-width: 1024px) {
+  .controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .exports {
+    flex-direction: column;
+  }
+
+  .controls select,
+  .controls input[type="date"],
+  .controls > button,
+  .exports button {
+    width: 100%;
+  }
+}
