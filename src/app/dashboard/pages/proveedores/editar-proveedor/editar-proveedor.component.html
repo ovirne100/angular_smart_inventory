@@ -1,0 +1,63 @@
+<!-- Modal Editar Proveedor -->
+<div class="modal-backdrop">
+  <div class="modal">
+    <h2>Editar Proveedor</h2>
+
+    <form #formProveedor="ngForm" (ngSubmit)="guardarCambios()">
+      <!-- Nombre -->
+      <div class="form-group">
+        <label for="name">Nombre *</label>
+        <input
+          type="text"
+          id="name"
+          name="name"
+          [(ngModel)]="form.name"
+          required
+          placeholder="Nombre del proveedor"
+        />
+      </div>
+
+      <!-- Email -->
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          [(ngModel)]="form.email"
+          placeholder="email@ejemplo.com"
+        />
+      </div>
+
+      <!-- Teléfono -->
+      <div class="form-group">
+        <label for="phone">Teléfono</label>
+        <input
+          type="text"
+          id="phone"
+          name="phone"
+          [(ngModel)]="form.phone"
+          placeholder="Número de teléfono"
+        />
+      </div>
+
+      <!-- Dirección -->
+      <div class="form-group">
+        <label for="address">Dirección</label>
+        <input
+          type="text"
+          id="address"
+          name="address"
+          [(ngModel)]="form.address"
+          placeholder="Dirección del proveedor"
+        />
+      </div>
+
+      <!-- Botones -->
+      <div class="modal-buttons">
+        <button type="submit" [disabled]="formProveedor.invalid">Actualizar</button>
+        <button type="button" (click)="cancelarEdicion()">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>

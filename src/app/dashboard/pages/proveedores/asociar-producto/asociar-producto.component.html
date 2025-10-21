@@ -1,0 +1,28 @@
+<!-- asociar-producto.component.html -->
+<div class="modal-backdrop">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Asociar producto a {{ proveedor?.name }}</h3>
+      <button class="close" (click)="cancelar.emit()">×</button>
+    </div>
+
+    <form (ngSubmit)="guardarProducto()">
+      <label>Producto</label>
+      <select [(ngModel)]="nuevoProducto.product_id" name="producto" required>
+        <option [ngValue]="null">-- Selecciona --</option>
+        <option *ngFor="let p of productos" [ngValue]="p.id">{{ p.name }}</option>
+      </select>
+
+      <label>Costo unitario</label>
+      <input type="number" [(ngModel)]="nuevoProducto.unit_cost" name="unit_cost" required />
+
+      <label>Referencia</label>
+      <input type="text" [(ngModel)]="nuevoProducto.supplier_reference" name="supplier_reference" />
+
+      <div class="modal-footer">
+        <button type="submit">Guardar</button>
+        <button type="button" (click)="cancelar.emit()">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,18 @@
+<div class="modal-backdrop">
+  <div class="modal">
+    <h2>Detalles del producto</h2>
+
+    <p><strong>Nombre:</strong> {{ producto.name }}</p>
+    <p><strong>Unidad:</strong> {{ producto.unit_measurement }}</p>
+    <p><strong>Lote:</strong> {{ producto.batch }}</p>
+
+    <p *ngIf="producto.expiration_date">
+      <strong>Fecha de vencimiento:</strong> {{ producto.expiration_date }}
+    </p>
+
+    <p><strong>Referencia:</strong> {{ producto.reference }}</p>
+    <p><strong>Categoría ID:</strong> {{ producto.category_id }}</p>
+
+    <button class="btn cancelar" (click)="cerrarModal()">Cerrar</button>
+  </div>
+</div>

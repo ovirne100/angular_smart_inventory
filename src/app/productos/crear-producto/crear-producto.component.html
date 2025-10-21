@@ -1,38 +1,99 @@
-<header>
-  <h2>Crear nuevo producto</h2>
-  <div class="codigo_barra">
-    <i class="fa-solid fa-barcode"></i>
+<!-- crear-producto.component.html -->
+<div class="crear-producto-container">
+  <div class="crear-producto-card">
+    <div class="header">
+      <h2><i class="fa-solid fa-plus-circle"></i> Crear Nuevo Producto</h2>
+      <p>Completa la información del producto para agregarlo al inventario</p>
+    </div>
+
+    <form #form="ngForm" (ngSubmit)="guardarProducto(form)" class="form-producto">
+      <div class="form-grid">
+        <div info-img>
+        <!-- Campos del producto -->
+        <div class="form-group">
+          <label for="name"><i class="fa-solid fa-tag"></i> Nombre del Producto *</label>
+          <input type="text" id="name" name="name" ngModel placeholder="Ej: Laptop Dell Inspiron" required class="form-input"/>
+        </div>
+
+        <div class="form-group">
+          <label for="reference"><i class="fa-solid fa-barcode"></i> Referencia *</label>
+          <input type="text" id="reference" name="reference" ngModel placeholder="Ej: LD1234" required class="form-input"/>
+        </div>
+
+        <div class="form-group">
+          <label for="unit"><i class="fa-solid fa-ruler"></i> Unidad de Medida *</label>
+          <select id="unit" name="unit" ngModel required class="form-input">
+            <option value="">Seleccionar unidad</option>
+            <option value="unidad">Unidad</option>
+            <option value="kg">Kilogramo</option>
+            <option value="g">Gramo</option>
+            <option value="l">Litro</option>
+            <option value="ml">Mililitro</option>
+            <option value="m">Metro</option>
+            <option value="cm">Centímetro</option>
+            <option value="caja">Caja</option>
+            <option value="paquete">Paquete</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="batch"><i class="fa-solid fa-layer-group"></i> Número de Lote *</label>
+          <input type="text" id="batch" name="batch" ngModel placeholder="Ej: B001" required class="form-input"/>
+        </div>
+
+        <div class="form-group">
+          <label for="category_id"><i class="fa-solid fa-folder"></i> Categoría *</label>
+          <div class="category-select-container">
+            <input type="text" id="category_search" name="category_search" ngModel
+                   (input)="filtrarCategorias($event)" placeholder="Buscar categoría..."
+                   class="form-input category-search"/>
+
+            <div class="category-dropdown" *ngIf="categoriasFiltradas.length > 0 && mostrarDropdown">
+              <div *ngFor="let categoria of categoriasFiltradas"
+                   class="category-option"
+                   (click)="seleccionarCategoria(categoria)">
+                <span class="category-id">{{ categoria.id }}</span>
+                <span class="category-name">{{ categoria.name }}</span>
+              </div>
+            </div>
+
+            <div class="selected-category" *ngIf="categoriaSeleccionada">
+              <span class="selected-id">{{ categoriaSeleccionada.id }}</span>
+              <span class="selected-name">{{ categoriaSeleccionada.name }}</span>
+              <button type="button" class="clear-category" (click)="limpiarCategoria()">
+                <i class="fa-solid fa-times"></i>
+              </button>
+            </div>
+
+            <input type="hidden" name="category_id" [ngModel]="categoriaSeleccionada?.id" required/>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="expiration_date"><i class="fa-solid fa-calendar"></i> Fecha de Vencimiento</label>
+          <input type="date" id="expiration_date" name="expiration_date" ngModel class="form-input"/>
+        </div>
+
+        <div class="form-group">
+          <label for="image">Imagen del producto</label>
+          <input type="file" (change)="onFileSelected($event)" accept="image/*" />
+        </div>
+        <div class="form-group" *ngIf="previewImage">
+          <label>Vista previa:</label>
+          <img [src]="previewImage" alt="Preview de imagen" style="max-width: 150px; max-height: 150px; border-radius: 8px;"/>
+        </div>
+      </div>
+
+        <!-- 🔽 Botones movidos aquí -->
+        <div class="form-actions">
+          <button type="button" class="btn-cancelar" (click)="cancelarCreacion()">
+            <i class="fa-solid fa-times"></i> Cancelar
+          </button>
+          <button type="submit" class="btn-guardar" [disabled]="form.invalid">
+            <i class="fa-solid fa-save"></i> Crear Producto
+          </button>
+        </div>
+      </div>
+    </form>
   </div>
-</header>
-
-<section class="crear-producto">
-  <form #formCrear="ngForm" (ngSubmit)="guardarProducto(formCrear)">
-
-    <label>Nombre:
-      <input type="text" name="name" ngModel required>
-    </label>
-
-    <label>Referencia:
-      <input type="text" name="reference" ngModel required>
-    </label>
-
-    <label>Unidad de medida:
-      <input type="text" name="unit" ngModel> <!-- Cambiado a "unit" -->
-    </label>
-
-    <label>Lote:
-      <input type="text" name="lote" ngModel required> <!-- Cambiado a "lote" -->
-    </label>
-
-    <label>Categoría (ID):
-      <input type="number" name="category_id" ngModel required>
-    </label>
-
-    <label>Fecha de vencimiento:
-      <input type="date" name="fechaVencimiento" ngModel required> <!-- Cambiado a "fechaVencimiento" -->
-    </label>
-
-    <button type="submit">Guardar</button>
-    <button type="button" (click)="cancelarCreacion()">Cancelar</button>
-  </form>
-</section>
+</div>
