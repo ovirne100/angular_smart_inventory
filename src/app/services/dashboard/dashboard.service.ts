@@ -6,11 +6,15 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class DashboardService {
-  private API_URL = 'http://localhost:8000/api/dashboard/summary';
+  // 🔗 URL del backend Laravel (ajusta si usas .env o proxy)
+  private readonly API_URL = 'http://localhost:8000/api/dashboard/summary';
 
   constructor(private http: HttpClient) {}
 
+  /**
+   * 📊 Obtiene los datos del resumen del dashboard
+   */
   getDashboardData(): Observable<any> {
-    return this.http.get(this.API_URL);
+    return this.http.get<any>(this.API_URL);
   }
 }

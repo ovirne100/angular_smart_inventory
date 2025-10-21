@@ -3,47 +3,37 @@
 
   <div class="cards-grid">
 
-    <!-- Tarjeta 1: Total de salidas -->
-    <div class="card blue">
+    <!-- Tarjeta: Producto con más stock -->
+    <div class="card cyan">
       <div class="icon">📦</div>
       <div class="content">
-        <h2>Total Salidas</h2>
-        <p class="value">{{ stats.totalSalidas | number }} und</p>
-        <span class="trend" [ngClass]="{'up': stats.variacionSalidas >= 0, 'down': stats.variacionSalidas < 0}">
-          {{ stats.variacionSalidas >= 0 ? '+' : '' }}{{ stats.variacionSalidas }}%
-        </span>
+        <h2>Producto con más stock</h2>
+        <p class="value">{{ stats.productoStock?.nombre || '—' }}</p>
+        <small>{{ stats.productoStock?.cantidad || 0 | number }} und</small>
       </div>
     </div>
 
-    <!-- Tarjeta 2: Devoluciones -->
-    <div class="card orange">
-      <div class="icon">🔁</div>
+    <!-- Tarjeta: Producto con más salida -->
+    <div class="card pink">
+      <div class="icon">🚚</div>
       <div class="content">
-        <h2>Devoluciones</h2>
-        <p class="value">{{ stats.totalDevoluciones | number }} und</p>
-        <span class="trend" [ngClass]="{'up': stats.variacionDevoluciones >= 0, 'down': stats.variacionDevoluciones < 0}">
-          {{ stats.variacionDevoluciones >= 0 ? '+' : '' }}{{ stats.variacionDevoluciones }}%
-        </span>
+        <h2>Producto con más salida</h2>
+        <p class="value">{{ stats.productoSalida?.nombre || '—' }}</p>
+        <small>{{ stats.productoSalida?.cantidad || 0 | number }} und</small>
       </div>
     </div>
 
-    <!-- Tarjeta 3: Producto más vendido -->
-    <div class="card green">
-      <div class="icon">🏆</div>
-      <div class="content">
-        <h2>Producto más vendido</h2>
-        <p class="value">{{ stats.productoTop?.nombre }}</p>
-        <small>{{ stats.productoTop?.cantidad | number }} und</small>
-      </div>
-    </div>
-
-    <!-- Tarjeta 4: Comparativa mensual -->
+    <!-- Tarjeta: Comparación mensual -->
     <div class="card violet">
       <div class="icon">📊</div>
       <div class="content">
-        <h2>Comparativa Mensual</h2>
-        <p class="value">{{ stats.comparativa | number }}%</p>
-        <small>{{ stats.mesAnterior }} → {{ stats.mesActual }}</small>
+        <h2>Comparativa Mes Anterior</h2>
+        <p class="value">
+          Salidas: {{ stats.salidasMesActual || 0 | number }} → {{ stats.salidasMesAnterior || 0 | number }}
+        </p>
+        <p class="value">
+          Entradas: {{ stats.entradasMesActual || 0 | number }} → {{ stats.entradasMesAnterior || 0 | number }}
+        </p>
       </div>
     </div>
 

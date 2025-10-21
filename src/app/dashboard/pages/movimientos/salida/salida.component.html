@@ -1,63 +1,53 @@
-<div class="form-container">
-  <div class="btn-container">
-    <button class="btn-toggle" type="button" (click)="toggleFormulario()">
-      ➖ Nueva Salida
+<div class="salida-container">
+
+  <div class="header">
+    <h2>📤 Salidas de Productos</h2>
+    <button (click)="toggleForm()" class="btn-toggle">
+      {{ showForm ? '✖ Cerrar' : '➕ Nueva Salida' }}
     </button>
   </div>
 
-  <!-- Mensaje visible incluso si el formulario se oculta -->
-  <div *ngIf="mensaje" class="alert" [ngClass]="tipoMensaje">
-    {{ mensaje }}
+  <div class="messages">
+    <div *ngIf="successMessage" class="alert success">{{ successMessage }}</div>
+    <div *ngIf="errorMessage" class="alert error">{{ errorMessage }}</div>
+    <div *ngIf="warningMessage" class="alert warning">{{ warningMessage }}</div>
   </div>
 
-  <!-- Formulario solo se muestra si mostrarFormulario es true -->
-  <div class="form-box" *ngIf="mostrarFormulario">
-    <h4>📦 Registrar Salida</h4>
+  <form *ngIf="showForm" [formGroup]="salidaForm" (ngSubmit)="onSubmit()" class="form-box" novalidate>
+    <h3>Registrar Nueva Salida</h3>
 
-    <form [formGroup]="salidaForm" (ngSubmit)="registrarSalida()">
-      <div class="form-group">
-        <label for="product_id">Producto *</label>
-        <select id="product_id" formControlName="product_id">
-          <option value="">Seleccione un producto</option>
-          <option *ngFor="let producto of productos" [value]="producto.id">
-            {{ producto.name }}
-          </option>
-        </select>
+    <div class="form-group">
+      <label>Producto *</label>
+      <select formControlName="product_id">
+        <option value="">Seleccione un producto</option>
+        <option *ngFor="let p of productos" [value]="p.id">{{ p.name }}</option>
+      </select>
+      <div class="error" *ngIf="salidaForm.controls['product_id'].invalid && salidaForm.controls['product_id'].touched">
+        Selecciona un producto.
       </div>
+    </div>
 
-      <div class="form-group">
-        <label for="quantity">Cantidad *</label>
-        <input type="number" id="quantity" formControlName="quantity" placeholder="Ej: 10" />
+    <div class="form-group">
+      <label>Cantidad *</label>
+      <input type="number" formControlName="quantity" placeholder="Ej: 10" min="1">
+      <div class="error" *ngIf="salidaForm.controls['quantity'].invalid && salidaForm.controls['quantity'].touched">
+        Ingresa una cantidad válida (≥1).
       </div>
+    </div>
 
-      <div class="form-group">
-        <label for="unit">Unidad</label>
-        <input type="text" id="unit" formControlName="unit" placeholder="unidad, caja, paquete..." />
-      </div>
+    <div class="form-group">
+      <label>Unidad</label>
+      <input type="text" formControlName="unit" placeholder="unidad, caja, paquete...">
+    </div>
 
-      <div class="form-group">
-        <label for="lot">Motivo o destino *</label>
-        <input type="text" id="lot" formControlName="lot" placeholder="Ej: venta, traslado, devolución..." />
-      </div>
+    <div class="form-group">
+      <label>Lote / Motivo</label>
+      <input type="text" formControlName="lot" placeholder="Ej: venta, traslado, L-2025-A...">
+      <small class="form-hint">Si no se especifica lote, se buscará inventario automáticamente (FIFO).</small>
+    </div>
 
-      <div class="form-group">
-        <label for="user_id">Usuario *</label>
-        <select id="user_id" formControlName="user_id">
-          <option value="">Seleccione un usuario</option>
-          <option *ngFor="let usuario of usuarios" [value]="usuario.id">
-            {{ usuario.name }}
-          </option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label for="inventory_id">Inventario ID *</label>
-        <input type="number" id="inventory_id" formControlName="inventory_id" placeholder="Ej: 1" />
-      </div>
-
-      <button type="submit" class="btn-submit" [disabled]="salidaForm.invalid">
-        💾 Guardar
-      </button>
-    </form>
-  </div>
+    <button type="submit" class="btn-submit" [disabled]="saving || salidaForm.invalid">
+      {{ saving ? 'Guardando...' : '✅ Guardar Salida' }}
+    </button>
+  </form>
 </div>

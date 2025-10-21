@@ -1,27 +1,32 @@
-/* Estilos generales */
+/* 🎨 Estilos generales */
 .dashboard-container {
   padding: 30px;
   font-family: 'Poppins', sans-serif;
   background-color: #f5f6fa;
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .title {
   text-align: center;
   font-size: 2rem;
-  margin-bottom: 30px;
+  margin-bottom: 40px;
   font-weight: 600;
   color: #2c3e50;
 }
 
-/* Grid de tarjetas */
+/* 🧩 Grid de tarjetas */
 .cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 25px;
+  width: 100%;
+  max-width: 1200px;
 }
 
-/* Tarjeta base */
+/* 🪄 Tarjeta base */
 .card {
   background: #fff;
   border-radius: 18px;
@@ -31,6 +36,7 @@
   flex-direction: column;
   align-items: center;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  text-align: center;
 }
 
 .card:hover {
@@ -38,17 +44,13 @@
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
 }
 
-/* Iconos */
+/* 🔹 Iconos */
 .icon {
   font-size: 40px;
   margin-bottom: 12px;
 }
 
-/* Contenido */
-.content {
-  text-align: center;
-}
-
+/* 🧾 Contenido */
 .content h2 {
   font-size: 1.2rem;
   color: #444;
@@ -67,24 +69,20 @@ small {
   font-size: 0.9rem;
 }
 
-/* Colores temáticos */
-.card.blue {
-  border-top: 6px solid #3498db;
+/* 🎨 Colores temáticos */
+.card.cyan {
+  border-top: 6px solid #00bcd4;
 }
 
-.card.orange {
-  border-top: 6px solid #f39c12;
-}
-
-.card.green {
-  border-top: 6px solid #2ecc71;
+.card.pink {
+  border-top: 6px solid #e91e63;
 }
 
 .card.violet {
   border-top: 6px solid #9b59b6;
 }
 
-/* Tendencias */
+/* 📈 Tendencias */
 .trend {
   font-weight: 600;
   font-size: 1rem;
@@ -98,21 +96,54 @@ small {
   color: #e74c3c;
 }
 
-/* Responsividad */
-@media (max-width: 768px) {
+/* 📱 Responsividad */
+@media (max-width: 992px) {
   .title {
-    font-size: 1.6rem;
+    font-size: 1.8rem;
+  }
+
+  .cards-grid {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
   }
 
   .card {
-    padding: 20px;
+    padding: 22px;
   }
 
   .icon {
-    font-size: 35px;
+    font-size: 36px;
   }
 
   .value {
     font-size: 1.3rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .dashboard-container {
+    padding: 20px;
+  }
+
+  .title {
+    font-size: 1.5rem;
+    margin-bottom: 25px;
+  }
+
+  .cards-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .card {
+    padding: 18px;
+  }
+
+  .icon {
+    font-size: 32px;
+  }
+
+  .value {
+    font-size: 1.2rem;
   }
 }
