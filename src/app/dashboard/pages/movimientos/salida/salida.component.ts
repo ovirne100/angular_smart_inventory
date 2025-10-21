@@ -57,32 +57,7 @@ export class SalidaComponent implements OnInit, OnDestroy {
       product_id: ['', Validators.required],
       quantity: ['', [Validators.required, Validators.min(1)]],
       unit: [''],
-<<<<<<< HEAD
-      lot: ['', Validators.required],
-      user_id: ['', Validators.required],
-      inventory_id: ['', Validators.required],
-    });
-
-    this.cargarDatos();
-  }
-
-  toggleFormulario() {
-    this.mostrarFormulario = !this.mostrarFormulario; // 👈 alterna visibilidad
-  }
-
-  cargarDatos() {
-    this.http.get('http://smart_inventory/api/outputs/form-data').subscribe({
-      next: (data: any) => {
-        this.productos = data.productos || [];
-        this.usuarios = data.usuarios || [];
-      },
-      error: () => {
-        this.mensaje = 'Error al cargar productos y usuarios';
-        this.tipoMensaje = 'error';
-      }
-=======
-      lot: [''],
->>>>>>> 7b9678809b776d45ae469b0cbba53ab709774817
+      lot: ['']
     });
   }
 
@@ -91,19 +66,6 @@ export class SalidaComponent implements OnInit, OnDestroy {
     this.clearMessages();
   }
 
-<<<<<<< HEAD
-    this.http.post('http://smart_inventory/api/outputs', this.salidaForm.value).subscribe({
-      next: (res: any) => {
-        this.mensaje = res.message || 'Salida registrada correctamente';
-        this.tipoMensaje = 'success';
-        this.salidaForm.reset();
-      },
-      error: (err) => {
-        this.mensaje = err.error?.message || 'Error al registrar la salida';
-        this.tipoMensaje = 'error';
-      }
-    });
-=======
   private clearMessages() {
     this.successMessage = '';
     this.errorMessage = '';
@@ -116,13 +78,12 @@ export class SalidaComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: res => {
-          console.log('📦 Datos del formulario:', res);
           this.productos = res.data?.productos || [];
           this.inventarios = res.data?.inventarios || [];
         },
         error: err => {
           console.error('❌ Error cargando datos del formulario', err);
-          this.errorMessage = err.error?.message || 'Error al cargar productos.';
+          this.errorMessage = err.error?.message || 'Error al cargar productos e inventarios.';
         }
       });
   }
@@ -136,7 +97,6 @@ export class SalidaComponent implements OnInit, OnDestroy {
     this.saving = true;
     this.clearMessages();
 
-    // Normaliza tipos: IDs a número
     const payload = {
       product_id: Number(this.salidaForm.value.product_id),
       quantity: Number(this.salidaForm.value.quantity),
@@ -150,18 +110,14 @@ export class SalidaComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: res => {
-          console.log('✅ Salida creada:', res);
           this.successMessage = res.message || '✅ Salida registrada correctamente.';
           this.resetForm();
           setTimeout(() => this.clearMessages(), 5000);
         },
         error: err => {
           console.error('❌ Error al registrar la salida:', err);
-          // Mostrar detalle de validación si existe
           if (err.status === 422 && err.error?.errors) {
-            // Laravel validation errors
-            const errors = err.error.errors;
-            this.errorMessage = Object.values(errors).flat().join(' ');
+            this.errorMessage = Object.values(err.error.errors).flat().join(' ');
           } else if (err.error?.message) {
             this.errorMessage = err.error.message;
           } else {
@@ -186,6 +142,5 @@ export class SalidaComponent implements OnInit, OnDestroy {
     let headers = new HttpHeaders({ 'Accept': 'application/json' });
     if (token) headers = headers.set('Authorization', `Bearer ${token}`);
     return headers;
->>>>>>> 7b9678809b776d45ae469b0cbba53ab709774817
   }
 }

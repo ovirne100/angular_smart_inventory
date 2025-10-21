@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 export interface ApiResponse<T> {
@@ -51,7 +51,7 @@ export interface OutputSummary {
 export class MovimientosService {
   private apiUrl = environment.apiUrl;
 
-  // ================== 📊 RESUMEN ENTRADAS ==================
+  // ================== RESUMEN ENTRADAS ==================
   private entriesCountSubject = new BehaviorSubject<number>(0);
   entriesCount$ = this.entriesCountSubject.asObservable();
 
@@ -61,7 +61,7 @@ export class MovimientosService {
   private lastEntryDateSubject = new BehaviorSubject<string | null>(null);
   lastEntryDate$ = this.lastEntryDateSubject.asObservable();
 
-  // ================== 📊 RESUMEN SALIDAS ==================
+  // ================== RESUMEN SALIDAS ==================
   private outputsCountSubject = new BehaviorSubject<number>(0);
   outputsCount$ = this.outputsCountSubject.asObservable();
 
@@ -71,7 +71,7 @@ export class MovimientosService {
   private lastOutputDateSubject = new BehaviorSubject<string | null>(null);
   lastOutputDate$ = this.lastOutputDateSubject.asObservable();
 
-  // ================== 📋 LISTAS COMPLETAS ==================
+  // ================== LISTAS COMPLETAS ==================
   private entradasSubject = new BehaviorSubject<Entrada[]>([]);
   entradas$ = this.entradasSubject.asObservable();
 
@@ -97,11 +97,8 @@ export class MovimientosService {
 
   getEntradasList(params: any = {}): void {
     this.getEntradas(params).subscribe({
-      next: (res) => {
-        console.log('📥 Entradas recibidas:', res);
-        this.entradasSubject.next(res.data || []);
-      },
-      error: (err) => {
+      next: res => this.entradasSubject.next(res.data || []),
+      error: err => {
         console.error('❌ Error al cargar entradas completas:', err);
         this.entradasSubject.next([]);
       }
@@ -109,20 +106,15 @@ export class MovimientosService {
   }
 
   refreshEntriesCount(): void {
-<<<<<<< HEAD
-    this.http.get<any>(`${this.apiUrl}/entries/form-data`, {
-=======
     this.http.get<ApiResponse<EntrySummary>>(`${this.apiUrl}/entries/summary`, {
->>>>>>> 7b9678809b776d45ae469b0cbba53ab709774817
       headers: { 'Accept': 'application/json' }
     }).subscribe({
-      next: (response) => {
-        console.log('📊 Resumen entradas recibido:', response);
+      next: response => {
         this.entriesCountSubject.next(response.data.count ?? 0);
         this.entriesQuantitySubject.next(response.data.quantity ?? 0);
         this.lastEntryDateSubject.next(response.data.last_date ?? null);
       },
-      error: (err) => {
+      error: err => {
         console.error('❌ Error al refrescar resumen de entradas', err);
         this.entriesCountSubject.next(0);
         this.entriesQuantitySubject.next(0);
@@ -148,11 +140,8 @@ export class MovimientosService {
 
   getSalidasList(params: any = {}): void {
     this.getSalidas(params).subscribe({
-      next: (res) => {
-        console.log('📤 Salidas recibidas:', res);
-        this.salidasSubject.next(res.data || []);
-      },
-      error: (err) => {
+      next: res => this.salidasSubject.next(res.data || []),
+      error: err => {
         console.error('❌ Error al cargar salidas completas:', err);
         this.salidasSubject.next([]);
       }
@@ -160,20 +149,15 @@ export class MovimientosService {
   }
 
   refreshOutputsCount(): void {
-<<<<<<< HEAD
-    this.http.get<any>(`${this.apiUrl}/outputs/form-data`, {
-=======
     this.http.get<ApiResponse<OutputSummary>>(`${this.apiUrl}/outputs/summary`, {
->>>>>>> 7b9678809b776d45ae469b0cbba53ab709774817
       headers: { 'Accept': 'application/json' }
     }).subscribe({
-      next: (response) => {
-        console.log('📊 Resumen salidas recibido:', response);
+      next: response => {
         this.outputsCountSubject.next(response.data.total_salidas ?? 0);
         this.outputsQuantitySubject.next(response.data.total_cantidad ?? 0);
         this.lastOutputDateSubject.next(response.data.ultima_salida ?? null);
       },
-      error: (err) => {
+      error: err => {
         console.error('❌ Error al refrescar resumen de salidas', err);
         this.outputsCountSubject.next(0);
         this.outputsQuantitySubject.next(0);
