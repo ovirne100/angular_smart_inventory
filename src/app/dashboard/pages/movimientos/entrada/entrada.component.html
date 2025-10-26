@@ -1,12 +1,23 @@
 <div class="form-container">
-  <button (click)="toggleForm()" class="btn-toggle">➕ Nueva Entrada</button>
 
-  <div *ngIf="successMessage" class="alert success">{{ successMessage }}</div>
-  <div *ngIf="errorMessage" class="alert error">{{ errorMessage }}</div>
-  <div *ngIf="warningMessage" class="alert warning">{{ warningMessage }}</div>
+  <!-- Botón toggle -->
+  <div class="header">
+    <h2>📥 Entradas de Productos</h2>
+    <button (click)="toggleForm()" class="btn-toggle">
+      {{ showForm ? '✖ Cerrar' : '➕ Nueva Entrada' }}
+    </button>
+  </div>
 
+  <!-- Mensajes -->
+  <div class="messages" *ngIf="successMessage || errorMessage || warningMessage">
+    <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
+    <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+    <div *ngIf="warningMessage" class="alert alert-warning">{{ warningMessage }}</div>
+  </div>
+
+  <!-- Formulario de Entrada -->
   <form *ngIf="showForm" [formGroup]="entradaForm" (ngSubmit)="onSubmit()" class="form-box" novalidate>
-    <h3>📥 Registrar Entrada</h3>
+    <h3>📥 Registrar Nueva Entrada</h3>
 
     <!-- Producto -->
     <div class="form-group">
@@ -15,12 +26,18 @@
         <option value="">Seleccione un producto</option>
         <option *ngFor="let p of productos" [value]="p.id">{{ p.name }}</option>
       </select>
+      <div class="error" *ngIf="entradaForm.controls['product_id'].invalid && entradaForm.controls['product_id'].touched">
+        Selecciona un producto.
+      </div>
     </div>
 
     <!-- Cantidad -->
     <div class="form-group">
       <label>Cantidad *</label>
       <input type="number" formControlName="quantity" placeholder="Ej: 50" min="1" />
+      <div class="error" *ngIf="entradaForm.controls['quantity'].invalid && entradaForm.controls['quantity'].touched">
+        Ingresa una cantidad válida (≥1).
+      </div>
     </div>
 
     <!-- Unidad -->
@@ -42,30 +59,83 @@
         <option value="">Seleccione un proveedor</option>
         <option *ngFor="let s of proveedores" [value]="s.id">{{ s.name }}</option>
       </select>
+      <div class="error" *ngIf="entradaForm.controls['supplier_id'].invalid && entradaForm.controls['supplier_id'].touched">
+        Selecciona un proveedor.
+      </div>
     </div>
 
     <!-- Ubicación interna -->
     <div class="form-group">
-<<<<<<< HEAD
-      <label>Usuario *</label>
-      <select formControlName="user_id">
-        <option value="">Seleccione un usuario</option>
-        <option *ngFor="let u of usuarios" [value]="u.id">{{ u.name }} {{u.role?.name}}</option>
-      </select>
-=======
       <label>Ubicación Interna *</label>
       <input type="text" formControlName="ubicacion_interna" placeholder="Ej: Almacén A-3" />
->>>>>>> 7b9678809b776d45ae469b0cbba53ab709774817
+      <div class="error" *ngIf="entradaForm.controls['ubicacion_interna'].invalid && entradaForm.controls['ubicacion_interna'].touched">
+        Ingresa una ubicación interna válida.
+      </div>
     </div>
 
     <!-- Stock mínimo -->
     <div class="form-group">
       <label>Stock Mínimo *</label>
       <input type="number" formControlName="min_stock" placeholder="Ej: 10" min="0" />
+      <div class="error" *ngIf="entradaForm.controls['min_stock'].invalid && entradaForm.controls['min_stock'].touched">
+        Ingresa un stock mínimo válido (≥0).
+      </div>
     </div>
 
-    <button type="submit" class="btn-submit" [disabled]="saving || entradaForm.invalid">
-      {{ saving ? 'Guardando...' : '✅ Guardar' }}
-    </button>
+    <!-- Usuario -->
+<div class="form-group">
+  <label>Usuario</label>
+  <input
+    type="text"
+    [value]="currentUser?.name || 'Cargando...'"
+    readonly
+    class="readonly-input"
+  />
+  <!-- Este input oculto mantiene el ID en el formulario -->
+  <input type="hidden" formControlName="user_id" />
+</div>
+
+
+<!-- Almacén -->
+<!-- Almacén -->
+<div class="form-group">
+  <label>Almacén (Warehouse)</label>
+  <select formControlName="warehouse_id">
+    <option value="">Seleccione un Almacén</option>
+    <option *ngFor="let w of warehouses" [value]="w.id">{{ w.name }}</option>
+  </select>
+
+  <button type="button" class="btn-small" (click)="toggleWarehouseForm()">
+    + Crear nuevo almacén
+  </button>
+</div>
+
+<!-- Subformulario para crear nuevo almacén -->
+<div *ngIf="showWarehouseForm" class="subform">
+  <h4>🆕 Crear nuevo almacén</h4>
+  <form [formGroup]="warehouseForm" (ngSubmit)="crearWarehouse()">
+    <div class="form-group">
+      <label>Nombre</label>
+      <input formControlName="name" placeholder="Ej: Bodega Central" />
+    </div>
+    <div class="form-group">
+      <label>Dirección</label>
+      <input formControlName="address" placeholder="Ej: Calle 45 #23-56" />
+    </div>
+    <div class="form-group">
+      <label>Capacidad</label>
+      <input formControlName="capacity" placeholder="Ej: 5000 m³" />
+    </div>
+    <button type="submit" [disabled]="warehouseForm.invalid">Guardar Almacén</button>
   </form>
+</div>
+
+
+    <!-- Botón enviar -->
+    <button type="submit" class="btn-submit" [disabled]="saving || entradaForm.invalid">
+      {{ saving ? 'Guardando...' : '✅ Guardar Entrada' }}
+    </button>
+
+  </form>
+
 </div>

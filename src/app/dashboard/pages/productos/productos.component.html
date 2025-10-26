@@ -9,9 +9,11 @@
 <app-actualizar-producto
   *ngIf="mostrarEditar && productoEnEdicion"
   [producto]="productoEnEdicion"
-  (cancelar)="cerrarEditar()"
-  (productoActualizado)="onProductoActualizado()">
+  (actualizado)="onProductoActualizado($event)"
+  (cancelar)="cerrarEditar()">
 </app-actualizar-producto>
+
+
 
 <!-- Modal Ver Más -->
 <app-ver-mas-producto

@@ -1,4 +1,3 @@
-<!-- asociar-producto.component.html -->
 <div class="modal-backdrop">
   <div class="modal">
     <div class="modal-header">
@@ -7,17 +6,39 @@
     </div>
 
     <form (ngSubmit)="guardarProducto()">
+      <!-- Producto -->
       <label>Producto</label>
-      <select [(ngModel)]="nuevoProducto.product_id" name="producto" required>
+      <select [(ngModel)]="nuevoProducto.product_id" name="producto" required (change)="onProductoSeleccionado()">
         <option [ngValue]="null">-- Selecciona --</option>
         <option *ngFor="let p of productos" [ngValue]="p.id">{{ p.name }}</option>
       </select>
 
+      <!-- Costo -->
       <label>Costo unitario</label>
-      <input type="number" [(ngModel)]="nuevoProducto.unit_cost" name="unit_cost" required />
+      <input
+        type="number"
+        [(ngModel)]="nuevoProducto.unit_cost"
+        name="unit_cost"
+        required
+      />
 
+      <!-- Referencia (solo lectura) -->
       <label>Referencia</label>
-      <input type="text" [(ngModel)]="nuevoProducto.supplier_reference" name="supplier_reference" />
+      <input
+        type="text"
+        [(ngModel)]="nuevoProducto.supplier_reference"
+        name="supplier_reference"
+        readonly
+      />
+
+      <!-- Lote (solo lectura) -->
+      <label>Lote</label>
+      <input
+        type="text"
+        [(ngModel)]="nuevoProducto.batch"
+        name="batch"
+        readonly
+      />
 
       <div class="modal-footer">
         <button type="submit">Guardar</button>

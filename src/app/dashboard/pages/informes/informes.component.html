@@ -1,74 +1,321 @@
-<div class="card p-4">
-  <h2>Informes</h2>
+<div class="informes-container">
+  <div class="informes-header">
+    <h2><i class="fa-solid fa-chart-bar"></i> Generador de Informes</h2>
+    <p class="subtitle">Selecciona el tipo de informe y configura los filtros necesarios</p>
+  </div>
 
-  <div class="controls">
-    <label>Tipo</label>
-    <select [(ngModel)]="tipo">
-      <option value="productos">Movimientos de productos</option>
-      <option value="alertas">Alertas</option>
-      <option value="inventario">Inventario actual</option>
-    </select>
+  <!-- ===================== SELECTOR DE TIPO DE INFORME ===================== -->
+  <div class="tipo-informe-selector">
+    <button
+      class="btn-tipo-informe"
+      [class.active]="tipoInforme === 'productos'"
+      (click)="cambiarTipoInforme('productos')">
+      <i class="fa-solid fa-boxes"></i>
+      <span>Productos</span>
+    </button>
 
-    <label>Desde</label>
-    <input type="date" [(ngModel)]="fechaInicio">
+    <button
+      class="btn-tipo-informe"
+      [class.active]="tipoInforme === 'proveedores'"
+      (click)="cambiarTipoInforme('proveedores')">
+      <i class="fa-solid fa-truck"></i>
+      <span>Proveedores</span>
+    </button>
 
-    <label>Hasta</label>
-    <input type="date" [(ngModel)]="fechaFin">
+    <button
+      class="btn-tipo-informe"
+      [class.active]="tipoInforme === 'alertas'"
+      (click)="cambiarTipoInforme('alertas')">
+      <i class="fa-solid fa-bell"></i>
+      <span>Alertas</span>
+    </button>
 
-    <div class="quick">
-      <button (click)="setQuick('today')">Hoy</button>
-      <button (click)="setQuick('week')">Última semana</button>
-      <button (click)="setQuick('month')">Mes</button>
+    <button
+      class="btn-tipo-informe"
+      [class.active]="tipoInforme === 'inventario'"
+      (click)="cambiarTipoInforme('inventario')">
+      <i class="fa-solid fa-warehouse"></i>
+      <span>Inventario</span>
+    </button>
+  </div>
+
+  <!-- ===================== FILTROS ===================== -->
+  <div class="filtros-container" *ngIf="mostrarFiltros">
+
+    <!-- Filtros para Productos -->
+    <div *ngIf="tipoInforme === 'productos'" class="filtros-panel">
+      <h3>🔍 Filtros de Productos</h3>
+      <div class="filtros-grid">
+        <div class="filtro-item">
+          <label>Búsqueda:</label>
+          <input type="text" [(ngModel)]="filtrosProductos.search" placeholder="Nombre, referencia...">
+        </div>
+
+        <div class="filtro-item">
+          <label>Lote:</label>
+          <input type="text" [(ngModel)]="filtrosProductos.lote" placeholder="Número de lote">
+        </div>
+
+        <div class="filtro-item">
+          <label>Referencia:</label>
+          <input type="text" [(ngModel)]="filtrosProductos.referencia" placeholder="Código de referencia">
+        </div>
+
+        <div class="filtro-item">
+          <label>Fecha Inicio:</label>
+          <input type="date" [(ngModel)]="filtrosProductos.fechaInicio">
+        </div>
+
+        <div class="filtro-item">
+          <label>Fecha Fin:</label>
+          <input type="date" [(ngModel)]="filtrosProductos.fechaFin">
+        </div>
+      </div>
     </div>
 
-    <button (click)="generar()">Generar</button>
+    <!-- Filtros para Proveedores -->
+    <div *ngIf="tipoInforme === 'proveedores'" class="filtros-panel">
+      <h3>🔍 Filtros de Proveedores</h3>
+      <div class="filtros-grid">
+        <div class="filtro-item">
+          <label>Búsqueda:</label>
+          <input type="text" [(ngModel)]="filtrosProveedores.search" placeholder="Nombre, email, teléfono...">
+        </div>
 
-    <div class="exports" *ngIf="tipo">
-      <button (click)="exportExcel()">Exportar CSV/Excel</button>
-      <button (click)="exportPdf()">Exportar PDF (server)</button>
-      <button (click)="exportPdfClient()">Exportar PDF (cliente)</button>
+        <div class="filtro-item">
+          <label>Fecha Inicio:</label>
+          <input type="date" [(ngModel)]="filtrosProveedores.fechaInicio">
+        </div>
+
+        <div class="filtro-item">
+          <label>Fecha Fin:</label>
+          <input type="date" [(ngModel)]="filtrosProveedores.fechaFin">
+        </div>
+      </div>
+    </div>
+
+    <!-- Filtros para Alertas -->
+    <div *ngIf="tipoInforme === 'alertas'" class="filtros-panel">
+      <h3>🔍 Filtros de Alertas</h3>
+      <div class="filtros-grid">
+        <div class="filtro-item">
+          <label>Tipo:</label>
+          <select [(ngModel)]="filtrosAlertas.tipo">
+            <option value="">Todos</option>
+            <option value="bajo_stock">Bajo Stock</option>
+            <option value="sin_stock">Sin Stock</option>
+          </select>
+        </div>
+
+        <div class="filtro-item">
+          <label>Estado:</label>
+          <select [(ngModel)]="filtrosAlertas.estado">
+            <option value="">Todos</option>
+            <option value="pendiente">Pendiente</option>
+            <option value="resuelta">Resuelta</option>
+          </select>
+        </div>
+
+        <div class="filtro-item">
+          <label>Fecha Inicio:</label>
+          <input type="date" [(ngModel)]="filtrosAlertas.fechaInicio">
+        </div>
+
+        <div class="filtro-item">
+          <label>Fecha Fin:</label>
+          <input type="date" [(ngModel)]="filtrosAlertas.fechaFin">
+        </div>
+      </div>
+    </div>
+
+    <!-- Filtros para Inventario -->
+    <div *ngIf="tipoInforme === 'inventario'" class="filtros-panel">
+      <h3>🔍 Filtros de Inventario</h3>
+      <div class="filtros-grid">
+        <div class="filtro-item">
+          <label>Producto:</label>
+          <input type="text" [(ngModel)]="filtrosInventario.producto" placeholder="Nombre del producto">
+        </div>
+
+        <div class="filtro-item">
+          <label>Lote:</label>
+          <input type="text" [(ngModel)]="filtrosInventario.lote" placeholder="Número de lote">
+        </div>
+
+        <div class="filtro-item">
+          <label>Stock Mínimo:</label>
+          <input type="number" [(ngModel)]="filtrosInventario.stockMinimo" placeholder="Cantidad mínima">
+        </div>
+
+        <div class="filtro-item checkbox">
+          <label>
+            <input type="checkbox" [(ngModel)]="filtrosInventario.mostrarAgotados">
+            Mostrar solo productos agotados
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botones de acción rápida -->
+    <div class="filtros-acciones">
+      <div class="botones-rapidos">
+        <button class="btn-rapido" (click)="setQuick('today')">Hoy</button>
+        <button class="btn-rapido" (click)="setQuick('week')">Semana</button>
+        <button class="btn-rapido" (click)="setQuick('month')">Mes</button>
+        <button class="btn-rapido" (click)="setQuick('year')">Año</button>
+      </div>
+
+      <div class="botones-accion">
+        <button class="btn-generar" (click)="generarInforme()" [disabled]="loading">
+          <i class="fa-solid fa-magic" *ngIf="!loading"></i>
+          <i class="fa-solid fa-spinner fa-spin" *ngIf="loading"></i>
+          {{ loading ? 'Generando...' : 'Generar Informe' }}
+        </button>
+      </div>
     </div>
   </div>
 
-  <div class="mt-4" *ngIf="tipo === 'productos' && datos.length">
-<!--
-    <canvas baseChart
-            [data]="barChartData"
-            [options]="barChartOptions"
-            chartType="bar">
-    </canvas>
--->
-    <table class="mt-4">
-      <thead><tr><th>Producto</th><th>Entradas</th><th>Salidas</th></tr></thead>
-      <tbody>
-        <tr *ngFor="let d of datos">
-          <td>{{ d.name }}</td>
-          <td>{{ d.total_entradas }}</td>
-          <td>{{ d.total_salidas }}</td>
-        </tr>
-      </tbody>
-    </table>
+  <!-- ===================== RESULTADOS ===================== -->
+  <div class="resultados-container" *ngIf="datosFiltrados.length > 0">
+    <div class="resultados-header">
+      <h3>📊 Resultados ({{ datosFiltrados.length }})</h3>
+      <div class="botones-exportar">
+        <button class="btn-exportar" (click)="exportarPDF()" title="Exportar PDF">
+          <i class="fa-solid fa-file-pdf"></i> PDF
+        </button>
+        <button class="btn-exportar" (click)="exportarExcel()" title="Exportar Excel">
+          <i class="fa-solid fa-file-excel"></i> Excel
+        </button>
+        <button class="btn-exportar" (click)="exportarWord()" title="Exportar Word">
+          <i class="fa-solid fa-file-word"></i> Word
+        </button>
+      </div>
+    </div>
+
+    <!-- Tabla de resultados - Productos -->
+    <div *ngIf="tipoInforme === 'productos'" class="tabla-resultados">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Referencia</th>
+            <th>Lote</th>
+            <th>Categoría</th>
+            <th>Fecha Venc.</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of datosFiltrados">
+            <td>{{ item.id }}</td>
+            <td>{{ item.name }}</td>
+            <td>{{ item.reference }}</td>
+            <td>{{ item.batch }}</td>
+            <td>{{ item.categoria?.name }}</td>
+            <td>{{ item.expiration_date }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Tabla de resultados - Proveedores -->
+    <div *ngIf="tipoInforme === 'proveedores'" class="tabla-resultados">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Teléfono</th>
+            <th>Dirección</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of datosFiltrados">
+            <td>{{ item.id }}</td>
+            <td>{{ item.name }}</td>
+            <td>{{ item.email }}</td>
+            <td>{{ item.phone }}</td>
+            <td>{{ item.address }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Tabla de resultados - Alertas -->
+    <div *ngIf="tipoInforme === 'alertas'" class="tabla-resultados">
+      <table>
+        <thead>
+          <tr>
+            <th>Tipo</th>
+            <th>Producto</th>
+            <th>Mensaje</th>
+            <th>Estado</th>
+            <th>Fecha</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of datosFiltrados">
+            <td>
+              <span class="badge" [class.badge-warning]="item.alert_type === 'bajo_stock'"
+                                  [class.badge-danger]="item.alert_type === 'sin_stock'">
+                {{ item.alert_type }}
+              </span>
+            </td>
+            <td>{{ item.product?.name }}</td>
+            <td>{{ item.message }}</td>
+            <td>
+              <span class="badge" [class.badge-info]="item.status === 'pendiente'"
+                                  [class.badge-success]="item.status === 'resuelta'">
+                {{ item.status }}
+              </span>
+            </td>
+            <td>{{ item.date }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Tabla de resultados - Inventario -->
+    <div *ngIf="tipoInforme === 'inventario'" class="tabla-resultados">
+      <table>
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Referencia</th>
+            <th>Lote/Batch</th>
+            <th>Entradas</th>
+            <th>Salidas</th>
+            <th>Stock Actual</th>
+            <th>Stock Mínimo</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of datosFiltrados">
+            <td>{{ item.name || item.producto }}</td>
+            <td>{{ item.reference || item.referencia }}</td>
+            <td>{{ item.batch || item.lote }}</td>
+            <td>{{ item.entradas }}</td>
+            <td>{{ item.salidas }}</td>
+            <td>{{ item.quantity || item.stock }}</td>
+            <td>{{ item.stock_minimo }}</td>
+            <td>
+              <span class="badge" [class.badge-success]="(item.quantity || item.stock) > 0"
+                                  [class.badge-danger]="(item.quantity || item.stock) <= 0">
+                {{ (item.quantity || item.stock) > 0 ? 'Disponible' : 'Agotado' }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
-  <div *ngIf="tipo === 'alertas' && datos.length">
-    <table>
-      <thead><tr><th>Tipo</th><th>Total</th></tr></thead>
-      <tbody>
-        <tr *ngFor="let a of datos"><td>{{ a.type }}</td><td>{{ a.total }}</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div *ngIf="tipo === 'inventario' && datos.length">
-    <table>
-      <thead><tr><th>Producto</th> <th>Referencia</th>
-      <th>Lote</th><th>Entradas</th><th>Salidas</th><th>Stock</th></tr></thead>
-      <tbody>
-        <tr *ngFor="let i of datos">
-          <td>{{ i.producto }}</td><td>{{ i.referencia }}</td><td>{{ i.lote }}</td><td>{{ i.entradas }}</td><td>{{ i.salidas }}</td><td>{{ i.stock }}</td>
-        </tr>
-      </tbody>
-    </table>
+  <!-- Mensaje cuando no hay datos -->
+  <div class="sin-resultados" *ngIf="!loading && datos.length === 0 && datosFiltrados.length === 0">
+    <i class="fa-solid fa-inbox"></i>
+    <p>No hay datos para mostrar. Genera un informe para comenzar.</p>
   </div>
 </div>
 

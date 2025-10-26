@@ -12,6 +12,7 @@ export class ProductosService {
 
   constructor(private http: HttpClient) {}
 
+  // ===================== HEADERS =====================
   private getAuthHeaders(): HttpHeaders {
     const token = localStorage.getItem('token');
     return new HttpHeaders({
@@ -20,11 +21,9 @@ export class ProductosService {
     });
   }
 
-  // ✅ Obtener todos los productos con filtros y paginación
-  getProducts(filters: any = {}): Observable<any> {
+  // ===================== OBTENER PRODUCTOS =====================
+  getProducts(filters: Record<string, any> = {}): Observable<{ data: Producto[] }> {
     let params = new HttpParams();
-
-    // si hay filtros, los agregamos como query params
     Object.keys(filters).forEach(key => {
       if (filters[key] !== null && filters[key] !== undefined) {
         params = params.append(key, filters[key]);
@@ -33,39 +32,46 @@ export class ProductosService {
 
     return this.http.get<any>(this.apiUrl, { headers: this.getAuthHeaders(), params }).pipe(
       map(response => {
-        const productos = response.data || response;
+        const productosArray = Array.isArray(response.data?.data) ? response.data.data : [];
 
-        // Si Laravel devuelve paginación, conserva todo el objeto
-        const data = Array.isArray(productos)
-          ? productos
-          : response.data;
-
-        const productosMapeados = data.map((item: any) => ({
+        const productosMapeados: Producto[] = productosArray.map((item: any) => ({
           ...item,
           categoria: item.categoria || { name: 'Sin categoría' },
-          image_url: item.image ? `http://smart_inventory/${item.image}` : null
+          expiration_date: this.parseExpirationDate(item.expiration_date),
+          image_url: item.image ? `http://smart_inventory/storage/${item.image}` : null
         }));
 
-        // si es paginación, conserva meta e info
-        return response.data
-          ? { ...response, data: productosMapeados }
-          : productosMapeados;
+        return { ...response.data, data: productosMapeados };
       })
     );
   }
 
-  // Obtener producto por ID
-  getProducto(id: number): Observable<Producto> {
-    return this.http.get<Producto>(`${this.apiUrl}/${id}`, { headers: this.getAuthHeaders() }).pipe(
-      map((p: Producto) => ({
-        ...p,
-        expiration_date: p.expiration_date ? (p.expiration_date as string).substring(0, 10) : null,
-        image_url: p.image ? `http://smart_inventory/${p.image}` : null
-      }))
-    );
-  }
+  // ===================== OBTENER PRODUCTO POR ID =====================
+ // ===================== OBTENER PRODUCTO POR ID =====================
+getProducto(id: number): Observable<Producto> {
+  return this.http.get<Producto>(`${this.apiUrl}/${id}`, { headers: this.getAuthHeaders() }).pipe(
+    map((p: Producto) => {
+      const expiration_date =
+        p.expiration_date
+          ? (typeof p.expiration_date === 'string'
+              ? p.expiration_date.substring(0, 10)
+              : p.expiration_date instanceof Date
+                ? p.expiration_date.toISOString().substring(0, 10)
+                : null)
+          : null;
 
-  // Crear producto
+      return {
+        ...p,
+        expiration_date,
+        image_url: p.image ? `http://smart_inventory/storage/${p.image}` : null
+      } as Producto;
+    })
+  );
+}
+
+
+
+  // ===================== CREAR PRODUCTO =====================
   crearProducto(producto: Partial<Producto>): Observable<Producto> {
     return this.http.post<any>(this.apiUrl, producto, { headers: this.getAuthHeaders() }).pipe(
       map(res => {
@@ -73,24 +79,39 @@ export class ProductosService {
         return {
           ...p,
           categoria: p.categoria || null,
-          image_url: p.image ? `http://smart_inventory/${p.image}` : null
+          expiration_date: this.parseExpirationDate(p.expiration_date),
+          image_url: p.image ? `http://smart_inventory/storage/${p.image}` : null
         };
       })
     );
   }
 
-  // Actualizar producto
-  actualizarProducto(producto: Producto): Observable<Producto> {
-    return this.http.put<Producto>(`${this.apiUrl}/${producto.id}`, producto, { headers: this.getAuthHeaders() }).pipe(
-      map((p: Producto) => ({
-        ...p,
-        image_url: p.image ? `http://smart_inventory/${p.image}` : null
-      }))
-    );
+  // ===================== ACTUALIZAR PRODUCTO =====================
+  actualizarProducto(id: number, data: any): Observable<any> {
+    const body = data instanceof FormData ? data : this.convertToFormData(data);
+    return this.http.post<any>(`${this.apiUrl}/${id}?_method=PUT`, body, { headers: this.getAuthHeaders() });
   }
 
-  // Eliminar producto
-  eliminarProducto(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`, { headers: this.getAuthHeaders() });
+  // ===================== ELIMINAR PRODUCTO =====================
+  eliminarProducto(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${id}`, { headers: this.getAuthHeaders() });
+  }
+
+  // ===================== HELPERS =====================
+  private convertToFormData(obj: Record<string, any>): FormData {
+    const formData = new FormData();
+    for (const key in obj) {
+      if (obj[key] !== null && obj[key] !== undefined) {
+        formData.append(key, obj[key]);
+      }
+    }
+    return formData;
+  }
+
+  private parseExpirationDate(date: string | Date | null | undefined): string | null {
+    if (!date) return null;
+    if (typeof date === 'string') return date.substring(0, 10);
+    if (date instanceof Date) return date.toISOString().substring(0, 10);
+    return null;
   }
 }

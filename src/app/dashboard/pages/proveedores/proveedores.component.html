@@ -34,7 +34,7 @@
   </div>
 
   <!-- Mensaje cuando no hay proveedores -->
-  <div *ngIf="suppliers.length === 0" class="no-proveedores">
+  <div *ngIf="proveedores.length === 0" class="no-proveedores">
     <div class="no-proveedores-content">
       <i class="fa-solid fa-truck"></i>
       <h3>No hay proveedores registrados</h3>
@@ -42,13 +42,15 @@
     </div>
   </div>
 
+
+
   <!-- Lista de proveedores existentes -->
-  <div *ngIf="suppliers.length > 0" class="proveedores-lista">
-    <div *ngFor="let supplier of suppliers" class="proveedor-item">
+  <div *ngIf="proveedores.length > 0" class="proveedores-lista">
+    <div *ngFor="let supplier of proveedores" class="proveedor-item">
       <div class="proveedor-info">
         <div class="proveedor-header">
           <h3>{{ supplier.name }}</h3>
-          <span class="proveedor-id">ID: {{ supplier.supplier_id }}</span>
+          <span class="proveedor-id">ID: {{ supplier.id }}</span>
         </div>
         <div class="proveedor-details">
           <div class="detail-row" *ngIf="supplier.email">
@@ -92,20 +94,20 @@
 </div> <!-- Fin proveedores-container -->
 
 <!-- ===================== PANEL DE PRODUCTOS (COMPONENTE HIJO) ===================== -->
-<app-productos-panel
-  *ngIf="proveedorSeleccionado && !mostrarCrear && !mostrarEditar"
+<app-product-suppliers
+  *ngIf="proveedorSeleccionado"
+  [proveedorId]="proveedorSeleccionado.id"
   [proveedorSeleccionado]="proveedorSeleccionado"
-  [productosProveedor]="productosProveedor"
-  (eliminarProducto)="eliminarProductoDelProveedor($event)"
-  (cerrar)="cerrarProductos()"
-  (abrirAsociarProducto)="abrirAsociar(proveedorSeleccionado)">
-</app-productos-panel>
+  [productos]="todosLosProductos"
+  (cerrar)="proveedorSeleccionado = undefined"
+  (productoEliminado)="eliminarProductoDelProveedor($event)">
+</app-product-suppliers>
 
 <!-- ===================== MODAL PARA ASOCIAR PRODUCTO ===================== -->
 <app-asociar-producto
   *ngIf="mostrarAsociar"
   [proveedor]="proveedorSeleccionado"
   [productos]="todosLosProductos"
-  (guardar)="asociarProductoDesdeModal($event)"
+  (asociado)="asociarProductoDesdeModal($event)"
   (cancelar)="cancelarAsociar()">
 </app-asociar-producto>

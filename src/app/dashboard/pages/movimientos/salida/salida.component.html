@@ -1,5 +1,6 @@
 <div class="salida-container">
 
+  <!-- Header -->
   <div class="header">
     <h2>📤 Salidas de Productos</h2>
     <button (click)="toggleForm()" class="btn-toggle">
@@ -7,60 +8,14 @@
     </button>
   </div>
 
-<<<<<<< HEAD
-  <!-- Formulario solo se muestra si mostrarFormulario es true -->
-  <div class="form-box" *ngIf="mostrarFormulario">
-    <h4>📦 Registrar Salida</h4>
-
-    <form [formGroup]="salidaForm" (ngSubmit)="registrarSalida()">
-      <div class="form-group">
-        <label for="product_id">Producto *</label>
-        <select id="product_id" formControlName="product_id">
-          <option value="">Seleccione un producto</option>
-          <option *ngFor="let producto of productos" [value]="producto.id">
-            {{ producto.name }}
-          </option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label for="quantity">Cantidad *</label>
-        <input type="number" id="quantity" formControlName="quantity" placeholder="Ej: 10" />
-      </div>
-
-      <div class="form-group">
-        <label for="unit">Unidad</label>
-        <input type="text" id="unit" formControlName="unit" placeholder="unidad, caja, paquete..." />
-      </div>
-
-      <div class="form-group">
-        <label for="lot">Motivo o destino *</label>
-        <input type="text" id="lot" formControlName="lot" placeholder="Ej: venta, traslado, devolución..." />
-      </div>
-
-  
-
-      <div class="form-group">
-        <label for="inventory_id">Inventario ID *</label>
-        <input type="number" id="inventory_id" formControlName="inventory_id" placeholder="Ej: 1" />
-      </div>
-
-      <button type="submit" class="btn-submit" [disabled]="salidaForm.invalid">
-        💾 Guardar
-      </button>
-
-      <div *ngIf="mensaje" class="alert" [ngClass]="tipoMensaje">
-        {{ mensaje }}
-      </div>
-    </form>
-=======
-  <div class="messages">
-    <div *ngIf="successMessage" class="alert success">{{ successMessage }}</div>
-    <div *ngIf="errorMessage" class="alert error">{{ errorMessage }}</div>
-    <div *ngIf="warningMessage" class="alert warning">{{ warningMessage }}</div>
->>>>>>> 7b9678809b776d45ae469b0cbba53ab709774817
+  <!-- Mensajes -->
+  <div class="messages" *ngIf="successMessage || errorMessage || warningMessage">
+    <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
+    <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+    <div *ngIf="warningMessage" class="alert alert-warning">{{ warningMessage }}</div>
   </div>
 
+  <!-- Formulario de Salida -->
   <form *ngIf="showForm" [formGroup]="salidaForm" (ngSubmit)="onSubmit()" class="form-box" novalidate>
     <h3>Registrar Nueva Salida</h3>
 
@@ -98,4 +53,5 @@
       {{ saving ? 'Guardando...' : '✅ Guardar Salida' }}
     </button>
   </form>
+
 </div>

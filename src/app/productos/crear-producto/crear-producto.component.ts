@@ -193,6 +193,8 @@ import { NgForm, FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ProductosService } from '../../services/productos/products.service';
 import { CategoriesService, Category } from '../../services/categories/categories.service';
+import { Producto } from '../../interfaces/producto';
+
 
 @Component({
   selector: 'app-crear-producto',
@@ -203,7 +205,7 @@ import { CategoriesService, Category } from '../../services/categories/categorie
 })
 export class CrearProductoComponent implements OnInit {
   @Output() cancelar = new EventEmitter<void>();
-  @Output() productoCreado = new EventEmitter<void>();
+  @Output() productoCreado = new EventEmitter<Producto>();
 
   categorias: Category[] = [];
   categoriasFiltradas: Category[] = [];
@@ -320,7 +322,7 @@ export class CrearProductoComponent implements OnInit {
         this.selectedFile = null;
         this.previewImage = null;
         this.categoriaSeleccionada = null;
-        this.productoCreado.emit();
+        this.productoCreado.emit(res);
         this.cancelar.emit();
       },
       error: (err) => {
@@ -333,6 +335,8 @@ export class CrearProductoComponent implements OnInit {
   cancelarCreacion() {
     this.cancelar.emit();
   }
+
+
 }
 
 

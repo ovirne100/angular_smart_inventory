@@ -8,6 +8,7 @@ export interface ProductSupplier {
   product_id: number;
   unit_cost?: number | null;
   supplier_reference?: string | null;
+
   supplier?: {
     supplier_id: number;
     name: string;
@@ -20,6 +21,8 @@ export interface ProductSupplier {
     name: string;
     reference?: string;
     unit_measurement?: string;
+    lot?: string;
+
   };
 }
 
@@ -50,5 +53,10 @@ export class ProductSupplierService {
   updateRelationship(id: number, data: Partial<ProductSupplier>): Observable<ProductSupplier> {
     return this.http.put<ProductSupplier>(`${this.apiUrl}/${id}`, data);
   }
+
+  attachProductsToSupplier(supplierId: number, products: any[]): Observable<any> {
+    return this.http.post(`http://smart_inventory/api/suppliers/${supplierId}/attach-products`, { products });
+  }
+
 
 }

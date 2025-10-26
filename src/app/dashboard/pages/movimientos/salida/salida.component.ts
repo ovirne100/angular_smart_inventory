@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
+import { MovimientosService } from '../../../../services/movimientos/movimientos';
 
 interface FormDataResponse {
   status: string;
@@ -40,7 +41,11 @@ export class SalidaComponent implements OnInit, OnDestroy {
   private apiUrl = 'http://localhost:8000/api';
   private destroy$ = new Subject<void>();
 
-  constructor(private fb: FormBuilder, private http: HttpClient) {}
+  constructor(
+    private fb: FormBuilder,
+    private http: HttpClient,
+    private movimientosService: MovimientosService
+  ) {}
 
   ngOnInit(): void {
     this.initForm();
@@ -112,6 +117,9 @@ export class SalidaComponent implements OnInit, OnDestroy {
         next: res => {
           this.successMessage = res.message || '✅ Salida registrada correctamente.';
           this.resetForm();
+          // Refrescar datos de movimientos automáticamente
+          this.movimientosService.refreshCounts();
+          this.movimientosService.getSalidasList();
           setTimeout(() => this.clearMessages(), 5000);
         },
         error: err => {

@@ -1,43 +1,86 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class ReportsService {
-  private base = 'http://smart_inventory/api/reports'; // ajusta base
+  private base = 'http://smart_inventory/api';
 
   constructor(private http: HttpClient) {}
 
+  // Headers con autenticación
+  private getAuthHeaders(): HttpHeaders {
+    const token = localStorage.getItem('token');
+    return new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+      Accept: 'application/json'
+    });
+  }
+
+  // Obtener productos con movimientos (entradas y salidas)
   getProductos(from?: string, to?: string): Observable<any[]> {
     let params = new HttpParams();
     if (from) params = params.set('from', from);
     if (to) params = params.set('to', to);
-    return this.http.get<any[]>(`${this.base}/products`, { params });
+    return this.http.get<any[]>(`${this.base}/products`, {
+      params,
+      headers: this.getAuthHeaders()
+    }).pipe(
+      map((response: any) => {
+        // Extraer el array de productos
+        return response.data?.data || response.data || response || [];
+      })
+    );
   }
 
+  // Obtener alertas
   getAlertas(from?: string, to?: string): Observable<any[]> {
     let params = new HttpParams();
     if (from) params = params.set('from', from);
     if (to) params = params.set('to', to);
-    return this.http.get<any[]>(`${this.base}/alerts`, { params });
+    return this.http.get<any[]>(`${this.base}/alerts`, {
+      params,
+      headers: this.getAuthHeaders()
+    }).pipe(
+      map((response: any) => {
+        return response.data || response || [];
+      })
+    );
   }
 
+  // Obtener inventario con stock actual
   getInventory(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.base}/inventory`);
+    return this.http.get<any[]>(`${this.base}/inventory`, {
+      headers: this.getAuthHeaders()
+    }).pipe(
+      map((response: any) => {
+        return response.data || response || [];
+      })
+    );
   }
 
+  // Exportar productos a Excel
   exportProductsExcel(from?: string, to?: string) {
     let params = new HttpParams();
     if (from) params = params.set('from', from);
     if (to) params = params.set('to', to);
-    // returns CSV stream
-    return this.http.get(`${this.base}/products/export/excel`, { params, responseType: 'blob' });
+    return this.http.get(`${this.base}/reports/products/export/excel`, {
+      params,
+      headers: this.getAuthHeaders(),
+      responseType: 'blob'
+    });
   }
 
+  // Exportar productos a PDF
   exportProductsPdf(from?: string, to?: string) {
     let params = new HttpParams();
     if (from) params = params.set('from', from);
     if (to) params = params.set('to', to);
-    return this.http.get(`${this.base}/products/export/pdf`, { params, responseType: 'blob' });
+    return this.http.get(`${this.base}/reports/products/export/pdf`, {
+      params,
+      headers: this.getAuthHeaders(),
+      responseType: 'blob'
+    });
   }
 }

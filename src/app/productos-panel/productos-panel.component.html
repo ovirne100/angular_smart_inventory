@@ -1,38 +1,62 @@
 <div class="productos-panel">
   <div class="productos-header">
-    <h3>Productos de {{ proveedorSeleccionado.name }}</h3>
+    <h3>Productos de {{ proveedorSeleccionado?.name || 'Proveedor' }}</h3>
+
     <div class="header-actions">
       <button class="btn-asociar" (click)="onAbrirAsociar()">
         <i class="fa-solid fa-plus"></i> Asociar producto
       </button>
+
       <button class="btn-cerrar" (click)="onCerrar()">
-          <i class="fa-solid fa-circle-xmark"></i> cerrar
+        <i class="fa-solid fa-circle-xmark"></i> Cerrar
       </button>
     </div>
   </div>
 
+  <!-- Mensaje si no hay productos -->
   <div *ngIf="productosProveedor.length === 0" class="no-productos">
     <p>Este proveedor no tiene productos asociados</p>
   </div>
 
+  <!-- Lista de productos -->
   <div *ngIf="productosProveedor.length > 0" class="productos-lista">
-    <div *ngFor="let producto of productosProveedor; trackBy: trackByProductId" class="producto-item">
-
-      <div class="producto-info">
-        <h4>{{ producto.name }}</h4>
-        <div class="producto-details">
-          <span *ngIf="producto.pivot?.unit_cost !== undefined" class="costo">
-            <strong>Costo:</strong> ${{ producto.pivot.unit_cost }}
-          </span>
-          <span *ngIf="producto.pivot?.supplier_reference" class="referencia">
-            <strong>Ref:</strong> {{ producto.pivot.supplier_reference }}
-          </span>
-        </div>
-           <button class="btn-menu" (click)="onEliminar(producto)" title="Eliminar producto">
-      <i class="fa-solid fa-trash"></i>
-      <span>Eliminar</span>
-    </button>
+    <div
+      *ngFor="let producto of productosProveedor; trackBy: trackByProductId"
+      class="producto-item"
+    >
+      <!-- Imagen del producto -->
+      <div class="producto-imagen">
+        <img
+          [src]="'http://smart_inventory/storage/' + producto.image"
+          [alt]="producto.name"
+        />
       </div>
 
+      <!-- Información del producto -->
+      <div class="producto-info">
+        <h4>{{ producto.name }}</h4>
+        <p><strong>Referencia:</strong> {{ producto.reference }}</p>
+        <p><strong>Lote:</strong> {{ producto.batch }}</p>
+
+        <div class="producto-details">
+          <!-- Pivot seguro -->
+          <ng-container *ngIf="producto.pivot as pivot">
+            <span class="costo">
+              <strong>Costo:</strong> ${{ +pivot.unit_cost | number:'1.0-2' }}
+            </span>
+
+            <span *ngIf="pivot.supplier_reference" class="referencia">
+              <strong>Ref. proveedor:</strong> {{ pivot.supplier_reference }}
+            </span>
+          </ng-container>
+        </div>
+
+        <!-- Botón eliminar -->
+        <button class="btn-menu" (click)="onEliminar(producto)" title="Eliminar producto">
+          <i class="fa-solid fa-trash"></i>
+          <span>Eliminar</span>
+        </button>
+      </div>
+    </div>
   </div>
 </div>

@@ -1,8 +1,8 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { SuppliersService, Supplier } from '../../../../services/proveedores/suppliers.service';
-
+import { SuppliersService } from '../../../../services/proveedores/suppliers.service';
+import { Proveedor } from '../../../../interfaces/producto';
 
 @Component({
   selector: 'app-editar-proveedor',
@@ -12,11 +12,11 @@ import { SuppliersService, Supplier } from '../../../../services/proveedores/sup
   styleUrls: ['./editar-proveedor.component.css']
 })
 export class EditarProveedorComponent {
-  @Input() proveedor!: Supplier;
+  @Input() proveedor!: Proveedor; // ✅ cambiar Supplier -> Proveedor
   @Output() cancelar = new EventEmitter<void>();
-  @Output() proveedorActualizado = new EventEmitter<Supplier>();
+  @Output() proveedorActualizado = new EventEmitter<Proveedor>(); // ✅ cambiar Supplier -> Proveedor
 
-  form: Partial<Supplier> = {}; // inicializa vacío
+  form: Partial<Proveedor> = {}; // ✅ cambiar Supplier -> Proveedor
 
   constructor(private suppliersService: SuppliersService) {}
 
@@ -32,10 +32,10 @@ export class EditarProveedorComponent {
   }
 
   guardarCambios() {
-    if (!this.proveedor || !this.proveedor.supplier_id) return;
+    if (!this.proveedor || !this.proveedor.id) return;
 
-    this.suppliersService.update(this.proveedor.supplier_id, this.form).subscribe({
-      next: (proveedorActualizado: Supplier) => {
+    this.suppliersService.update(this.proveedor.id, this.form).subscribe({
+      next: (proveedorActualizado: Proveedor) => { // ✅ cambiar Supplier -> Proveedor
         this.proveedorActualizado.emit(proveedorActualizado);
         this.cancelar.emit();
       },

@@ -1,7 +1,8 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SuppliersService } from '../services/proveedores/suppliers.service'; // 👈 Asegúrate de la ruta correcta
 import { FormsModule } from '@angular/forms';
+import { SuppliersService } from '../services/proveedores/suppliers.service';
+import { Producto, Proveedor } from '../interfaces/producto';
 
 @Component({
   selector: 'app-productos-panel',
@@ -11,36 +12,37 @@ import { FormsModule } from '@angular/forms';
   styleUrls: ['./productos-panel.component.css']
 })
 export class ProductosPanelComponent {
-  @Input() proveedorSeleccionado: any;
-  @Input() productosProveedor: any[] = [];
-  @Output() eliminarProducto = new EventEmitter<any>();
+  @Input() proveedorSeleccionado?: Proveedor;
+  @Input() productosProveedor: Producto[] = [];
+  @Output() eliminarProducto = new EventEmitter<Producto>();
   @Output() cerrar = new EventEmitter<void>();
   @Output() abrirAsociarProducto = new EventEmitter<void>();
 
-  // ✅ Inyección del servicio
   constructor(private suppliersService: SuppliersService) {}
 
-  onEliminar(producto: any) {
+  trackByProductId(index: number, producto: Producto) {
+    return producto.id ?? producto.pivot?.product_id;
+  }
+
+  onEliminar(producto: Producto) {
     const supplierId = this.proveedorSeleccionado?.id;
-    const productId = producto?.id;
+    const productId = producto.id ?? producto.pivot?.product_id;
 
-    if (!supplierId || !productId) {
-      console.warn('⚠️ Faltan IDs para eliminar', { supplierId, productId });
-      return;
-    }
+    if (!supplierId || !productId) return;
 
-    console.log('Intentando eliminar', { supplierId, productId });
-
-    this.suppliersService.deleteRelationship(supplierId, productId).subscribe({
-      next: (response) => {
-        console.log('✅ Respuesta del servidor:', response);
-        this.productosProveedor = this.productosProveedor.filter(p => p.id !== productId);
+    this.suppliersService.detachProduct(supplierId, productId).subscribe({
+      next: () => {
+        this.eliminarProducto.emit(producto);
+        this.productosProveedor = this.productosProveedor.filter(
+          p => (p.id ?? p.pivot?.product_id) !== productId
+        );
       },
-      error: (error) => {
-        console.error('❌ Error al eliminar relación:', error);
+      error: (err: any) => {
+        console.error('❌ Error eliminando producto:', err);
       }
     });
   }
+
 
   onCerrar() {
     this.cerrar.emit();
@@ -48,9 +50,5 @@ export class ProductosPanelComponent {
 
   onAbrirAsociar() {
     this.abrirAsociarProducto.emit();
-  }
-
-  trackByProductId(index: number, producto: any) {
-    return producto.product_id;
   }
 }

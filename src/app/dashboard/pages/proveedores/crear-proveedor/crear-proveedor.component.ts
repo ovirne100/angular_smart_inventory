@@ -1,7 +1,8 @@
 import { Component, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { SuppliersService, Supplier } from '../../../../services/proveedores/suppliers.service';
+import { SuppliersService } from '../../../../services/proveedores/suppliers.service';
+import { Proveedor } from '../../../../interfaces/producto';
 
 @Component({
   selector: 'app-crear-proveedor',
@@ -12,9 +13,9 @@ import { SuppliersService, Supplier } from '../../../../services/proveedores/sup
 })
 export class CrearProveedorComponent {
   @Output() cancelar = new EventEmitter<void>();
-  @Output() proveedorCreado = new EventEmitter<Supplier>();
+  @Output() proveedorCreado = new EventEmitter<Proveedor>();
 
-  form: Partial<Supplier> = {
+  form: Partial<Proveedor> = {
     name: '',
     email: '',
     phone: '',

@@ -1,33 +1,28 @@
+// src/app/interfaces/producto.ts
 export interface Producto {
-  id?: number;
-  category_id?: number;
-
-  categoria?:{
-    id: number;
-    name: string;
-  };
-
+  id: number;
   name: string;
+  batch: string;
+  expiration_date: string | Date;  // permite string o Date
   reference?: string;
   unit_measurement?: string;
-  batch: string;
-  expiration_date?: string | Date | null;
-
-  //image
+  category_id?: number;
   image?: string;
-  image_url?: string | null;
+  pivot?: { supplier_id: number; product_id: number; unit_cost: string; supplier_reference?: string; batch: string };
+  image_url?: string;
+  categoria?: { name: string } | null;
+}
 
-  //para la tabla pivot
-  pivot?: {
-    supplier_id: number;
-    product_id: number;
-    unit_cost: string; // Laravel lo devuelve como string
-    supplier_reference?: string | null;
-  };
 
-  //supplier
-  supplier?: any; // Changed from Supplier to any to fix "Cannot find name 'Supplier'" error
-  supplier_id?: number;
-  supplier_name?: string;
 
+
+
+
+// src/app/interfaces/proveedor.ts
+export interface Proveedor {
+  id: number;
+  name: string;
+  email?: string;
+  phone?: string;
+  address?: string;
 }

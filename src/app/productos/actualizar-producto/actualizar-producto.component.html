@@ -73,6 +73,19 @@
         />
       </div>
 
+      <div class="form-group">
+        <label for="image">Imagen</label>
+        <input
+          type="file"
+          id="image"
+          name="image"
+          (change)="nuevaImagen = $any($event.target).files[0]"
+          accept="image/*"
+        />
+      </div>
+
+
+
       <!-- Botones -->
       <div class="modal-buttons">
         <button type="submit" [disabled]="formProducto.invalid">Guardar</button>

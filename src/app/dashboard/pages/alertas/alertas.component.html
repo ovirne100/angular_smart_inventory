@@ -37,7 +37,13 @@
             {{ alerta.alert_type==='bajo_stock' ? '📉 Stock Bajo' : '🚫 Sin Stock' }}
           </span>
         </p>
+<p><strong>Lote:</strong> {{ alerta.inventory?.product?.lot }}</p>
+<p><strong>Referencia:</strong> {{ alerta.inventory?.product?.reference }}</p>
+
+
+
         <p><strong>Fecha:</strong> {{ alerta.date | date:'short' }}</p>
+
         <p *ngIf="alerta.resolved_at"><strong>Resuelta:</strong> {{ alerta.resolved_at | date:'short' }}</p>
       </div>
     </div>

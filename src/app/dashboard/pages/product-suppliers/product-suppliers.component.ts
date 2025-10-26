@@ -1,10 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges } from '@angular/core';
+import { Producto, Proveedor } from '../../../interfaces/producto';
+import { SuppliersService } from '../../../services/proveedores/suppliers.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ProductSupplierService, ProductSupplier } from '../../../services/product-supplier/product-supplier.service';
-import { ProductosService } from '../../../services/productos/products.service';
-import { SuppliersService, Supplier } from '../../../services/proveedores/suppliers.service';
-import { Producto } from '../../../interfaces/producto';
 
 @Component({
   selector: 'app-product-suppliers',
@@ -13,128 +11,105 @@ import { Producto } from '../../../interfaces/producto';
   templateUrl: './product-suppliers.component.html',
   styleUrls: ['./product-suppliers.component.css']
 })
-export class ProductSuppliersComponent implements OnInit {
-  relationships: ProductSupplier[] = [];
-  products: Producto[] = [];
-  suppliers: Supplier[] = [];
+export class ProductSuppliersComponent implements OnChanges {
+  @Input() proveedorId?: number;
+  @Input() proveedorSeleccionado?: Proveedor;
+  @Input() productos: Producto[] = [];
+  @Output() productoEliminado = new EventEmitter<number>();
+  @Output() cerrar = new EventEmitter<void>();
 
-  // Form data
-  form: Partial<ProductSupplier> = {
-    supplier_id: 0,
-    product_id: 0,
-    unit_cost: null,
-    supplier_reference: ''
-  };
+  productosProveedor: Producto[] = [];
+  mostrarAsociar = false;
+  productosCatalogo: Producto[] = [];
+  productosSeleccionados: Set<number> = new Set();
+  costos: { [key: number]: number } = {};
 
-  editingId?: number;
+  constructor(private suppliersService: SuppliersService) {}
 
-  constructor(
-    private productSupplierService: ProductSupplierService,
-    private productosService: ProductosService,
-    private suppliersService: SuppliersService
-  ) {}
-
-  ngOnInit(): void {
-    this.loadData();
+  ngOnChanges(): void {
+    if (this.proveedorId) this.cargarProductos();
   }
 
-  loadData(): void {
-    // Cargar relaciones
-    this.productSupplierService.getRelationships().subscribe({
-      next: (rels) => this.relationships = rels,
-      error: (err) => console.error('Error cargando relaciones', err)
-    });
-
-    // Cargar productos
-    this.productosService.getProducts().subscribe({
-      next: (products: Producto[]) => this.products = products,
-      error: (err: any) => console.error('Error cargando productos', err)
-    });
-
-    // Cargar proveedores
-    this.suppliersService.list().subscribe({
-      next: (res: any) => this.suppliers = res.data ?? res,
-      error: (err) => console.error('Error cargando proveedores', err)
+  cargarProductos(): void {
+    if (!this.proveedorId) return;
+    this.suppliersService.getSupplierProducts(this.proveedorId).subscribe({
+      next: res => (this.productosProveedor = res.data),
+      error: err => console.error(err)
     });
   }
 
-  submit(): void {
-    if (this.editingId) {
-      this.productSupplierService.updateRelationship(this.editingId, this.form).subscribe({
-        next: () => {
-          this.resetForm();
-          this.loadData();
-        },
-        error: (err) => console.error('Error actualizando relación', err)
-      });
+  eliminar(producto: Producto): void {
+    if (!this.proveedorId || !producto.id) return;
+
+    if (!confirm(`Eliminar ${producto.name}?`)) return;
+
+    this.suppliersService.detachProduct(this.proveedorId, producto.id).subscribe({
+      next: () => {
+        this.productoEliminado.emit(producto.id);
+        this.cargarProductos();
+      },
+      error: err => console.error(err)
+    });
+  }
+
+  onCerrar(): void {
+    this.cerrar.emit();
+  }
+
+  onAbrirAsociar(): void {
+    this.mostrarAsociar = true;
+    this.productosCatalogo = this.productos.filter(p =>
+      !this.productosProveedor.some(pp => pp.id === p.id)
+    );
+  }
+
+  onCerrarAsociar(): void {
+    this.mostrarAsociar = false;
+    this.productosSeleccionados.clear();
+    this.costos = {};
+  }
+
+  isSelected(productId: number): boolean {
+    return this.productosSeleccionados.has(productId);
+  }
+
+  toggleSeleccion(productId: number): void {
+    if (this.productosSeleccionados.has(productId)) {
+      this.productosSeleccionados.delete(productId);
+      delete this.costos[productId];
     } else {
-      this.productSupplierService.createRelationship(this.form).subscribe({
-        next: () => {
-          this.resetForm();
-          this.loadData();
-        },
-        error: (err) => console.error('Error creando relación', err)
-      });
+      this.productosSeleccionados.add(productId);
     }
   }
 
-  edit(relationship: ProductSupplier): void {
-    this.form = {
-      supplier_id: relationship.supplier_id,
-      product_id: relationship.product_id,
-      unit_cost: relationship.unit_cost,
-      supplier_reference: relationship.supplier_reference
+  updateCost(productId: number, value: number): void {
+    this.costos[productId] = value;
+  }
+
+  onAsociar(): void {
+    if (!this.proveedorId || this.productosSeleccionados.size === 0) return;
+
+    const payload = {
+      products: Array.from(this.productosSeleccionados).map(id => ({
+        product_id: id,
+        unit_cost: this.costos[id] || 0
+      }))
     };
-    this.editingId = relationship.id;
+
+    this.suppliersService.attachProduct(this.proveedorId, payload).subscribe({
+      next: () => {
+        alert('✅ Productos asociados correctamente');
+        this.onCerrarAsociar();
+        this.cargarProductos();
+      },
+      error: err => {
+        console.error(err);
+        alert('⚠️ Error al asociar productos');
+      }
+    });
   }
 
- /* delete(id: number): void {
-    if (confirm('¿Eliminar esta relación?')) {
-      this.productSupplierService.deleteRelationship(id).subscribe({
-        next: () => this.loadData(),
-        error: (err) => console.error('Error eliminando relación', err)
-      });
-    }
-  }*/
-deleteRelationship(rel: any): void {
-  console.log('🟢 Click detectado', rel);
-
-  const supplier_id = rel.supplier_id;
-  const product_id = rel.product_id;
-
-  if (!supplier_id || !product_id) {
-    console.warn('⚠️ Faltan IDs', rel);
-    return;
+  trackByProductId(index: number, producto: Producto): number {
+    return producto.id || index;
   }
-
-  this.suppliersService.detachProduct({ supplier_id, product_id }).subscribe({
-    next: (res: any) => {
-      console.log('✅ Eliminado correctamente', res);
-      this.loadData();
-    },
-    error: (err) => console.error('❌ Error eliminando relación', err)
-  });
-}
-
-  resetForm(): void {
-    this.form = {
-      supplier_id: 0,
-      product_id: 0,
-      unit_cost: null,
-      supplier_reference: ''
-    };
-    this.editingId = undefined;
-  }
-
-  getProductName(id: number): string {
-    const product = this.products.find(p => p.id === id);
-    return product ? product.name : 'N/A';
-  }
-
-  getSupplierName(id: number): string {
-    const supplier = this.suppliers.find(s => s.supplier_id === id);
-    return supplier ? supplier.name : 'N/A';
-  }
-
-  
 }

@@ -12,4 +12,6 @@ export interface Alert {
   date: string;
   created_at?: string;
   resolved_at?: string | null; // permite null
+    lot?: string | null;       // ✅ agregar esto
+    reference?: string | null; // ✅ agregar esto
 }
