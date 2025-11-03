@@ -302,4 +302,11 @@
   .productos-panel {
     width: 100%;
   }
+
+  .proveedores-header{
+    margin-top: 40px;
+  }
+  .btn-crear-principal{
+    font-size: 11px;
+  }
 }

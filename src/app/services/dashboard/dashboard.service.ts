@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DashboardService {
-  // 🔗 URL del backend Laravel (ajusta si usas .env o proxy)
-  private readonly API_URL = 'http://localhost:8000/api/dashboard/summary';
+  // 🔗 URL del backend Laravel
+  private readonly API_URL = `${environment.apiUrl}/dashboard/summary`;
 
   constructor(private http: HttpClient) {}
 

@@ -23,15 +23,26 @@ export interface Entrada {
 }
 
 export interface Salida {
-  id?: number;
-  producto: string;
-  categoria: string;
-  usuario: string;
-  cantidad: string;
-  lote: string;
-  inventario: number | null;
-  fecha: string;
+  id: number;
+  quantity: number;
+  unit: string;
+  lot: string;
+  motivo: string;
+  created_at: string;
+  product?: {
+    id: number;
+    name: string;
+  };
+  user?: {
+    id: number;
+    name: string;
+  };
+  inventory?: {
+    id: number;
+    stock: number;
+  };
 }
+
 
 export interface EntrySummary {
   count: number;

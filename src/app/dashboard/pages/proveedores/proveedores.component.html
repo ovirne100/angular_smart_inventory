@@ -99,6 +99,8 @@
   [proveedorId]="proveedorSeleccionado.id"
   [proveedorSeleccionado]="proveedorSeleccionado"
   [productos]="todosLosProductos"
+  [modoModal]="true"
+  [autoAbrir]="true"
   (cerrar)="proveedorSeleccionado = undefined"
   (productoEliminado)="eliminarProductoDelProveedor($event)">
 </app-product-suppliers>

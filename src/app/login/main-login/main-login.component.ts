@@ -27,20 +27,18 @@ export class MainLoginComponent{
 
     this.auth.login(this.loginForm.value).subscribe({
       next: (res: any) => {
-        // Cargar información del usuario después del login
-        this.auth.loadUserInfo().subscribe({
-          next: (user) => {
-            console.log('Usuario cargado:', user);
-            alert('Login exitoso');
-            this.router.navigate(['/dashboard']);
-          },
-          error: (err) => {
-            console.error('Error cargando usuario:', err);
-            // Aún así navegar al dashboard si el login fue exitoso
-            alert('Login exitoso');
-            this.router.navigate(['/dashboard']);
-          }
-        });
+        // El backend ya devuelve el usuario en la respuesta del login
+        // No necesitamos hacer una segunda petición
+        if (res.user) {
+          // El usuario ya está guardado en el AuthService por el pipe tap
+          this.router.navigate(['/dashboard']);
+        } else {
+          // Fallback: si por alguna razón no viene el usuario, cargarlo
+          this.auth.loadUserInfo().subscribe({
+            next: () => this.router.navigate(['/dashboard']),
+            error: () => this.router.navigate(['/dashboard']) // Navegar de todos modos
+          });
+        }
       },
       error: () => alert('Usuario o contraseña incorrectos')
     });

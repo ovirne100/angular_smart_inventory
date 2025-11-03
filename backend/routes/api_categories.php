@@ -15,8 +15,8 @@ Route::prefix('categories')->group(function () {
     // Obtener todas las categorías
     Route::get('/', [CategoryController::class, 'index']);
 
-    // Obtener una categoría específica
-    Route::get('/{id}', [CategoryController::class, 'show']);
+    // Crear una nueva categoría (debe ir antes de /{id} para evitar conflictos)
+    Route::post('/', [CategoryController::class, 'store']);
 
     // Inicializar categorías desde el frontend
     Route::post('/init', [CategoryController::class, 'init']);
@@ -26,6 +26,9 @@ Route::prefix('categories')->group(function () {
 
     // Verificar estado de sincronización
     Route::get('/status/check', [CategoryController::class, 'status']);
+
+    // Obtener una categoría específica (debe ir al final para evitar conflictos)
+    Route::get('/{id}', [CategoryController::class, 'show']);
 });
 
 // Ruta de prueba para verificar que el backend funciona

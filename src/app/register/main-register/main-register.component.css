@@ -226,3 +226,25 @@ input{
     text-align: center;
   }
 }
+
+@media (max-width: 480px) {
+  .container {
+    padding: 1rem;
+  }
+  .right {
+    width: 100%;
+    max-width: 100%;
+    padding: 1.25rem;
+  }
+  .left h1 {
+    font-size: 2rem;
+  }
+  .logo img {
+    width: 140px;
+  }
+}
+
+/* Smooth mobile scrolling */
+.container {
+  -webkit-overflow-scrolling: touch;
+}

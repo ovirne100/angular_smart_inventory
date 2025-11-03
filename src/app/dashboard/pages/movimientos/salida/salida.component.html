@@ -19,9 +19,66 @@
   <form *ngIf="showForm" [formGroup]="salidaForm" (ngSubmit)="onSubmit()" class="form-box" novalidate>
     <h3>Registrar Nueva Salida</h3>
 
+    <!-- Escáner de código de barras -->
+    <div class="form-group scanner-group">
+      <button type="button" (click)="toggleScanner()" class="btn-scanner" [class.active]="mostrarScanner">
+        <i class="fa-solid fa-barcode"></i>
+        {{ mostrarScanner ? 'Ocultar Escáner' : 'Escanear Código de Barras' }}
+      </button>
+      
+      <div *ngIf="mostrarScanner" class="scanner-content">
+        <!-- Input manual -->
+        <div class="scanner-input-container">
+          <input 
+            type="text" 
+            [(ngModel)]="codigoBarrasInput" 
+            (keyup.enter)="buscarProductoPorCodigo()"
+            (input)="onCodigoInputChange()"
+            placeholder="Ingrese el código de barras manualmente"
+            class="scanner-input"
+            [disabled]="escaneando">
+          <button 
+            type="button" 
+            (click)="buscarProductoPorCodigo()" 
+            class="btn-buscar"
+            [disabled]="escaneando || !codigoBarrasInput || codigoBarrasInput.trim().length === 0">
+            <i class="fa-solid fa-search" *ngIf="!escaneando"></i>
+            <i class="fa-solid fa-spinner fa-spin" *ngIf="escaneando"></i>
+            {{ escaneando ? 'Buscando...' : 'Buscar' }}
+          </button>
+        </div>
+
+        <!-- Separador -->
+        <div class="scanner-divider" *ngIf="scannerSupported">
+          <span>O</span>
+        </div>
+
+        <!-- Cámara -->
+        <div *ngIf="scannerSupported" class="scanner-camera-section">
+          <button 
+            type="button" 
+            (click)="isScanning ? stopScanning() : startCameraScanning()" 
+            class="btn-camera"
+            [class.scanning]="isScanning">
+            <i class="fa-solid" [class.fa-camera]="!isScanning" [class.fa-stop]="isScanning"></i>
+            {{ isScanning ? 'Detener Cámara' : 'Iniciar Cámara' }}
+          </button>
+          
+          <div #scannerContainer class="scanner-container" [style.display]="isScanning ? 'block' : 'none'">
+            <!-- QuaggaJS renderizará aquí -->
+          </div>
+        </div>
+
+        <div *ngIf="!scannerSupported" class="scanner-warning">
+          <i class="fa-solid fa-exclamation-triangle"></i>
+          <span>El escáner de cámara no está disponible. Use el modo manual.</span>
+        </div>
+      </div>
+    </div>
+
     <div class="form-group">
       <label>Producto *</label>
-      <select formControlName="product_id">
+      <select formControlName="product_id" (change)="onProductoChange()">
         <option value="">Seleccione un producto</option>
         <option *ngFor="let p of productos" [value]="p.id">{{ p.name }}</option>
       </select>
@@ -32,10 +89,19 @@
 
     <div class="form-group">
       <label>Cantidad *</label>
-      <input type="number" formControlName="quantity" placeholder="Ej: 10" min="1">
+      <input type="number" formControlName="quantity" placeholder="Ej: 10" min="1" (input)="onCantidadChange()">
       <div class="error" *ngIf="salidaForm.controls['quantity'].invalid && salidaForm.controls['quantity'].touched">
         Ingresa una cantidad válida (≥1).
       </div>
+      <div class="error" *ngIf="!validacionInventario.disponible && validacionInventario.mensajeError">
+        {{ validacionInventario.mensajeError }}
+      </div>
+      <div class="success" *ngIf="validacionInventario.disponible && validacionInventario.mensajeError === ''">
+        ✅ Cantidad disponible
+      </div>
+      <small class="form-hint" *ngIf="productoSeleccionado && validacionInventario.cantidadDisponible > 0">
+        Stock disponible: <strong>{{ validacionInventario.cantidadDisponible }}</strong>
+      </small>
     </div>
 
     <div class="form-group">
@@ -44,12 +110,32 @@
     </div>
 
     <div class="form-group">
-      <label>Lote / Motivo</label>
-      <input type="text" formControlName="lot" placeholder="Ej: venta, traslado, L-2025-A...">
-      <small class="form-hint">Si no se especifica lote, se buscará inventario automáticamente (FIFO).</small>
+      <label>Lote</label>
+      <input type="text" formControlName="lot" placeholder="Ej: 1011" (input)="onLoteChange()">
+      <small class="form-hint">Si no se especifica lote, se sumará el stock de todos los lotes disponibles.</small>
+      <small class="form-hint" *ngIf="productoSeleccionado && lotesDisponibles.length === 0">
+        ⚠️ Este producto no tiene lotes disponibles en inventario
+      </small>
     </div>
 
-    <button type="submit" class="btn-submit" [disabled]="saving || salidaForm.invalid">
+    <div class="form-group">
+      <label>Motivo</label>
+      <input type="text" formControlName="motivo" placeholder="Ej: venta, traslado, consumo interno...">
+      <small class="form-hint" *ngIf="productoSeleccionado && lotesDisponibles.length > 0">
+        💡 Seleccione un lote de las entradas registradas. Total de lotes: {{ lotesDisponibles.length }}
+      </small>
+      <small class="form-hint" *ngIf="productoSeleccionado && lotesDisponibles.length === 0">
+        ⚠️ Este producto no tiene lotes registrados en entradas. Debe registrar una entrada primero.
+      </small>
+>>>>>>> ede7a69 (mejorando la aplicacion en general)
+    </div>
+
+    <div class="form-group">
+      <label>Motivo</label>
+      <input type="text" formControlName="motivo" placeholder="Ej: venta, traslado, consumo interno...">
+    </div>
+
+    <button type="submit" class="btn-submit" [disabled]="saving || salidaForm.invalid || !validacionInventario.disponible || !validacionInventario.loteValido">
       {{ saving ? 'Guardando...' : '✅ Guardar Salida' }}
     </button>
   </form>

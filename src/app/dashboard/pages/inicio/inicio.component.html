@@ -23,17 +23,97 @@
       </div>
     </div>
 
-    <!-- Tarjeta: Comparación mensual -->
-    <div class="card violet">
-      <div class="icon">📊</div>
+    <!-- Tarjeta: Comparación mensual con gráfica -->
+    <div class="card violet chart-card">
       <div class="content">
-        <h2>Comparativa Mes Anterior</h2>
-        <p class="value">
-          Salidas: {{ stats.salidasMesActual || 0 | number }} → {{ stats.salidasMesAnterior || 0 | number }}
-        </p>
-        <p class="value">
-          Entradas: {{ stats.entradasMesActual || 0 | number }} → {{ stats.entradasMesAnterior || 0 | number }}
-        </p>
+        <div class="chart-header">
+          <div class="chart-title">
+            <h2>Comparativa Mes Anterior</h2>
+            <p class="chart-subtitle">Entradas y salidas del mes actual frente al mes pasado</p>
+          </div>
+          <div class="legend-pills">
+            <span class="pill actual">
+              <i class="fa-solid fa-calendar-check"></i>
+              <strong>Mes Actual</strong>
+            </span>
+            <span class="pill previous">
+              <i class="fa-solid fa-calendar-days"></i>
+              <strong>Mes Anterior</strong>
+            </span>
+            <span class="pill variation">
+              <i class="fa-solid fa-chart-line"></i>
+              <strong>Variación %</strong>
+            </span>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas baseChart
+                  [data]="barChartData"
+                  [type]="barChartType"
+                  [options]="barChartOptions"
+                  [plugins]="comparisonPlugins">
+          </canvas>
+        </div>
+        <div class="insight-grid">
+          <div class="insight-card">
+            <div class="insight-header">
+              <span class="insight-label">
+                <i class="fa-solid fa-arrow-down"></i> Entradas
+              </span>
+              <span class="insight-tag actual">
+                <i class="fa-solid fa-calendar-check"></i> Mes Actual
+              </span>
+            </div>
+            <div class="insight-body">
+              <span class="insight-value">{{ stats.entradasMesActual || 0 | number }}</span>
+              <span class="insight-meta">
+                vs {{ stats.entradasMesAnterior || 0 | number }} el mes anterior
+              </span>
+              <span class="trend insight-delta"
+                    [class]="getTendenciaClass(stats.entradasMesActual || 0, stats.entradasMesAnterior || 0)">
+                <i class="fa-solid"
+                   [ngClass]="{
+                     'fa-arrow-up': (stats.entradasMesActual || 0) > (stats.entradasMesAnterior || 0),
+                     'fa-arrow-down': (stats.entradasMesActual || 0) < (stats.entradasMesAnterior || 0),
+                     'fa-equals': (stats.entradasMesActual || 0) === (stats.entradasMesAnterior || 0)
+                   }"></i>
+                {{ calcularPorcentajeCambio(stats.entradasMesActual || 0, stats.entradasMesAnterior || 0) }}%
+                <span class="insight-delta-detail">
+                  {{ (stats.entradasMesActual || 0) - (stats.entradasMesAnterior || 0) | number }} und
+                </span>
+              </span>
+            </div>
+          </div>
+          <div class="insight-card">
+            <div class="insight-header">
+              <span class="insight-label">
+                <i class="fa-solid fa-arrow-up"></i> Salidas
+              </span>
+              <span class="insight-tag actual">
+                <i class="fa-solid fa-calendar-check"></i> Mes Actual
+              </span>
+            </div>
+            <div class="insight-body">
+              <span class="insight-value">{{ stats.salidasMesActual || 0 | number }}</span>
+              <span class="insight-meta">
+                vs {{ stats.salidasMesAnterior || 0 | number }} el mes anterior
+              </span>
+              <span class="trend insight-delta"
+                    [class]="getTendenciaClass(stats.salidasMesActual || 0, stats.salidasMesAnterior || 0)">
+                <i class="fa-solid"
+                   [ngClass]="{
+                     'fa-arrow-up': (stats.salidasMesActual || 0) > (stats.salidasMesAnterior || 0),
+                     'fa-arrow-down': (stats.salidasMesActual || 0) < (stats.salidasMesAnterior || 0),
+                     'fa-equals': (stats.salidasMesActual || 0) === (stats.salidasMesAnterior || 0)
+                   }"></i>
+                {{ calcularPorcentajeCambio(stats.salidasMesActual || 0, stats.salidasMesAnterior || 0) }}%
+                <span class="insight-delta-detail">
+                  {{ (stats.salidasMesActual || 0) - (stats.salidasMesAnterior || 0) | number }} und
+                </span>
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 

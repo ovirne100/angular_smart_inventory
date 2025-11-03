@@ -88,30 +88,53 @@ export class MainRegisterComponent {
   registerForm: FormGroup;
   roles: any[] = [];
   errors: Record<string, string[]> = {};
+  cargandoRoles: boolean = true;
+  errorRoles: string = '';
 
   constructor(
     private fb: FormBuilder,
     private http: HttpClient,
     private router: Router,
-private rolesService: RolesService
+    private rolesService: RolesService
   ) {
     // Inicializar FormGroup
+    // El role_id se crea deshabilitado inicialmente
     this.registerForm = this.fb.group({
       name: ['', Validators.required],
       lastname: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(8)]],
       password_confirmation: ['', Validators.required],
-      role_id: [''] // aqui guardamos el id del  rol
+      role_id: [{value: '', disabled: true}, Validators.required] // Deshabilitado hasta cargar roles
     });
 
     // Cargar roles públicos
+    this.cargarRoles();
+  }
+
+  cargarRoles(): void {
+    this.cargandoRoles = true;
+    this.errorRoles = '';
+    
     this.rolesService.getPublicRoles().subscribe({
       next: (data) => {
-        console.log('Roles recibidos:', data); // <-- añade este log
-        this.roles = data;
+        console.log('Roles recibidos:', data);
+        this.roles = data || [];
+        this.cargandoRoles = false;
+        
+        if (this.roles.length === 0) {
+          this.errorRoles = 'No hay roles disponibles';
+        } else {
+          // Habilitar el campo role_id cuando se carguen los roles
+          this.registerForm.get('role_id')?.enable();
+        }
       },
-      error: (err) => console.error('Error cargando roles', err)
+      error: (err) => {
+        console.error('Error cargando roles:', err);
+        this.errorRoles = 'Error al cargar los roles. Por favor, recarga la página.';
+        this.cargandoRoles = false;
+        // Mantener deshabilitado si hay error
+      }
     });
   }
 
@@ -127,8 +150,11 @@ private rolesService: RolesService
     }
 
     this.errors = {};
-    console.log(this.registerForm.value)
-    this.http.post('http://127.0.0.1:8000/api/register', this.registerForm.value)
+    // Usar getRawValue() para incluir campos deshabilitados
+    const formData = this.registerForm.getRawValue();
+    console.log('Datos del formulario:', formData);
+    
+    this.http.post('http://127.0.0.1:8000/api/register', formData)
       .subscribe({
         next: () => this.router.navigate(['/login']),
         error: (err) => {

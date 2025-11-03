@@ -1,10 +1,31 @@
-<div class="productos-panel">
+<div class="productos-panel" *ngIf="!modoModal">
   <!-- ===================== CABECERA ===================== -->
   <div class="productos-header">
-    <h3>Productos de {{ proveedorSeleccionado?.name || 'Proveedor' }}</h3>
+    <div class="header-info">
+      <h3>Productos de {{ proveedorSeleccionado?.name || 'Proveedor' }}</h3>
+      <div class="productos-count">
+        <span class="badge-count">
+          {{ productosProveedor.length }} / {{ MAX_PRODUCTOS }} productos
+        </span>
+        <span class="badge-full" *ngIf="productosProveedor.length >= MAX_PRODUCTOS">
+          <i class="fa-solid fa-exclamation-triangle"></i> Límite alcanzado
+        </span>
+      </div>
+    </div>
 
     <div class="header-actions">
-      <button class="btn-asociar" (click)="onAbrirAsociar()">
+      <button
+        class="btn-ver-productos"
+        (click)="onAbrirProductos()"
+        [title]="'Ver productos asociados (' + productosProveedor.length + ')'">
+        <i class="fa-solid fa-boxes"></i> Ver Productos ({{ productosProveedor.length }})
+      </button>
+
+      <button
+        class="btn-asociar"
+        (click)="onAbrirAsociar()"
+        [disabled]="productosProveedor.length >= MAX_PRODUCTOS"
+        [title]="productosProveedor.length >= MAX_PRODUCTOS ? 'Límite de productos alcanzado' : 'Asociar producto'">
         <i class="fa-solid fa-plus"></i> Asociar producto
       </button>
 
@@ -14,88 +35,314 @@
     </div>
   </div>
 
-  <!-- ===================== LISTA DE PRODUCTOS ===================== -->
-  <div *ngIf="productosProveedor.length === 0" class="no-productos">
+  <!-- ===================== MENSAJE INFORMATIVO ===================== -->
+  <div class="info-message" *ngIf="productosProveedor.length === 0">
+    <i class="fa-solid fa-info-circle"></i>
     <p>Este proveedor no tiene productos asociados.</p>
+    <p class="hint-text">Usa el botón "Asociar producto" para comenzar.</p>
   </div>
 
-  <div *ngIf="productosProveedor.length > 0" class="productos-lista">
-    <div
-      *ngFor="let producto of productosProveedor; trackBy: trackByProductId"
-      class="producto-item"
-    >
-      <div class="producto-imagen">
-        <img
-          [src]="producto.image_url || 'http://smart_inventory/storage/' + producto.image"
-          [alt]="producto.name"
-        />
-      </div>
+  <div class="info-message" *ngIf="productosProveedor.length > 0">
+    <i class="fa-solid fa-check-circle"></i>
+    <p>Este proveedor tiene {{ productosProveedor.length }} producto(s) asociado(s).</p>
+    <p class="hint-text">Haz clic en "Ver Productos" para ver la lista completa.</p>
+  </div>
+</div>
 
-      <div class="producto-info">
-        <h4>{{ producto.name }}</h4>
-        <p><strong>Referencia:</strong> {{ producto.reference }}</p>
-        <p><strong>Lote:</strong> {{ producto.batch }}</p>
-
-        <div class="producto-details" *ngIf="producto.pivot">
-          <span class="costo">
-            <strong>Costo:</strong>
-            ${{ +producto.pivot.unit_cost | number: '1.0-2' }}
+<!-- ===================== MODAL VER PRODUCTOS ASOCIADOS ===================== -->
+<div *ngIf="mostrarProductos" class="modal-overlay">
+  <div class="modal modal-large">
+    <div class="modal-header">
+      <div class="modal-header-left">
+        <h3>Productos de {{ proveedorSeleccionado?.name || 'Proveedor' }}</h3>
+        <div class="productos-count">
+          <span class="badge-count">
+            {{ productosProveedor.length }} / {{ MAX_PRODUCTOS }} productos
           </span>
-
-          <span *ngIf="producto.pivot.supplier_reference" class="referencia">
-            <strong>Ref. proveedor:</strong>
-            {{ producto.pivot.supplier_reference }}
+          <span class="badge-full" *ngIf="productosProveedor.length >= MAX_PRODUCTOS">
+            <i class="fa-solid fa-exclamation-triangle"></i> Límite alcanzado
           </span>
         </div>
-
-        <button class="btn-eliminar" (click)="eliminar(producto)">
-          <i class="fa-solid fa-trash"></i> Eliminar
+      </div>
+      <div class="modal-header-actions">
+        <button
+          class="btn-asociar-modal"
+          (click)="onAbrirAsociar()"
+          [disabled]="productosProveedor.length >= MAX_PRODUCTOS"
+          [title]="productosProveedor.length >= MAX_PRODUCTOS ? 'Límite de productos alcanzado' : 'Asociar producto'">
+          <i class="fa-solid fa-plus-circle"></i> Asociar Producto
+        </button>
+        <button class="btn-cerrar-modal-text" (click)="onCerrarProductos()" title="Cerrar">
+          <i class="fa-solid fa-times"></i> Cerrar
         </button>
       </div>
     </div>
+
+    <div class="modal-body">
+      <!-- ===================== CONTROLES DE BÚSQUEDA Y ORDENAMIENTO ===================== -->
+      <div class="controles-panel" *ngIf="productosProveedor.length > 0">
+        <div class="search-container">
+          <input
+            type="text"
+            class="search-input"
+            placeholder="Buscar por nombre, referencia o lote..."
+            [(ngModel)]="searchTerm"
+            (input)="onBuscar()">
+          <button class="btn-clear-search" (click)="limpiarBusqueda()" *ngIf="searchTerm">
+            <i class="fa-solid fa-times"></i>
+          </button>
+        </div>
+
+        <div class="sort-container">
+          <label>Ordenar por:</label>
+          <select [(ngModel)]="sortBy" (change)="cambiarOrdenamiento(sortBy)">
+            <option value="name">Nombre</option>
+            <option value="reference">Referencia</option>
+            <option value="cost">Costo</option>
+            <option value="batch">Lote</option>
+          </select>
+          <button class="btn-sort" (click)="cambiarOrdenamiento(sortBy)">
+            <i class="fa-solid" [class.fa-sort-up]="sortOrder === 'asc'" [class.fa-sort-down]="sortOrder === 'desc'"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- ===================== LISTA DE PRODUCTOS ===================== -->
+      <div *ngIf="productosProveedor.length === 0" class="no-productos">
+        <i class="fa-solid fa-box-open"></i>
+        <p>Este proveedor no tiene productos asociados.</p>
+        <p class="hint-text">Usa el botón "Asociar producto" para comenzar.</p>
+      </div>
+
+      <div *ngIf="productosProveedor.length > 0 && productosPagina.length === 0" class="no-resultados">
+        <i class="fa-solid fa-search"></i>
+        <p>No se encontraron productos que coincidan con la búsqueda.</p>
+        <button class="btn-limpiar" (click)="limpiarBusqueda()">Limpiar búsqueda</button>
+      </div>
+
+      <div *ngIf="productosPagina.length > 0" class="productos-lista">
+        <div
+          *ngFor="let producto of productosPagina; trackBy: trackByProductId"
+          class="producto-item"
+        >
+          <div class="producto-imagen">
+            <img
+              [src]="producto.image_url || (producto.image ? 'http://127.0.0.1:8000/storage/' + producto.image : 'assets/no-image.png')"
+              [alt]="producto.name"
+              loading="lazy" decoding="async" referrerpolicy="no-referrer"
+              (error)="onImageError($event)"
+            />
+          </div>
+
+          <div class="producto-info">
+            <div class="producto-header-info">
+              <h4 class="producto-name">{{ producto.name }}</h4>
+              <span class="producto-id">ID: {{ producto.id }}</span>
+            </div>
+            
+            <div class="producto-details-grid">
+              <div class="detail-item">
+                <i class="fa-solid fa-barcode"></i>
+                <span class="detail-label">Referencia:</span>
+                <span class="detail-value">{{ producto.reference || 'N/A' }}</span>
+              </div>
+              
+              <div class="detail-item">
+                <i class="fa-solid fa-layer-group"></i>
+                <span class="detail-label">Lote:</span>
+                <span class="detail-value">{{ producto.batch || 'N/A' }}</span>
+              </div>
+
+              <div class="detail-item" *ngIf="producto.pivot && producto.pivot.unit_cost">
+                <i class="fa-solid fa-dollar-sign"></i>
+                <span class="detail-label">Costo:</span>
+                <span class="detail-value costo-highlight">${{ producto.pivot.unit_cost | number: '1.2-2' }}</span>
+              </div>
+
+              <div class="detail-item" *ngIf="producto.pivot?.supplier_reference">
+                <i class="fa-solid fa-tag"></i>
+                <span class="detail-label">Ref. Proveedor:</span>
+                <span class="detail-value">{{ producto.pivot?.supplier_reference }}</span>
+              </div>
+            </div>
+
+            <div class="producto-actions">
+              <button class="btn-eliminar" (click)="eliminar(producto)" title="Eliminar producto">
+                <i class="fa-solid fa-trash"></i> Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===================== PAGINACIÓN ===================== -->
+        <div class="paginacion" *ngIf="totalPages > 1">
+          <button
+            class="btn-pagina"
+            [disabled]="currentPage === 1"
+            (click)="cambiarPagina(currentPage - 1)">
+            <i class="fa-solid fa-chevron-left"></i> Anterior
+          </button>
+
+          <div class="pagina-info">
+            Página {{ currentPage }} de {{ totalPages }}
+            <span class="items-info">({{ productosFiltrados.length }} productos)</span>
+          </div>
+
+          <button
+            class="btn-pagina"
+            [disabled]="currentPage === totalPages"
+            (click)="cambiarPagina(currentPage + 1)">
+            Siguiente <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
 <!-- ===================== MODAL ASOCIAR PRODUCTOS ===================== -->
 <div *ngIf="mostrarAsociar" class="modal-overlay">
-  <div class="modal">
+  <div class="modal modal-large">
     <div class="modal-header">
-      <h3>Asociar productos a {{ proveedorSeleccionado?.name || 'Proveedor' }}</h3>
-      <button class="btn-cerrar-modal" (click)="onCerrarAsociar()">×</button>
+      <div class="modal-header-left">
+        <h3>Asociar productos a {{ proveedorSeleccionado?.name || 'Proveedor' }}</h3>
+        <div class="productos-count">
+          <span class="badge-count">
+            {{ productosSeleccionados.size }} producto(s) seleccionado(s)
+          </span>
+          <span class="badge-info">
+            Disponibles: {{ productosCatalogo.length }}
+          </span>
+        </div>
+      </div>
+      <div class="modal-header-actions">
+        <button class="btn-cerrar-modal" (click)="onCerrarAsociar()" title="Cerrar">
+          <i class="fa-solid fa-times"></i>
+        </button>
+      </div>
     </div>
 
     <div class="modal-body">
-      <div *ngIf="productosCatalogo.length === 0" class="loading">
-        <p>Cargando catálogo de productos...</p>
+      <!-- ===================== FILTRO DE BÚSQUEDA ===================== -->
+      <div *ngIf="productosCatalogo.length > 0" class="filtro-asociar-container">
+        <div class="search-container-asociar">
+          <i class="fa-solid fa-search search-icon"></i>
+          <input
+            type="text"
+            class="search-input-asociar"
+            placeholder="Buscar por nombre, referencia o lote..."
+            [(ngModel)]="searchTermAsociar"
+            (input)="filtrarCatalogo()"
+          />
+          <button
+            class="btn-clear-search-asociar"
+            (click)="limpiarBusquedaAsociar()"
+            *ngIf="searchTermAsociar"
+            title="Limpiar búsqueda">
+            <i class="fa-solid fa-times"></i>
+          </button>
+        </div>
+        <div class="resultados-info">
+          <span *ngIf="searchTermAsociar">
+            {{ productosCatalogoFiltrados.length }} resultado(s) de {{ productosCatalogo.length }} productos
+          </span>
+          <span *ngIf="!searchTermAsociar">
+            {{ productosCatalogo.length }} producto(s) disponible(s)
+          </span>
+        </div>
       </div>
 
-      <div *ngIf="productosCatalogo.length > 0" class="product-list">
-        <div *ngFor="let p of productosCatalogo" class="product-item">
-          <label>
+      <div *ngIf="productosCatalogo.length === 0" class="no-productos">
+        <i class="fa-solid fa-box-open"></i>
+        <p>No hay productos disponibles para asociar.</p>
+        <p class="hint-text">Todos los productos ya están asociados a este proveedor.</p>
+      </div>
+
+      <div *ngIf="productosCatalogo.length > 0 && productosCatalogoFiltrados.length === 0" class="no-resultados">
+        <i class="fa-solid fa-search"></i>
+        <p>No se encontraron productos que coincidan con la búsqueda.</p>
+        <button class="btn-limpiar" (click)="limpiarBusquedaAsociar()">Limpiar búsqueda</button>
+      </div>
+
+      <div *ngIf="productosCatalogo.length > 0 && productosCatalogoFiltrados.length > 0" class="productos-lista-asociar">
+        <div *ngFor="let p of productosCatalogoFiltrados" class="producto-item-asociar" [class.selected]="isSelected(p.id)">
+          <div class="producto-checkbox">
             <input
               type="checkbox"
+              [id]="'product-' + p.id"
               [checked]="isSelected(p.id)"
               (change)="toggleSeleccion(p.id)"
             />
-            {{ p.name }} <small>(Ref: {{ p.reference }} | Lote: {{ p.batch }})</small>
-          </label>
+            <label [for]="'product-' + p.id" class="checkbox-label"></label>
+          </div>
 
-          <input
-            *ngIf="isSelected(p.id)"
-            type="number"
-            min="0"
-            step="0.01"
-            placeholder="Costo unitario"
-            #costInput
-            (input)="updateCost(p.id, costInput.valueAsNumber)"
-          />
+          <div class="producto-imagen">
+            <img
+              [src]="p.image_url || (p.image ? 'http://127.0.0.1:8000/storage/' + p.image : 'assets/no-image.png')"
+              [alt]="p.name"
+              loading="lazy"
+              (error)="onImageError($event)"
+            />
+          </div>
+
+          <div class="producto-info-asociar">
+            <div class="producto-header-info">
+              <h4>{{ p.name }}</h4>
+              <span class="producto-id">ID: {{ p.id }}</span>
+            </div>
+
+            <div class="producto-details-grid">
+              <div class="detail-item">
+                <i class="fa-solid fa-barcode"></i>
+                <span class="detail-label">Referencia:</span>
+                <span class="detail-value">{{ p.reference || 'N/A' }}</span>
+              </div>
+
+              <div class="detail-item">
+                <i class="fa-solid fa-layer-group"></i>
+                <span class="detail-label">Lote:</span>
+                <span class="detail-value">{{ p.batch || 'N/A' }}</span>
+              </div>
+            </div>
+
+            <div class="costo-input-container" *ngIf="isSelected(p.id)">
+              <label class="costo-label">
+                <i class="fa-solid fa-dollar-sign"></i>
+                Costo unitario:
+              </label>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="0.00"
+                class="costo-input"
+                [value]="costos[p.id] || ''"
+                (input)="updateCost(p.id, $any($event.target).valueAsNumber)"
+              />
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
     <div class="modal-footer">
-      <button class="btn-guardar" (click)="onAsociar()">Guardar</button>
-      <button class="btn-cancelar" (click)="onCerrarAsociar()">Cancelar</button>
+      <div class="footer-info">
+        <span *ngIf="productosSeleccionados.size > 0" class="seleccionados-count">
+          {{ productosSeleccionados.size }} producto(s) seleccionado(s)
+        </span>
+      </div>
+      <div class="footer-actions">
+        <button class="btn-cancelar" (click)="onCerrarAsociar()">
+          <i class="fa-solid fa-times"></i> Cancelar
+        </button>
+        <button
+          class="btn-guardar"
+          (click)="onAsociar()"
+          [disabled]="productosSeleccionados.size === 0">
+          <i class="fa-solid fa-check"></i> Guardar ({{ productosSeleccionados.size }})
+        </button>
+      </div>
     </div>
   </div>
 </div>

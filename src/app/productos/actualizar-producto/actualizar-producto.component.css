@@ -1,15 +1,15 @@
 :root{
   --bg-backdrop: rgba(7, 12, 20, 0.6);
-  --card-bg: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-  --glass-border: rgba(255,255,255,0.06);
+  --card-bg: #1f2937;
+  --glass-border: rgba(255, 255, 255, 0.1);
   --accent: #6c8cff;        /* color principal */
   --accent-600: #4163f2;
-  --muted: #9aa4b2;
-  --text: #e6eef8;
+  --muted: #9ca3af;
+  --text: #ffffff;
   --danger: #ff6b6b;
   --radius-lg: 12px;
   --radius-sm: 8px;
-  --shadow: 0 8px 30px rgba(2,6,23,0.6);
+  --shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
   --input-height: 44px;
   --gap: 14px;
   --max-width: 720px;
@@ -36,7 +36,7 @@
   box-shadow: var(--shadow);
   border-radius: var(--radius-lg);
   padding: 22px;
-  color: var(--text);
+  color: #ffffff;
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
   -webkit-font-smoothing: antialiased;
   transform: translateY(6px);
@@ -46,10 +46,10 @@
 /* Header */
 .modal h2{
   margin: 0 0 14px 0;
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   letter-spacing: -0.2px;
-  font-weight: 600;
-  color: var(--text);
+  font-weight: 700;
+  color: #ffffff;
 }
 
 /* Form grid */
@@ -73,9 +73,10 @@ form{
 
 /* Labels */
 .form-group label{
-  font-size: 0.85rem;
-  color: var(--muted);
+  font-size: 0.9rem;
+  color: #e5e7eb;
   margin-bottom: 8px;
+  font-weight: 600;
 }
 
 /* Inputs */
@@ -86,18 +87,20 @@ form{
 .form-group input[type="password"]{
   height: var(--input-height);
   padding: 0 12px;
-  background: rgba(255,255,255,0.02);
-  border: 1px solid rgba(255,255,255,0.04);
+  background: #1a1a1a;
+  border: 1px solid #374151;
   border-radius: var(--radius-sm);
-  color: var(--text);
+  color: #ffffff;
   outline: none;
   transition: box-shadow .15s ease, border-color .12s ease, transform .08s ease;
   font-size: 0.95rem;
+  font-weight: 400;
 }
 
 /* Placeholder */
 .form-group input::placeholder{
-  color: rgba(255,255,255,0.16);
+  color: #9ca3af;
+  opacity: 0.7;
 }
 
 /* Focus state (accessible) */
@@ -149,8 +152,9 @@ input.ng-invalid.ng-touched {
 /* Secondary */
 .modal-buttons button[type="button"]{
   background: transparent;
-  color: var(--muted);
-  border: 1px solid rgba(255,255,255,0.04);
+  color: #e5e7eb;
+  border: 1px solid #4b5563;
+  font-weight: 600;
 }
 
 /* Hover states */
@@ -200,5 +204,120 @@ input.ng-invalid.ng-touched {
 .text-muted { color: var(--muted); font-size: .85rem; }
 .w-100 { width: 100%; }
 .mb-6 { margin-bottom: 6px; }
+
+/* Estilos para la imagen actual */
+.imagen-actual-container {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background: #f9fafb;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.imagen-actual {
+  max-width: 200px;
+  max-height: 200px;
+  width: auto;
+  height: auto;
+  border-radius: 8px;
+  margin-bottom: 0.75rem;
+  display: block;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-eliminar-imagen {
+  padding: 0.5rem 1rem;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.btn-eliminar-imagen:hover {
+  background: #dc2626;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.btn-eliminar-imagen i {
+  font-size: 0.875rem;
+}
+
+.imagen-eliminada-mensaje {
+  padding: 0.75rem 1rem;
+  background: #fef3c7;
+  border: 1px solid #fbbf24;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #92400e;
+  font-size: 0.875rem;
+}
+
+.imagen-eliminada-mensaje i {
+  color: #f59e0b;
+  font-size: 1rem;
+}
+
+.btn-restaurar-imagen {
+  margin-left: auto;
+  padding: 0.375rem 0.75rem;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  transition: all 0.2s ease;
+}
+
+.btn-restaurar-imagen:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.input-imagen {
+  margin-top: 0.5rem;
+}
+
+/* Estilos para elementos small */
+.form-group small {
+  color: #9ca3af !important;
+}
+
+/* Estilos para input file */
+input[type="file"] {
+  color: #ffffff;
+}
+
+input[type="file"]::file-selector-button {
+  background: #3b82f6;
+  color: #ffffff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-right: 0.75rem;
+  transition: all 0.2s ease;
+}
+
+input[type="file"]::file-selector-button:hover {
+  background: #2563eb;
+}
 
 

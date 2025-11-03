@@ -32,3 +32,4 @@ INSERT IGNORE INTO categories (id, name, created_at, updated_at) VALUES
 (28, 'Organización', NOW(), NOW()),
 (29, 'Bricolaje', NOW(), NOW()),
 (30, 'Ferretería', NOW(), NOW());
+(30, 'Aseo', NOW(), NOW());

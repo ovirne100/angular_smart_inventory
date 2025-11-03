@@ -19,6 +19,7 @@
 }
 
 .sidebar {
+  width: 330px;
   background: #fff;
   border-right: 1px solid #ddd;
   padding: 1rem;
@@ -45,8 +46,8 @@
 }
 
 .user-avatar {
-  width: 60px;
-  height: 60px;
+  width: 70px;
+  height: 70px;
   background: linear-gradient(135deg, #ffbf00, #ff8c00);
   border-radius: 50%;
   display: flex;
@@ -83,7 +84,7 @@
 .user-role {
   margin: 0;
   font-size: 0.8rem;
-  color: #666;
+  color:#f8f9fa;
   background: #ff5100;
   padding: 2px 8px;
   border-radius: 12px;
@@ -94,7 +95,7 @@
 .user-email {
   margin: 4px 0 0 0;
   font-size: 0.75rem;
-  color: #888;
+  color: black;
   font-style: italic;
 }
 
@@ -163,6 +164,11 @@
   flex: 1;
   padding: 1rem;
   overflow-y: auto;
+}
+
+@media (max-width:768px){
+  /* Cuando el sidebar esté visible en móvil, aseguramos que el main no se muestre */
+  .sidebar + .main { display: none; }
 }
 
 .header {
@@ -261,9 +267,6 @@
   }
 
 
-  .main {
-
-  }
 }
 
 

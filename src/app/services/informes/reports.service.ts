@@ -2,10 +2,11 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class ReportsService {
-  private base = 'http://smart_inventory/api';
+  private base = environment.apiUrl;
 
   constructor(private http: HttpClient) {}
 
@@ -49,9 +50,13 @@ export class ReportsService {
     );
   }
 
-  // Obtener inventario con stock actual
-  getInventory(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.base}/inventory`, {
+  // Obtener inventario con stock actual (con rango de fechas)
+  getInventory(from?: string, to?: string): Observable<any[]> {
+    let params = new HttpParams();
+    if (from) params = params.set('from', from);
+    if (to) params = params.set('to', to);
+    return this.http.get<any[]>(`${this.base}/inventories`, {
+      params,
       headers: this.getAuthHeaders()
     }).pipe(
       map((response: any) => {

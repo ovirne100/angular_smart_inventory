@@ -3,6 +3,7 @@
 
   <div class="filtros">
     <button [class.activo]="filtroActivo==='todas'" (click)="obtenerAlertas()">📋 Todas</button>
+    <button [class.activo]="filtroActivo==='pendientes'" (click)="filtrarPor('pendientes')">⏳ Pendientes</button>
     <button [class.activo]="filtroActivo==='resueltas'" (click)="filtrarPor('resueltas')">✅ Resueltas</button>
     <button [class.activo]="filtroActivo==='bajo'" (click)="filtrarPor('bajo')">📉 Stock Bajo</button>
     <button [class.activo]="filtroActivo==='sin'" (click)="filtrarPor('sin')">🚫 Sin Stock</button>
@@ -29,6 +30,14 @@
       <p class="alerta-mensaje">{{ alerta.message }}</p>
 
       <div class="alerta-info">
+        <p><strong>Estado:</strong>
+          <span [ngClass]="{
+            'estado-pendiente': alerta.status === 'pendiente',
+            'estado-resuelta': alerta.status === 'resuelta'
+          }">
+            {{ alerta.status === 'pendiente' ? '⏳ Pendiente' : alerta.status === 'resuelta' ? '✅ Resuelta' : '⚠️ Activa' }}
+          </span>
+        </p>
         <p><strong>Tipo:</strong>
           <span [ngClass]="{
             'tipo-bajo': alerta.alert_type==='bajo_stock',
@@ -37,8 +46,8 @@
             {{ alerta.alert_type==='bajo_stock' ? '📉 Stock Bajo' : '🚫 Sin Stock' }}
           </span>
         </p>
-<p><strong>Lote:</strong> {{ alerta.inventory?.product?.lot }}</p>
-<p><strong>Referencia:</strong> {{ alerta.inventory?.product?.reference }}</p>
+<p><strong>Lote:</strong> {{ alerta.product?.lot || alerta.product?.batch }}</p>
+<p><strong>Referencia:</strong> {{ alerta.product?.reference }}</p>
 
 
 
@@ -46,6 +55,58 @@
 
         <p *ngIf="alerta.resolved_at"><strong>Resuelta:</strong> {{ alerta.resolved_at | date:'short' }}</p>
       </div>
+
+      <button *ngIf="alerta.status !== 'resuelta' && (alerta.alert_type === 'bajo_stock' || alerta.alert_type === 'sin_stock')" class="btn-reabastecer" (click)="abrirModalOrden(alerta)">🛒 Reabastecer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Orden de Reabastecimiento -->
+<div class="modal-backdrop" *ngIf="mostrarOrden">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Crear Orden de Reabastecimiento</h3>
+      <button class="modal-close" (click)="cerrarModalOrden()">✖</button>
+    </div>
+    <div class="modal-body">
+      <div class="campo">
+        <label>Producto</label>
+        <div class="readonly">{{ alertaSeleccionada?.product?.name || 'N/D' }}</div>
+      </div>
+      <div class="campo">
+        <label>Lote</label>
+        <div class="readonly">{{ alertaSeleccionada?.product?.lot || alertaSeleccionada?.product?.batch || 'N/D' }}</div>
+      </div>
+      <div class="campo">
+        <label>Proveedor</label>
+        <div class="readonly">
+          <span *ngIf="cargandoProveedor">Cargando proveedor...</span>
+          <span *ngIf="!cargandoProveedor">{{ proveedorNombre || 'No asociado' }}</span>
+        </div>
+      </div>
+      <div class="campo" *ngIf="proveedorEmail">
+        <label>Email del proveedor</label>
+        <div class="readonly">{{ proveedorEmail }}</div>
+      </div>
+      <div class="campo">
+        <label>Referencia</label>
+        <div class="readonly">{{ alertaSeleccionada?.product?.reference || 'N/D' }}</div>
+      </div>
+      <div class="campo">
+        <label>Usuario que solicita</label>
+        <div class="readonly">{{ usuarioLogueado || 'Cargando...' }}</div>
+      </div>
+      <div class="campo">
+        <label>Cantidad a solicitar</label>
+        <input type="number" min="1" [(ngModel)]="cantidad" placeholder="Ej: 50" required />
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancelar" (click)="cerrarModalOrden()" [disabled]="enviandoOrden">Cancelar</button>
+      <button class="btn-confirmar" (click)="enviarOrden()" [disabled]="enviandoOrden || !cantidad || cantidad < 1">
+        <span *ngIf="enviandoOrden">Enviando...</span>
+        <span *ngIf="!enviandoOrden">Enviar orden</span>
+      </button>
     </div>
   </div>
 </div>

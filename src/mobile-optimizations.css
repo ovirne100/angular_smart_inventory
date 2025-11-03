@@ -2,6 +2,115 @@
 
 /* Viewport y configuración base para móviles */
 @media (max-width: 768px) {
+/*botones para crear y buscar prodcutos*/
+#crear_busqueda_producto{
+  margin-top: 25px;
+}
+.input-busqueda{
+  width: 190px;
+}
+.filtro-fijo{
+  width: 220px;
+}
+.btn-crear-principal{
+  width: 127px;
+  height: 50px;
+}
+
+  /* Modo menú móvil abierto via clase en body (compatible con navegadores sin :has) */
+  body.menu-open {
+    overflow: hidden;
+    touch-action: none;
+  }
+  body.menu-open::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 1500;
+  }
+  body.menu-open .productos-container,
+  body.menu-open .productos-lista,
+  body.menu-open .producto-item,
+  body.menu-open .acciones,
+  body.menu-open .main,
+  body.menu-open .content,
+  body.menu-open .container,
+  body.menu-open app-dashboard,
+  body.menu-open router-outlet {
+    pointer-events: none !important;
+  }
+  /* Ocultar completamente el contenido principal mientras el menú esté abierto */
+  body.menu-open .main,
+  body.menu-open .container,
+  body.menu-open app-dashboard,
+  body.menu-open router-outlet,
+  html:has(.navbar-menu.active) .main,
+  html:has(.navbar-overlay.active) .main,
+  html:has(.sidebar.mobile-open) .main {
+    display: none !important;
+    visibility: hidden !important;
+  }
+  /* Bloquear scroll y cubrir contenido cuando el menú móvil esté abierto */
+  body:has(.sidebar.mobile-open),
+  html:has(.sidebar.mobile-open),
+  body:has(.navbar-menu.active),
+  html:has(.navbar-menu.active),
+  body:has(.mobile-menu.open),
+  html:has(.mobile-menu.open),
+  body:has(.navbar-overlay.active),
+  html:has(.navbar-overlay.active) {
+    overflow: hidden;
+    touch-action: none;
+  }
+
+  body:has(.sidebar.mobile-open)::after,
+  body:has(.navbar-menu.active)::after,
+  body:has(.mobile-menu.open)::after,
+  body:has(.navbar-overlay.active)::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 1500; /* por debajo del menú (sidebar/nav) pero encima del contenido */
+  }
+
+  /* Asegurar que el panel de menú quede encima del backdrop */
+  .sidebar.mobile-open,
+  .navbar-menu.active,
+  .mobile-menu.open {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 3000;
+  }
+
+  /* Ocultar contenido principal (incluido productos) mientras el menú está abierto */
+  body:has(.sidebar.mobile-open) .productos-container,
+  body:has(.navbar-menu.active) .productos-container,
+  body:has(.mobile-menu.open) .productos-container,
+  body:has(.navbar-overlay.active) .productos-container {
+    display: none !important;
+  }
+  body:has(.sidebar.mobile-open) .main,
+  body:has(.navbar-menu.active) .main,
+  body:has(.mobile-menu.open) .main,
+  body:has(.navbar-overlay.active) .main,
+  body:has(.sidebar.mobile-open) .content,
+  body:has(.navbar-menu.active) .content,
+  body:has(.mobile-menu.open) .content,
+  body:has(.navbar-overlay.active) .content {
+    pointer-events: none;
+  }
+  /* Asegurar altura y área segura en móviles con notch */
+  html, body {
+    height: 100%;
+  }
+  body {
+    padding-top: calc(60px + env(safe-area-inset-top));
+    padding-bottom: calc(16px + env(safe-area-inset-bottom));
+  }
   /* Ajustes para el body en móviles */
   body {
     padding-top: 60px; /* Altura del navbar móvil */
@@ -19,9 +128,19 @@
   /* Mejoras de scroll en móviles */
   .productos-container,
   .sidebar,
-  .navbar-menu {
+  .navbar-menu,
+  .tabla-resultados,
+  .table-responsive,
+  .main-scroll,
+  .content-scroll {
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
+  }
+
+  /* Evitar bloqueos de scroll por contenedores fijos */
+  .content, .main, .page, .router-outlet-host {
+    min-height: calc(100vh - 60px);
+    overflow-y: auto;
   }
 
   /* Optimización de animaciones para móviles */
@@ -60,6 +179,19 @@
     padding: 0 1rem;
   }
 
+  /* Formularios y registros: evitar zoom y mejorar usabilidad */
+  input, select, textarea, .form-control, .form-input {
+    font-size: 16px; /* Previene zoom en iOS */
+    min-height: 46px;
+  }
+
+  /* En vistas de autenticación/registro comunes */
+  .auth-container, .login-container, .register-container, .auth-card {
+    margin: 0 auto;
+    padding: 1rem;
+    width: 100%;
+  }
+
   /* Botones más grandes para touch */
   .btn {
     min-height: 48px;
@@ -76,9 +208,10 @@
 
   /* Optimización de grid para móviles */
   .productos-lista {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
     gap: 1rem;
     padding: 1rem;
+    display: grid !important;
   }
 
   /* Mejoras en tarjetas */
@@ -106,8 +239,16 @@
 /* Optimizaciones para tablets */
 @media (min-width: 769px) and (max-width: 1024px) {
   .productos-lista {
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    grid-template-columns: repeat(2, 1fr) !important;
     gap: 2rem;
+    display: grid !important;
+  }
+}
+
+@media (min-width: 1025px) {
+  .productos-lista {
+    grid-template-columns: repeat(3, 1fr) !important;
+    display: grid !important;
   }
 
   .navbar-container {
@@ -138,6 +279,20 @@
   .btn:focus,
   .form-input:focus {
     border-color: var(--primary-color);
+  }
+
+  .form-actions {
+    flex-direction: column;
+    align-items: stretch;
+    width: 200px;
+  }
+
+  .btn-guardar,
+  .btn-cancelar {
+    width: 100%;
+  }
+  .form-group {
+   width: 200px;
   }
 }
 
@@ -174,6 +329,7 @@
     left: 0;
     right: 0;
     z-index: 1000;
+    padding-top: env(safe-area-inset-top);
   }
 
   /* Sidebar móvil optimizado */
@@ -184,6 +340,9 @@
     height: calc(100vh - 60px);
     transform: translateX(-100%);
     transition: transform 0.3s ease;
+    will-change: transform;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .sidebar.mobile-open {
@@ -195,8 +354,9 @@
 @media (max-width: 768px) {
   /* Lazy loading visual */
   .producto-item {
-    opacity: 0;
-    animation: fadeInUp 0.6s ease forwards;
+    /* Evitar que queden invisibles si la animación no corre en móviles */
+    opacity: 1;
+    animation: none;
   }
 
   /* Reducir efectos de sombra en móviles */
@@ -230,6 +390,18 @@
   .btn {
     font-size: clamp(0.85rem, 3vw, 0.9rem);
   }
+
+  /* Tablas: forzar scroll horizontal sin romper layout */
+  .tabla-resultados table,
+  .table-responsive table,
+  table[data-mobile-scroll="true"] {
+    min-width: 720px;
+  }
+  .tabla-resultados,
+  .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
 }
 
 /* Optimizaciones de memoria */
@@ -238,6 +410,10 @@
   .producto-item::before,
   .producto-item::after {
     content: none;
+  }
+
+  info-img{
+    width: 200px;
   }
 
   /* Simplificar gradientes */
@@ -289,6 +465,11 @@
     max-width: 100%;
     height: auto;
   }
+
+  /* Evitar que imágenes grandes rompan el layout en informes */
+  .informes-container img {
+    display: block;
+  }
 }
 
 /* Mejoras de batería */
@@ -303,6 +484,11 @@
     }
   }
 
+  /*user_info*/
+  .user-info{
+    margin-top: 70px;
+  }
+
   /* Optimización de GPU */
   .producto-item,
   .btn,
@@ -310,5 +496,15 @@
     transform: translateZ(0);
     will-change: auto;
   }
+
+  /* Botón flotante: evitar que tape contenido en móviles */
+  .btn-menu {
+    bottom: calc(20px + env(safe-area-inset-bottom));
+  }
 }
+
+/* Helpers opcionales reutilizables para contenedores con scroll */
+.main-scroll { overflow-y: auto; }
+.content-scroll { overflow-y: auto; }
+.table-responsive { width: 100%; overflow-x: auto; }
 

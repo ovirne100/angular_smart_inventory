@@ -59,28 +59,43 @@
         <div class="producto-info">
           <div class="producto-header">
             <h3>{{ producto.name }}</h3>
-            <span class="producto-id">ID: {{ producto.id }}</span>
+            <span class="producto-id">#{{ producto.id }}</span>
           </div>
           <div class="producto-details">
             <div class="detail-row">
-              <span class="detail-label"><i class="fa-solid fa-barcode"></i> Referencia:</span>
-              <span class="detail-value">{{ producto.reference }}</span>
+              <span class="detail-label"><i class="fa-solid fa-barcode"></i> Código de Barras:</span>
+              <span class="detail-value" style="font-weight: 600; color: #ffbf00;">{{ producto.codigo_de_barras || producto.reference || 'Sin código' }}</span>
             </div>
             <div class="detail-row">
               <span class="detail-label"><i class="fa-solid fa-ruler"></i> Unidad:</span>
-              <span class="detail-value">{{ producto.unit_measurement || 'N/A' }}</span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label"><i class="fa-solid fa-layer-group"></i> Lote:</span>
-              <span class="detail-value">{{ producto.batch || 'N/A' }}</span>
+              <span class="detail-value">{{ obtenerNombreUnidad(producto.unit_measurement) || 'N/A' }}</span>
             </div>
             <div class="detail-row" *ngIf="producto.expiration_date">
-              <span class="detail-label"><i class="fa-solid fa-calendar"></i> Vencimiento:</span>
-              <span class="detail-value">{{ producto.expiration_date }}</span>
+              <span class="detail-label"><i class="fa-solid fa-calendar"></i> Vencimiento Principal:</span>
+              <span class="detail-value">{{ formatearFecha(producto.expiration_date) }}</span>
             </div>
             <div class="detail-row">
               <span class="detail-label"><i class="fa-solid fa-folder"></i> Categoría:</span>
-              <span class="detail-value">{{ producto.categoria?.name }}</span>
+              <span class="detail-value">{{ producto.categoria?.name || 'Sin categoría' }}</span>
+            </div>
+
+            <!-- Lotes de Inventario -->
+            <div class="detail-row lotes-inventario" *ngIf="producto.lotesInventario && producto.lotesInventario.length > 0">
+              <div class="lotes-header">
+                <span class="detail-label">
+                  <i class="fa-solid fa-boxes"></i> Lotes en Inventario ({{ producto.lotesInventario.length }}):
+                </span>
+              </div>
+              <div class="lotes-list">
+                <div *ngFor="let lote of producto.lotesInventario" class="lote-item">
+                  <div class="lote-info">
+                    <span class="lote-numero"><strong>Lote:</strong> {{ lote.lot }}</span>
+                    <span class="lote-fecha" *ngIf="lote.expiration_date">
+                      <i class="fa-solid fa-calendar"></i> Vence: {{ formatearFecha(lote.expiration_date) }}
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

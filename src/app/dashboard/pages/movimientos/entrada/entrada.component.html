@@ -19,10 +19,67 @@
   <form *ngIf="showForm" [formGroup]="entradaForm" (ngSubmit)="onSubmit()" class="form-box" novalidate>
     <h3>📥 Registrar Nueva Entrada</h3>
 
+    <!-- Escáner de código de barras -->
+    <div class="form-group scanner-group">
+      <button type="button" (click)="toggleScanner()" class="btn-scanner" [class.active]="mostrarScanner">
+        <i class="fa-solid fa-barcode"></i>
+        {{ mostrarScanner ? 'Ocultar Escáner' : 'Escanear Código de Barras' }}
+      </button>
+
+      <div *ngIf="mostrarScanner" class="scanner-content">
+        <!-- Input manual -->
+        <div class="scanner-input-container">
+          <input
+            type="text"
+            [(ngModel)]="codigoBarrasInput"
+            (keyup.enter)="buscarProductoPorCodigo()"
+            (input)="onCodigoInputChange()"
+            placeholder="Ingrese el código de barras manualmente"
+            class="scanner-input"
+            [disabled]="escaneando">
+          <button
+            type="button"
+            (click)="buscarProductoPorCodigo()"
+            class="btn-buscar"
+            [disabled]="escaneando || !tieneCodigoValido()">
+            <i class="fa-solid fa-search" *ngIf="!escaneando"></i>
+            <i class="fa-solid fa-spinner fa-spin" *ngIf="escaneando"></i>
+            {{ escaneando ? 'Buscando...' : 'Buscar' }}
+          </button>
+        </div>
+
+        <!-- Separador -->
+        <div class="scanner-divider" *ngIf="scannerSupported">
+          <span>O</span>
+        </div>
+
+        <!-- Cámara -->
+        <div *ngIf="scannerSupported" class="scanner-camera-section">
+          <button
+            type="button"
+            (click)="isScanning ? stopScanning() : startCameraScanning()"
+            class="btn-camera"
+            [class.scanning]="isScanning">
+            <i class="fa-solid" [class.fa-camera]="!isScanning" [class.fa-stop]="isScanning"></i>
+            {{ isScanning ? 'Detener Cámara' : 'Iniciar Cámara' }}
+          </button>
+
+          <div #scannerContainer class="scanner-container" [style.display]="isScanning ? 'block' : 'none'">
+            <!-- QuaggaJS renderizará aquí -->
+          </div>
+        </div>
+
+        <div *ngIf="!scannerSupported" class="scanner-warning">
+          <i class="fa-solid fa-exclamation-triangle"></i>
+          <span>El escáner de cámara no está disponible. Use el modo manual.</span>
+        </div>
+      </div>
+    </div>
+
     <!-- Producto -->
     <div class="form-group">
       <label>Producto *</label>
-      <select formControlName="product_id">
+      <select formControlName="product_id" (change)="onProductoChange()">
         <option value="">Seleccione un producto</option>
         <option *ngFor="let p of productos" [value]="p.id">{{ p.name }}</option>
       </select>
@@ -49,7 +106,29 @@
     <!-- Lote -->
     <div class="form-group">
       <label>Lote</label>
-      <input type="text" formControlName="lot" placeholder="Ej: L-2025-A" />
+      <input type="text" formControlName="lot" (input)="onLoteChange()" placeholder="Ingrese el lote (ej: 1234, 5678, etc.)" />
+      <small class="form-hint">
+        💡 Puede ingresar cualquier lote. Cada entrada con diferente lote se guardará como registro separado.
+      </small>
+      <small class="form-hint" *ngIf="productoSeleccionado && (productoSeleccionado.batch || productoSeleccionado.lote)">
+        Lote del catálogo: <strong>{{ productoSeleccionado.batch || productoSeleccionado.lote }}</strong> (solo referencia)
+      </small>
+      <small class="form-hint" *ngIf="esLotePrincipal" style="color: #28a745; font-weight: 600;">
+        ✓ Este es el lote principal del catálogo. Usará la fecha de vencimiento del catálogo.
+      </small>
+      <small class="form-hint" *ngIf="productoSeleccionado && !esLotePrincipal && entradaForm.get('lot')?.value?.trim()" style="color: #ff9800; font-weight: 600;">
+        ⚠ Este es un lote nuevo. Puede especificar una fecha de vencimiento diferente.
+      </small>
+    </div>
+
+    <!-- Fecha de Vencimiento del Lote (solo para lotes nuevos) -->
+    <div class="form-group" *ngIf="!esLotePrincipal">
+      <label>Fecha de Vencimiento del Lote <span style="color: #ff9800;">*</span></label>
+      <input type="date" formControlName="expiration_date" />
+      <small class="form-hint">
+        💡 Especifique la fecha de vencimiento de este lote nuevo.
+>>>>>>> ede7a69 (mejorando la aplicacion en general)
+      </small>
     </div>
 
     <!-- Proveedor -->
@@ -105,29 +184,9 @@
     <option *ngFor="let w of warehouses" [value]="w.id">{{ w.name }}</option>
   </select>
 
-  <button type="button" class="btn-small" (click)="toggleWarehouseForm()">
+  <button type="button" class="btn-small" (click)="abrirModalAlmacen()">
     + Crear nuevo almacén
   </button>
-</div>
-
-<!-- Subformulario para crear nuevo almacén -->
-<div *ngIf="showWarehouseForm" class="subform">
-  <h4>🆕 Crear nuevo almacén</h4>
-  <form [formGroup]="warehouseForm" (ngSubmit)="crearWarehouse()">
-    <div class="form-group">
-      <label>Nombre</label>
-      <input formControlName="name" placeholder="Ej: Bodega Central" />
-    </div>
-    <div class="form-group">
-      <label>Dirección</label>
-      <input formControlName="address" placeholder="Ej: Calle 45 #23-56" />
-    </div>
-    <div class="form-group">
-      <label>Capacidad</label>
-      <input formControlName="capacity" placeholder="Ej: 5000 m³" />
-    </div>
-    <button type="submit" [disabled]="warehouseForm.invalid">Guardar Almacén</button>
-  </form>
 </div>
 
 
@@ -138,4 +197,64 @@
 
   </form>
 
+</div>
+
+<!-- Modal para crear nuevo almacén -->
+<div *ngIf="mostrarModalAlmacen" class="modal-overlay" (click)="cerrarModalAlmacen()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>🆕 Crear nuevo almacén</h3>
+      <button type="button" class="btn-cerrar-modal" (click)="cerrarModalAlmacen()">×</button>
+    </div>
+
+    <div class="modal-body">
+      <form [formGroup]="warehouseForm" (ngSubmit)="crearWarehouse()">
+        <div class="form-group">
+          <label>Nombre *</label>
+          <input
+            type="text"
+            formControlName="name"
+            placeholder="Ej: Bodega Central"
+            class="form-control"
+          />
+          <div class="error" *ngIf="warehouseForm.controls['name'].invalid && warehouseForm.controls['name'].touched">
+            El nombre es obligatorio.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Dirección *</label>
+          <input
+            type="text"
+            formControlName="address"
+            placeholder="Ej: Calle 45 #23-56"
+            class="form-control"
+          />
+          <div class="error" *ngIf="warehouseForm.controls['address'].invalid && warehouseForm.controls['address'].touched">
+            La dirección es obligatoria.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Capacidad *</label>
+          <input
+            type="text"
+            formControlName="capacity"
+            placeholder="Ej: 5000 m³"
+            class="form-control"
+          />
+          <div class="error" *ngIf="warehouseForm.controls['capacity'].invalid && warehouseForm.controls['capacity'].touched">
+            La capacidad es obligatoria.
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-cancelar" (click)="cerrarModalAlmacen()">Cancelar</button>
+          <button type="submit" class="btn-guardar" [disabled]="warehouseForm.invalid || saving">
+            {{ saving ? 'Guardando...' : 'Guardar Almacén' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>

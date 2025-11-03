@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export interface ProductSupplier {
   id?: number;
@@ -30,7 +31,7 @@ export interface ProductSupplier {
   providedIn: 'root'
 })
 export class ProductSupplierService {
-  private apiUrl = 'http://smart_inventory/api/product-suppliers';
+  private apiUrl = `${environment.apiUrl}/product-suppliers`;
 
   constructor(private http: HttpClient) {}
 
@@ -55,7 +56,7 @@ export class ProductSupplierService {
   }
 
   attachProductsToSupplier(supplierId: number, products: any[]): Observable<any> {
-    return this.http.post(`http://smart_inventory/api/suppliers/${supplierId}/attach-products`, { products });
+    return this.http.post(`${environment.apiUrl}/suppliers/${supplierId}/attach-products`, { products });
   }
 
 

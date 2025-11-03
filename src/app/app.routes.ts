@@ -36,6 +36,7 @@ import { VerMasProductoComponent } from './productos/ver-mas-producto/ver-mas-pr
 // 🚚 Submódulos de movimientos
 import { EntradaComponent } from './dashboard/pages/movimientos/entrada/entrada.component';
 import { SalidaComponent } from './dashboard/pages/movimientos/salida/salida.component';
+import { BarcodeScannerComponent } from './dashboard/pages/movimientos/barcode-scanner/barcode-scanner.component';
 
 export const routes: Routes = [
   // ✅ Rutas públicas
@@ -67,6 +68,7 @@ export const routes: Routes = [
         children: [
           { path: 'entradas', component: EntradaComponent },
           { path: 'salidas', component: SalidaComponent },
+          { path: 'escanear', component: BarcodeScannerComponent },
           { path: '', redirectTo: 'entradas', pathMatch: 'full' } // Default
         ]
       },

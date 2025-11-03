@@ -105,6 +105,50 @@ class CategoryController extends Controller
     }
 
     /**
+     * Crear una nueva categoría
+     * POST /api/categories
+     */
+    public function store(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'name' => 'required|string|max:255|unique:categories,name'
+            ], [
+                'name.required' => 'El nombre de la categoría es obligatorio',
+                'name.unique' => 'Ya existe una categoría con ese nombre',
+                'name.max' => 'El nombre de la categoría no puede exceder 255 caracteres'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error de validación',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $category = Category::create([
+                'name' => $request->input('name'),
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Categoría creada exitosamente',
+                'data' => $category
+            ], 201);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al crear la categoría',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Sincronizar categorías
      * POST /api/categories/sync
      */

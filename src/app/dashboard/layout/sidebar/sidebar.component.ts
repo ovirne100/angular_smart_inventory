@@ -50,6 +50,11 @@ export class SidebarComponent implements OnInit {
   toggleSidebar() {
     if (window.innerWidth <= 768) {
       this.mobileOpen = !this.mobileOpen;
+      if (this.mobileOpen) {
+        document.body.classList.add('menu-open');
+      } else {
+        document.body.classList.remove('menu-open');
+      }
     } else {
       this.collapsed = !this.collapsed;
       localStorage.setItem('sidebar-collapsed', JSON.stringify(this.collapsed));
@@ -58,11 +63,13 @@ export class SidebarComponent implements OnInit {
 
   closeMobileSidebar() {
     this.mobileOpen = false;
+    document.body.classList.remove('menu-open');
   }
 
   private checkScreenSize() {
     if (window.innerWidth <= 768) {
       this.mobileOpen = false;
+      document.body.classList.remove('menu-open');
     }
   }
 

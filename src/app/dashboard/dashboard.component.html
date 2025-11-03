@@ -83,7 +83,7 @@
   </aside>
 
   <!-- Contenido dinámico -->
-  <main class="main">
+  <main class="main" *ngIf="!isMobile || !showSidebar">
     <router-outlet></router-outlet>
   </main>
 

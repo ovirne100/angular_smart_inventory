@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class WarehousesService {
-  private apiUrl = 'http://smart_inventory/api/warehouses'; // ajusta tu URL base
+  private apiUrl = `${environment.apiUrl}/warehouses`;
 
   constructor(private http: HttpClient) {}
 

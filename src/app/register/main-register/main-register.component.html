@@ -41,10 +41,14 @@
 
   <!-- Select de roles -->
   <div class="form-group">
-    <select formControlName="role_id" id="role" >
-      <option  value="">SELECCIONE UN ROL</option>
+    <select formControlName="role_id" id="role">
+      <option value="">SELECCIONE UN ROL</option>
+      <option *ngIf="cargandoRoles" value="" disabled>Cargando roles...</option>
       <option *ngFor="let rol of roles" [value]="rol.id">{{ rol.name }}</option>
     </select>
+    <div *ngIf="errorRoles" class="error-mensaje-roles" style="color: red; font-size: 12px; margin-top: 5px;">
+      {{ errorRoles }}
+    </div>
   </div>
 
   <div class="registro">

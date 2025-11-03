@@ -20,6 +20,9 @@ export interface Alert {
   product?: {
     id: number;
     name: string;
+    batch?: string;
+    lot?: string;
+    reference?: string;
   };
   inventory?: any;
 }
@@ -60,5 +63,19 @@ export class AlertsService {
    */
   resolveAlert(id: number): Observable<any> {
     return this.http.put(`${this.apiUrl}/${id}/resolve`, {});
+  }
+
+  /**
+   * ⏳ Marcar una alerta como pendiente
+   */
+  markAsPending(id: number): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${id}/pending`, {});
+  }
+
+  /**
+   * 🔄 Actualizar el estado de una alerta
+   */
+  updateAlertStatus(id: number, status: 'pendiente' | 'resuelta'): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${id}/status`, { status });
   }
 }
