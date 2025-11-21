@@ -11,6 +11,7 @@ export interface Producto {
   id: number;
   name: string;
   batch: string;
+  lote?: string;
   expiration_date: string | Date;  // permite string o Date
   codigo_de_barras?: string;
   reference?: string; // Mantener por compatibilidad

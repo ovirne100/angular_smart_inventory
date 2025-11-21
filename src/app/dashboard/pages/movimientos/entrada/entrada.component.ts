@@ -10,6 +10,7 @@ import { AlertsService } from '../../../../services/alertas/alerts.service';
 import { ProductosService } from '../../../../services/productos/products.service';
 import { UnitsService } from '../../../../services/units/units.service';
 
+// Declaración global de Quagga
 declare var Quagga: any;
 
 interface FormDataResponse {
@@ -164,6 +165,7 @@ export class EntradaComponent implements OnInit, OnDestroy {
     this.saving = true;
     const payload = {
       ...this.warehouseForm.value,
+      // Asegurar que capacity se maneje como string o el tipo esperado por el backend
       capacity: String(this.warehouseForm.value.capacity)
     };
 
@@ -251,12 +253,17 @@ export class EntradaComponent implements OnInit, OnDestroy {
   onLoteChange(): void {
     this.verificarLotePrincipal();
     if (this.esLotePrincipal) {
+      // Si es lote principal, limpiar la fecha de vencimiento ya que usará la del catálogo
       this.entradaForm.patchValue({ expiration_date: '' });
     }
   }
 
   onSubmit(): void {
     if (this.entradaForm.invalid) {
+      // Marcar todos los controles como 'touched' para mostrar los errores
+      Object.keys(this.entradaForm.controls).forEach(key => {
+        this.entradaForm.controls[key].markAsTouched();
+      });
       this.warningMessage = '⚠️ Por favor completa todos los campos obligatorios.';
       return;
     }
@@ -271,8 +278,10 @@ export class EntradaComponent implements OnInit, OnDestroy {
 
     const formValue = { ...this.entradaForm.value };
     if (this.esLotePrincipal) {
+      // Asegurarse de no enviar fecha de vencimiento si es lote principal
       delete formValue.expiration_date;
     } else if (formValue.expiration_date) {
+      // Formatear la fecha para el backend si es necesario (ej: añadir hora)
       const fecha = formValue.expiration_date;
       if (fecha.includes('-') && fecha.length === 10) {
         formValue.expiration_date = `${fecha} 00:00:00`;
@@ -283,12 +292,13 @@ export class EntradaComponent implements OnInit, OnDestroy {
     this.clearMessages();
     const headers = this.getAuthHeaders();
 
-    this.http.post(`${this.apiUrl}/entries`, formValue, { headers })
+    this.http.post<CreateEntryResponse>(`${this.apiUrl}/entries`, formValue, { headers })
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: res => {
-          this.successMessage = '✅ Entrada creada correctamente.';
+          this.successMessage = res.message || '✅ Entrada creada correctamente.';
           this.resetForm();
+          // Notificar a otros servicios de movimientos si es necesario
           this.movimientosService.refreshCounts();
           this.movimientosService.getEntradasList();
         },
@@ -302,7 +312,13 @@ export class EntradaComponent implements OnInit, OnDestroy {
 
   private resetForm(): void {
     this.entradaForm.reset();
+    // Restaurar valores por defecto/usuario
+    if (this.currentUser?.id) {
+        this.entradaForm.patchValue({ user_id: this.currentUser.id });
+    }
     this.showForm = false;
+    this.productoSeleccionado = null;
+    this.esLotePrincipal = false;
   }
 
   private clearMessages(): void {
@@ -368,146 +384,174 @@ export class EntradaComponent implements OnInit, OnDestroy {
     // Forzar detección de cambios para actualizar el estado del botón
     this.cdr.detectChanges();
   }
+  /**
+ * 🧹 Asegura que solo se ingresen caracteres numéricos en el campo de código de barras manual.
+ */
+limpiarEntradaNumerica(): void {
+  // Elimina cualquier carácter que no sea un dígito (0-9)
+  const valorLimpio = this.codigoBarrasInput.replace(/\D/g, '');
 
-  startCameraScanning(): void {
-    if (this.isScanning) {
+  if (this.codigoBarrasInput !== valorLimpio) {
+    this.codigoBarrasInput = valorLimpio;
+    // La detección de cambios ya se llama en onCodigoInputChange, pero es buena práctica
+    // asegurarse de que la UI se actualice si el valor cambia.
+    // this.cdr.detectChanges();
+  }
+}
+
+
+// En entrada.component.ts:
+// ... (código previo)
+
+startCameraScanning(): void {
+  if (this.isScanning) {
       this.stopScanning();
       return;
-    }
+  }
 
-    if (typeof Quagga === 'undefined') {
+  if (typeof Quagga === 'undefined') {
       this.errorMessage = '❌ El escáner no está disponible. Por favor, recarga la página o usa el modo manual.';
       return;
-    }
+  }
 
-    // Asegurarse de que el contenedor esté visible antes de inicializar
-    this.mostrarScanner = true;
+  this.mostrarScanner = true;
+  this.isScanning = true;
+  this.errorMessage = '';
+  this.successMessage = '📷 Iniciando escáner... Apunta al centro.';
+  this.lastScannedCode = '';
 
-    // Esperar a que el DOM se actualice y el contenedor esté disponible
-    setTimeout(() => {
+  this.cdr.detectChanges();
+
+  setTimeout(() => {
       if (!this.scannerContainer?.nativeElement) {
-        this.errorMessage = '❌ Error: contenedor del escáner no encontrado.';
-        this.isScanning = false;
-        return;
+          this.errorMessage = '❌ Error: contenedor del escáner no encontrado.';
+          this.isScanning = false;
+          this.cdr.detectChanges();
+          return;
       }
 
-      // Limpiar cualquier instancia previa de Quagga
       try {
-        Quagga.stop();
-        Quagga.offDetected();
-        Quagga.offProcessed();
+          Quagga.stop();
       } catch (e) {
-        // Ignorar errores si no hay instancia previa
+          // Ignorar errores si no hay instancia previa
       }
 
-      this.errorMessage = '';
-      this.successMessage = '📷 Iniciando escáner...';
-      this.lastScannedCode = '';
-      this.isScanning = true;
+      this.successMessage = '📷 Escaneando... Apunta la cámara al código de barras';
 
       Quagga.init({
-        inputStream: {
-          name: 'Live',
-          type: 'LiveStream',
-          target: this.scannerContainer.nativeElement,
-          constraints: {
-            width: { min: 640, ideal: 1280, max: 1920 },
-            height: { min: 480, ideal: 720, max: 1080 },
-            facingMode: 'environment'
+          inputStream: {
+              name: 'Live',
+              type: 'LiveStream',
+              target: this.scannerContainer.nativeElement,
+              constraints: {
+                  // OPTIMIZACIÓN 1: Resolución fija más baja para mejorar FPS/velocidad
+                  width: { ideal: 640 },
+                  height: { ideal: 480 },
+                  facingMode: 'environment',
+                  // Intento de forzar el zoom/enfoque (solo funciona en algunos dispositivos)
+                  advanced: [
+                      { torch: true },
+                      { focusMode: 'continuous' }
+                  ]
+              },
+              // OPTIMIZACIÓN 2: Centrar aún más el área de detección (opcional: '25%')
+              area: {
+                  top: '25%',
+                  right: '25%',
+                  left: '25%',
+                  bottom: '25%'
+              }
           },
-          area: {
-            top: '10%',
-            right: '10%',
-            left: '10%',
-            bottom: '10%'
-          }
-        },
-        locator: {
-          patchSize: 'medium',
-          halfSample: true
-        },
-        numOfWorkers: 4,
-        decoder: {
-          readers: [
-            'ean_reader',
-            'ean_8_reader',
-            'code_128_reader',
-            'code_39_reader',
-            'upc_reader',
-            'upc_e_reader',
-            'i2of5_reader'
-          ],
-          debug: {
-            drawBoundingBox: true,
-            showFrequency: false,
-            drawScanline: true,
-            showPattern: false
-          }
-        },
-        locate: true,
-        frequency: 10
+          locator: {
+              patchSize: 'medium', // Tolerancia media a la perspectiva
+              halfSample: false,   // Mejor calidad de imagen para decodificación
+              // Umbral de contraste. 0.1 a 0.2 es usualmente bueno.
+              threshold: 0.15
+          },
+          // OPTIMIZACIÓN 3: Usar un Web Worker para procesamiento en segundo plano
+          numOfWorkers: 1,
+          decoder: {
+              readers: [
+                  'code_128_reader',
+                  'ean_reader', // EAN-13
+                  'ean_8_reader',
+                  'upc_reader', // UPC-A
+                  'upc_e_reader',
+                  'code_39_reader',
+                  'i2of5_reader'
+              ],
+              // Forzar la longitud mínima del código, 8 ya filtra códigos muy cortos
+              min_pattern_length: 8,
+              supplementary: true
+          },
+          locate: true,
+          // OPTIMIZACIÓN 4: Aumentar la frecuencia de intentos de decodificación
+          frequency: 15
       }, (err: any) => {
-        if (err) {
-          console.error('Error inicializando QuaggaJS:', err);
-          this.errorMessage = '❌ Error al iniciar el escáner. Verifica los permisos de la cámara.';
-          this.isScanning = false;
-          return;
-        }
-
-        this.successMessage = '📷 Escaneando... Apunta la cámara al código de barras';
-
-        Quagga.start();
-
-        // Detección simplificada - acepta el código en la primera lectura válida
-        const detectHandler = (result: any) => {
-          try {
-            if (!result || !result.codeResult) {
+          if (err) {
+              console.error('Error inicializando QuaggaJS:', err);
+              this.errorMessage = '❌ Error al iniciar el escáner. Verifica los permisos de la cámara.';
+              this.isScanning = false;
+              this.cdr.detectChanges();
               return;
-            }
-
-            const code = String(result.codeResult.code || '').trim();
-
-            if (!code || code.length < 3) {
-              return;
-            }
-
-            // Ignorar códigos muy cortos (menos de 8 caracteres) que pueden ser lecturas parciales
-            if (code.length < 8) {
-              return;
-            }
-
-            // Ignorar si es el mismo código que ya se escaneó
-            if (code === this.lastScannedCode) {
-              return;
-            }
-
-
-            // Aceptar inmediatamente el código escaneado
-            this.lastScannedCode = code;
-            Quagga.offDetected(detectHandler);
-            this.stopScanning();
-
-            // Asignar el código y buscar
-            setTimeout(() => {
-              this.codigoBarrasInput = code;
-              this.buscarProductoPorCodigo();
-            }, 300);
-          } catch (error) {
-            console.error('❌ Error en detectHandler:', error);
           }
-        };
 
-        Quagga.onDetected(detectHandler);
+          Quagga.start();
+
+          // Opcional: Para ver los cuadros de detección
+          Quagga.onProcessed((result: any) => {
+              const drawingCtx = Quagga.canvas.ctx.overlay;
+              const drawingCanvas = Quagga.canvas.dom.overlay;
+              drawingCtx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
+              if (result.box) {
+                  Quagga.ImageDebug.drawPath(result.box, { x: 0, y: 1 }, drawingCtx, { color: 'blue', lineWidth: 2 });
+              }
+              if (result.codeResult && result.line) {
+                  Quagga.ImageDebug.drawPath(result.line, { x: 'x', y: 'y' }, drawingCtx, { color: 'red', lineWidth: 3 });
+              }
+          });
+
+          Quagga.onDetected((result: any) => {
+              try {
+                  if (!result || !result.codeResult) {
+                      return;
+                  }
+
+                  const code = String(result.codeResult.code || '').trim();
+                  const confidence = result.codeResult.verification || 0;
+
+                  // FILTRO DE CONFIANZA Y LONGITUD (CORRECCIÓN CLAVE)
+                  // Si la confianza es baja (por debajo de 90%) o el código es demasiado corto, lo ignoramos.
+                  if (confidence < 0.9 || code.length < 8) {
+                      // console.warn('Código ignorado (baja confianza/longitud):', code, 'Confianza:', confidence);
+                      return;
+                  }
+
+                  if (code === this.lastScannedCode) {
+                      return;
+                  }
+
+                  this.lastScannedCode = code;
+                  this.stopScanning();
+
+                  this.codigoBarrasInput = code;
+                  this.buscarProductoPorCodigo();
+                  this.cdr.detectChanges();
+              } catch (error) {
+                  console.error('❌ Error en onDetected:', error);
+              }
+          });
       });
-    }, 300);
-  }
+  }, 100);
+}
 
   stopScanning(): void {
     if (this.isScanning && typeof Quagga !== 'undefined') {
       try {
-        Quagga.stop();
+        // Asegurarse de limpiar los event handlers antes de detener
         Quagga.offDetected();
         Quagga.offProcessed();
+        Quagga.stop();
       } catch (error) {
         console.error('Error deteniendo QuaggaJS:', error);
       }
@@ -556,16 +600,20 @@ export class EntradaComponent implements OnInit, OnDestroy {
           this.showForm = true;
         }
 
-        // Obtener el nombre completo de la unidad de medida
+        // Obtener el nombre completo de la unidad de medida (usando el servicio UnitsService de forma síncrona si es posible)
         let nombreUnidad = producto.unit_measurement || '';
-        if (nombreUnidad) {
-          const unidades = this.unitsService.getUnitsSync();
-          const unidadEncontrada = unidades.find(u =>
-            u.abbreviation?.toLowerCase() === nombreUnidad.toLowerCase() ||
-            u.name.toLowerCase() === nombreUnidad.toLowerCase()
-          );
-          if (unidadEncontrada) {
-            nombreUnidad = unidadEncontrada.name; // Usar el nombre completo
+        if (nombreUnidad && this.unitsService.getUnitsSync) {
+          try {
+             const unidades = this.unitsService.getUnitsSync();
+             const unidadEncontrada = unidades.find((u: any) =>
+               u.abbreviation?.toLowerCase() === nombreUnidad.toLowerCase() ||
+               u.name.toLowerCase() === nombreUnidad.toLowerCase()
+             );
+             if (unidadEncontrada) {
+               nombreUnidad = unidadEncontrada.name; // Usar el nombre completo
+             }
+          } catch (e) {
+            console.warn('Error al obtener unidades de forma síncrona, usando el valor crudo.', e);
           }
         }
 
@@ -591,7 +639,7 @@ export class EntradaComponent implements OnInit, OnDestroy {
         this.cdr.detectChanges();
       },
       complete: () => {
-        // Asegurarse de que escaneando se resetee incluso si hay algún problema
+        // Asegurarse de que escaneando se resetee
         if (this.escaneando) {
           this.escaneando = false;
           this.cdr.detectChanges();

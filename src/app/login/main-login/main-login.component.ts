@@ -1,8 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-main-login',
@@ -12,14 +12,27 @@ import { Router } from '@angular/router';
   styleUrls:['./main-login.component.css']
 })
 
-export class MainLoginComponent{
+export class MainLoginComponent implements OnInit {
   loginForm: FormGroup;
+  returnUrl: string = '/dashboard/inicio';
 
-  constructor(private fb: FormBuilder, private auth: AuthService, private router: Router) {
+  constructor(
+    private fb: FormBuilder, 
+    private auth: AuthService, 
+    private router: Router,
+    private route: ActivatedRoute
+  ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required]
     });
+  }
+
+  ngOnInit() {
+    // Obtener la URL de retorno de los query params o localStorage
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] 
+      || localStorage.getItem('returnUrl') 
+      || '/dashboard/inicio';
   }
 
   onSubmit() {
@@ -27,16 +40,20 @@ export class MainLoginComponent{
 
     this.auth.login(this.loginForm.value).subscribe({
       next: (res: any) => {
+        // Limpiar returnUrl del localStorage
+        localStorage.removeItem('returnUrl');
+        
         // El backend ya devuelve el usuario en la respuesta del login
         // No necesitamos hacer una segunda petición
         if (res.user) {
-          // El usuario ya está guardado en el AuthService por el pipe tap
-          this.router.navigate(['/dashboard']);
+          // Redirigir a la URL guardada o al dashboard por defecto
+          console.log('🔗 Redirigiendo a:', this.returnUrl);
+          this.router.navigateByUrl(this.returnUrl);
         } else {
           // Fallback: si por alguna razón no viene el usuario, cargarlo
           this.auth.loadUserInfo().subscribe({
-            next: () => this.router.navigate(['/dashboard']),
-            error: () => this.router.navigate(['/dashboard']) // Navegar de todos modos
+            next: () => this.router.navigateByUrl(this.returnUrl),
+            error: () => this.router.navigateByUrl(this.returnUrl)
           });
         }
       },

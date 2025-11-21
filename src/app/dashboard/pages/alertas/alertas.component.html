@@ -22,7 +22,11 @@
       <p>✨ No hay alertas para mostrar</p>
     </div>
 
-    <div *ngFor="let alerta of alertas" class="alerta-card" [ngClass]="getAlertClass(alerta)">
+    <div *ngFor="let alerta of alertas" 
+         [id]="'alerta-' + alerta.id"
+         class="alerta-card" 
+         [ngClass]="{'alerta-destacada': alertaIdDestacada === alerta.id}"
+         [class]="getAlertClass(alerta)">
       <div class="alerta-header">
         <h4>{{ alerta.product?.name || 'Producto no disponible' }}</h4>
       </div>
@@ -43,17 +47,16 @@
             'tipo-bajo': alerta.alert_type==='bajo_stock',
             'tipo-sin': alerta.alert_type==='sin_stock'
           }">
-            {{ alerta.alert_type==='bajo_stock' ? '📉 Stock Bajo' : '🚫 Sin Stock' }}
+            {{ alerta.alert_type==='bajo_stock' ? '📉 Stock Bajo' : alerta.alert_type==='sin_stock' ? '🚫 Sin Stock' : 'Desconocido' }}
           </span>
         </p>
-<p><strong>Lote:</strong> {{ alerta.product?.lot || alerta.product?.batch }}</p>
-<p><strong>Referencia:</strong> {{ alerta.product?.reference }}</p>
+        <p><strong>Lote:</strong> {{ alerta.product?.lot || alerta.product?.batch || 'N/D' }}</p>
+        <p><strong>Código de barras:</strong> {{ alerta.product?.codigo_de_barras || alerta.product?.reference || 'N/D' }}</p>
+        <p><strong>Stock Actual:</strong> {{ alerta.inventory?.stock ?? alerta.inventory?.stock_actual ?? 'N/D' }}</p>
+        <p><strong>Stock Mínimo:</strong> {{ alerta.inventory?.min_stock ?? 'N/D' }}</p>
+        <p><strong>Fecha:</strong> {{ alerta.date | colombiaDate:'datetime-short' }}</p>
 
-
-
-        <p><strong>Fecha:</strong> {{ alerta.date | date:'short' }}</p>
-
-        <p *ngIf="alerta.resolved_at"><strong>Resuelta:</strong> {{ alerta.resolved_at | date:'short' }}</p>
+        <p *ngIf="alerta.resolved_at"><strong>Resuelta:</strong> {{ alerta.resolved_at | colombiaDate:'datetime-short' }}</p>
       </div>
 
       <button *ngIf="alerta.status !== 'resuelta' && (alerta.alert_type === 'bajo_stock' || alerta.alert_type === 'sin_stock')" class="btn-reabastecer" (click)="abrirModalOrden(alerta)">🛒 Reabastecer</button>
@@ -74,10 +77,6 @@
         <div class="readonly">{{ alertaSeleccionada?.product?.name || 'N/D' }}</div>
       </div>
       <div class="campo">
-        <label>Lote</label>
-        <div class="readonly">{{ alertaSeleccionada?.product?.lot || alertaSeleccionada?.product?.batch || 'N/D' }}</div>
-      </div>
-      <div class="campo">
         <label>Proveedor</label>
         <div class="readonly">
           <span *ngIf="cargandoProveedor">Cargando proveedor...</span>
@@ -89,8 +88,16 @@
         <div class="readonly">{{ proveedorEmail }}</div>
       </div>
       <div class="campo">
-        <label>Referencia</label>
-        <div class="readonly">{{ alertaSeleccionada?.product?.reference || 'N/D' }}</div>
+        <label>Código de barras/Referencia</label>
+        <div class="readonly">{{ alertaSeleccionada?.product?.codigo_de_barras || alertaSeleccionada?.product?.reference || 'N/D' }}</div>
+      </div>
+      <div class="campo">
+        <label>Stock Actual</label>
+        <div class="readonly">{{ alertaSeleccionada?.inventory?.stock ?? alertaSeleccionada?.inventory?.stock_actual ?? 'N/D' }}</div>
+      </div>
+      <div class="campo">
+        <label>Stock Mínimo</label>
+        <div class="readonly">{{ alertaSeleccionada?.inventory?.min_stock ?? 'N/D' }}</div>
       </div>
       <div class="campo">
         <label>Usuario que solicita</label>

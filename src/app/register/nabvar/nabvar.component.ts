@@ -16,7 +16,7 @@ export class NabvarComponent {
 
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { Router, NavigationEnd, RouterLink } from '@angular/router';
+import { Router, NavigationEnd, RouterLink, RouterLinkActive } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { Location } from '@angular/common';
 
@@ -25,7 +25,7 @@ import { Location } from '@angular/common';
   templateUrl: './nabvar.component.html',
   styleUrls: ['./nabvar.component.css'],
   standalone: true,
-  imports: [CommonModule, RouterLink]
+  imports: [CommonModule, RouterLink, RouterLinkActive]
 })
 export class NabvarComponent implements OnInit {
   showLoginLink: boolean = false;

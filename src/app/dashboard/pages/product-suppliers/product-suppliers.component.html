@@ -231,7 +231,7 @@
           <input
             type="text"
             class="search-input-asociar"
-            placeholder="Buscar por nombre, referencia o lote..."
+            placeholder="Buscar por nombre, código de barras o lote..."
             [(ngModel)]="searchTermAsociar"
             (input)="filtrarCatalogo()"
           />
@@ -295,14 +295,14 @@
             <div class="producto-details-grid">
               <div class="detail-item">
                 <i class="fa-solid fa-barcode"></i>
-                <span class="detail-label">Referencia:</span>
-                <span class="detail-value">{{ p.reference || 'N/A' }}</span>
+                <span class="detail-label">Código de barras:</span>
+                <span class="detail-value">{{ p.codigo_de_barras || p.reference || 'N/A' }}</span>
               </div>
 
               <div class="detail-item">
                 <i class="fa-solid fa-layer-group"></i>
                 <span class="detail-label">Lote:</span>
-                <span class="detail-value">{{ p.batch || 'N/A' }}</span>
+                <span class="detail-value">{{ p.batch || p.lote || 'N/A' }}</span>
               </div>
             </div>
 

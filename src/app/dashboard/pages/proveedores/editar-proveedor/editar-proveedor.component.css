@@ -20,6 +20,7 @@
   max-width: 500px;
   max-height: 90vh;
   overflow-y: auto;
+  
 }
 
 .modal h2 {
@@ -46,6 +47,7 @@
   border-radius: 8px;
   font-size: 14px;
   transition: border-color 0.3s;
+  color: black;
 }
 
 .form-group input:focus {

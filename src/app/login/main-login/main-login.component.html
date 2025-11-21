@@ -16,6 +16,11 @@
   <div class="right">
     <h2>Iniciar Sesión</h2>
 
+    <!-- Mensaje cuando viene desde una alerta -->
+    <div *ngIf="returnUrl && returnUrl.includes('alertas')" class="alerta-mensaje">
+      <p>🔔 Para ver la alerta, por favor inicia sesión</p>
+    </div>
+
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" id="loginForm" autocomplete="off">
 
       <input type="text" name="fake-username" style="display:none;" autocomplete="username">

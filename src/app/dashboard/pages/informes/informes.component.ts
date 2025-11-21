@@ -86,6 +86,10 @@ export class InformesComponent implements OnInit {
   mostrarModalPDF: boolean = false;
   tipoExportacionPDF: string = ''; // 'normal' o 'inventario'
 
+  // Estado para modal de detalles de producto
+  mostrarModalDetalleProducto: boolean = false;
+  productoSeleccionado: any = null;
+
   // Filtros por tipo de informe
   filtrosProductos = {
     search: '',
@@ -123,9 +127,9 @@ export class InformesComponent implements OnInit {
   readonly reportConfigs: Record<ReportType, ReportMeta> = {
     productos: {
       type: 'productos',
-      title: 'Informe de Productos',
+      title: 'Informe de Productos en Inventario',
       icon: 'fa-boxes',
-      description: 'Consulta el detalle de productos registrados, su código de barras, proveedor y fechas clave.',
+      description: 'Consulta el detalle de productos que están en inventario con stock disponible, incluyendo código de barras, proveedor, lote y stock actual.',
       columns: [
         { key: 'id', label: 'ID', align: 'center', type: 'number' },
         { key: 'name', label: 'Nombre' },
@@ -157,6 +161,13 @@ export class InformesComponent implements OnInit {
             }
             return '—';
           }
+        },
+        {
+          key: 'stock',
+          label: 'Stock',
+          type: 'number',
+          align: 'right',
+          valueAccessor: (row) => row.stock ?? 0
         },
         {
           key: 'categoria',
@@ -465,209 +476,361 @@ export class InformesComponent implements OnInit {
     });
   }
 
-  // Generar informe de productos
+  // Generar informe de productos - Solo productos en inventario
   generarInformeProductos(): void {
     const headers = this.getAuthHeaders();
 
-    // Obtener TODOS los productos sin límite de paginación
-    this.productosService.getProducts({
-      search: '',
-      page: 1,
-      perPage: 10000 // Número muy alto para obtener todos
-    }).subscribe({
-      next: (res: any) => {
-        let productos = Array.isArray(res.data) ? res.data : [];
-        
-        // Si hay paginación, cargar todas las páginas
-        if (res.last_page && res.last_page > 1) {
-          const requests = [];
-          for (let page = 2; page <= res.last_page; page++) {
-            requests.push(
-              this.productosService.getProducts({
-                search: '',
-                page: page,
-                perPage: 10000
-              })
-            );
+    // Obtener inventarios para filtrar solo productos con stock
+    // Incluir relaciones con productos y proveedores
+    this.http.get(`${environment.apiUrl}/inventories?include=product.suppliers,product.supplier`, { headers }).subscribe({
+      next: (inventariosRes: any) => {
+        const inventarios = Array.isArray(inventariosRes?.data)
+          ? inventariosRes.data
+          : Array.isArray(inventariosRes)
+            ? inventariosRes
+            : [];
+
+        // Crear un Set de IDs de productos que tienen stock en inventario
+        const productosConStock = new Set<number>();
+        inventarios.forEach((inv: any) => {
+          const productId = inv.product_id || inv.product?.id;
+          const stock = Number(inv.stock_actual ?? inv.stock ?? 0);
+          if (productId && stock > 0) {
+            productosConStock.add(productId);
           }
-          
-          // Esperar todas las peticiones usando forkJoin
-          forkJoin(requests).subscribe({
-            next: (responses: any[]) => {
-              responses.forEach((response: any) => {
-                const nuevos = Array.isArray(response.data) ? response.data : [];
-                productos = [...productos, ...nuevos];
-              });
-              console.log(`✅ Total productos cargados: ${productos.length}`);
-              this.procesarProductos(productos, headers);
-            },
-            error: (err) => {
-              console.error('Error cargando páginas adicionales:', err);
-              this.procesarProductos(productos, headers);
-            }
-          });
-        } else {
-          console.log(`✅ Total productos cargados: ${productos.length}`);
-          this.procesarProductos(productos, headers);
+        });
+
+        console.log(`✅ Productos con stock en inventario: ${productosConStock.size}`);
+
+        // Si no hay productos con stock, mostrar mensaje
+        if (productosConStock.size === 0) {
+          this.datos = [];
+          this.datosFiltrados = [];
+          this.loading = false;
+          this.updateSummaryMetrics();
+          return;
         }
+
+        // Obtener TODOS los productos sin límite de paginación
+        // Incluir relaciones con proveedores en la petición
+        // Obtener directamente desde la API con todas las relaciones
+        this.http.get<any>(`${environment.apiUrl}/products?perPage=10000&include=suppliers,categoria`, { headers }).subscribe({
+          next: (res: any) => {
+            // Obtener productos desde la respuesta
+            let productos = Array.isArray(res.data)
+              ? res.data
+              : Array.isArray(res.data?.data)
+                ? res.data.data
+                : Array.isArray(res)
+                  ? res
+                  : [];
+
+            // Si hay paginación, cargar todas las páginas
+            if (res.last_page && res.last_page > 1) {
+              const requests = [];
+              for (let page = 2; page <= res.last_page; page++) {
+                requests.push(
+                  this.http.get<any>(`${environment.apiUrl}/products?page=${page}&perPage=10000&include=suppliers,categoria`, { headers })
+                );
+              }
+
+              // Esperar todas las peticiones usando forkJoin
+              forkJoin(requests).subscribe({
+                next: (responses: any[]) => {
+                  responses.forEach((response: any) => {
+                    const nuevos = Array.isArray(response.data)
+                      ? response.data
+                      : Array.isArray(response.data?.data)
+                        ? response.data.data
+                        : [];
+                    productos = [...productos, ...nuevos];
+                  });
+
+                  // Filtrar solo productos que están en inventario
+                  productos = productos.filter((p: any) => productosConStock.has(p.id));
+
+                  console.log(`✅ Total productos en inventario cargados: ${productos.length}`);
+                  console.log('📦 Productos con datos completos:', productos);
+                  this.procesarProductos(productos, headers, inventarios);
+                },
+                error: (err) => {
+                  console.error('Error cargando páginas adicionales:', err);
+                  // Filtrar solo productos que están en inventario
+                  productos = productos.filter((p: any) => productosConStock.has(p.id));
+                  this.procesarProductos(productos, headers, inventarios);
+                }
+              });
+            } else {
+              // Filtrar solo productos que están en inventario
+              productos = productos.filter((p: any) => productosConStock.has(p.id));
+              console.log(`✅ Total productos en inventario cargados: ${productos.length}`);
+              console.log('📦 Productos con datos completos:', productos);
+              this.procesarProductos(productos, headers, inventarios);
+            }
+          },
+          error: (err) => {
+            console.error('Error generando informe de productos:', err);
+            this.loading = false;
+          }
+        });
       },
       error: (err) => {
-        console.error('Error generando informe de productos:', err);
+        console.error('Error obteniendo inventarios:', err);
         this.loading = false;
       }
     });
   }
 
   // Procesar productos (extraído para reutilizar)
-  private procesarProductos(productos: any[], headers: HttpHeaders): void {
-
-        // ✅ Añadir proveedor sin alterar la lógica existente
-        productos = productos.map((p: any) => ({
-          ...p,
-          proveedor:
-            p.proveedor?.name ||
-            p.supplier?.name ||
-            (Array.isArray(p.suppliers) && p.suppliers.length > 0 ? p.suppliers[0]?.name : null) ||
-            p.supplier_name ||
-            p.provider?.name ||
-            p.proveedor || // si viene como string
-            'Sin proveedor'
-        }));
-
-        // Obtener entradas para mapear lotes
-        this.http.get<any>(`${environment.apiUrl}/entries`, { headers }).subscribe({
-          next: (entradasRes: any) => {
-            const entradas = Array.isArray(entradasRes?.data)
-              ? entradasRes.data
-              : Array.isArray(entradasRes)
-                ? entradasRes
-                : [];
-
-            // Crear un mapa de lotes por producto (usar el primer lote encontrado)
-            const lotesPorProducto = new Map<number, string>();
-            entradas.forEach((entrada: any) => {
-              const productId = entrada.product_id || entrada.product?.id;
-              if (!productId) return;
-
-              // Si el producto ya tiene un lote mapeado, no sobrescribir
-              if (!lotesPorProducto.has(productId)) {
-                const lot = String(entrada.lot || entrada.lote || entrada.batch || '').trim();
-                if (lot && lot !== 'SIN_LOTE') {
-                  lotesPorProducto.set(productId, lot);
-                }
-              }
-            });
-
-            // ✅ Añadir proveedor y lote sin alterar la lógica existente
-            productos = productos.map((p: any) => {
-              // Función auxiliar para limpiar texto
-              const limpiar = (texto: any): string => {
-                if (!texto) return '';
-                let limpio = String(texto);
-                limpio = limpio.replace(/>>>>>>>[^\n]*/g, '').replace(/<<<<<<<[^\n]*/g, '').replace(/=======[^\n]*/g, '');
-                return limpio.trim().replace(/\s+/g, ' ');
-              };
-
-              // Mapear proveedor y limpiar
-              const proveedor = limpiar(
-                p.proveedor?.name ||
-                p.supplier?.name ||
-                (Array.isArray(p.suppliers) && p.suppliers.length > 0 ? p.suppliers[0]?.name : null) ||
-                p.supplier_name ||
-                p.provider?.name ||
-                p.proveedor || // si viene como string
-                'Sin proveedor'
-              );
-
-              // Mapear lote - buscar en diferentes lugares posibles
-              let batch = p.batch || p.lote || null;
-              if (batch) batch = limpiar(batch);
-
-              // Si no hay lote en el producto, buscar en inventarios
-              if (!batch) {
-                // Si hay inventarios, tomar el primer lote
-                if (p.inventories && Array.isArray(p.inventories) && p.inventories.length > 0) {
-                  const firstInventory = p.inventories[0];
-                  batch = limpiar(firstInventory.lot || firstInventory.batch || firstInventory.lote || null);
-                }
-                // Si hay lotes como relación
-                if (!batch && p.lotes && Array.isArray(p.lotes) && p.lotes.length > 0) {
-                  batch = limpiar(p.lotes[0].batch || p.lotes[0].lot || p.lotes[0].lote || null);
-                }
-                // Si aún no hay lote, buscar en el mapa de entradas
-                if (!batch && p.id && lotesPorProducto.has(p.id)) {
-                  batch = limpiar(lotesPorProducto.get(p.id) || null);
-                }
-              }
-
-              return {
-                ...p,
-                name: limpiar(p.name),
-                codigo_de_barras: limpiar(p.codigo_de_barras || p.reference || ''),
-                reference: limpiar(p.codigo_de_barras || p.reference || ''), // Mantener por compatibilidad
-                proveedor,
-                batch: batch || undefined, // Mantener undefined si no hay lote para que el valueAccessor lo maneje
-                lote: batch || undefined,
-                categoria: p.categoria ? { ...p.categoria, name: limpiar(p.categoria.name) } : p.categoria
-              };
-            });
-
-            // Aplicar filtros de búsqueda localmente
-            const { search, lote, referencia } = this.filtrosProductos;
-
-            if (search) {
-              productos = productos.filter((p: any) =>
-                p.name?.toLowerCase().includes(search.toLowerCase()) ||
-                p.reference?.toLowerCase().includes(search.toLowerCase())
-              );
-            }
-
-            if (lote) {
-              productos = productos.filter((p: any) => {
-                const batchValue = p.batch || p.lote || '';
-                return batchValue.toString().toLowerCase().includes(lote.toLowerCase());
-              });
-            }
-
-            if (referencia) {
-              productos = productos.filter((p: any) =>
-                (p.codigo_de_barras || p.reference || '').toLowerCase().includes(referencia.toLowerCase())
-              );
-            }
-
-            this.datos = productos;
-            this.datosFiltrados = [...this.datos];
-            console.log('Productos cargados con lotes:', productos);
-            this.loading = false;
-            this.updateSummaryMetrics();
-          },
-          error: (err) => {
-            console.error('Error obteniendo entradas para lotes:', err);
-            // Continuar sin los lotes de entradas
-            this.procesarProductosSinLotes(productos);
-          }
-        });
-  }
-
-  // Procesar productos sin obtener lotes de entradas (fallback)
-  private procesarProductosSinLotes(productos: any[]): void {
-    productos = productos.map((p: any) => {
-      const proveedor =
+  private procesarProductos(productos: any[], headers: HttpHeaders, inventarios: any[] = []): void {
+    // ✅ Añadir proveedor sin alterar la lógica existente
+    productos = productos.map((p: any) => ({
+      ...p,
+      proveedor:
         p.proveedor?.name ||
         p.supplier?.name ||
         (Array.isArray(p.suppliers) && p.suppliers.length > 0 ? p.suppliers[0]?.name : null) ||
         p.supplier_name ||
         p.provider?.name ||
-        p.proveedor ||
-        'Sin proveedor';
+        p.proveedor || // si viene como string
+        'Sin proveedor'
+    }));
+
+    // Crear mapa de inventarios por producto para obtener stock, lotes y proveedores
+    const inventariosPorProducto = new Map<number, any[]>();
+    const proveedoresPorProducto = new Map<number, string>();
+
+    inventarios.forEach((inv: any) => {
+      const productId = inv.product_id || inv.product?.id;
+      if (productId) {
+        if (!inventariosPorProducto.has(productId)) {
+          inventariosPorProducto.set(productId, []);
+        }
+        inventariosPorProducto.get(productId)!.push(inv);
+
+        // Buscar proveedor en el inventario
+        if (!proveedoresPorProducto.has(productId)) {
+          const proveedorDesdeInv =
+            inv.product?.supplier?.name ||
+            (Array.isArray(inv.product?.suppliers) && inv.product.suppliers.length > 0 ? inv.product.suppliers[0]?.name : null) ||
+            inv.supplier?.name ||
+            inv.proveedor?.name ||
+            (typeof inv.proveedor === 'string' ? inv.proveedor : null);
+
+          if (proveedorDesdeInv) {
+            proveedoresPorProducto.set(productId, proveedorDesdeInv);
+          }
+        }
+      }
+    });
+
+    // Obtener entradas para mapear lotes y proveedores
+    this.http.get<any>(`${environment.apiUrl}/entries`, { headers }).subscribe({
+      next: (entradasRes: any) => {
+        const entradas = Array.isArray(entradasRes?.data)
+          ? entradasRes.data
+          : Array.isArray(entradasRes)
+            ? entradasRes
+            : [];
+
+        // Crear un mapa de lotes por producto (usar el primer lote encontrado)
+        const lotesPorProducto = new Map<number, string>();
+        entradas.forEach((entrada: any) => {
+          const productId = entrada.product_id || entrada.product?.id;
+          if (!productId) return;
+
+          // Si el producto ya tiene un lote mapeado, no sobrescribir
+          if (!lotesPorProducto.has(productId)) {
+            const lot = String(entrada.lot || entrada.lote || entrada.batch || '').trim();
+            if (lot && lot !== 'SIN_LOTE') {
+              lotesPorProducto.set(productId, lot);
+            }
+          }
+
+          // Buscar proveedor en las entradas si no se encontró antes
+          if (!proveedoresPorProducto.has(productId)) {
+            const proveedorDesdeEntrada =
+              entrada.supplier?.name ||
+              entrada.proveedor?.name ||
+              (typeof entrada.proveedor === 'string' ? entrada.proveedor : null) ||
+              entrada.product?.supplier?.name ||
+              (Array.isArray(entrada.product?.suppliers) && entrada.product.suppliers.length > 0 ? entrada.product.suppliers[0]?.name : null);
+
+            if (proveedorDesdeEntrada) {
+              proveedoresPorProducto.set(productId, proveedorDesdeEntrada);
+            }
+          }
+        });
+
+        // ✅ Añadir proveedor, lote y stock desde inventario
+        productos = productos.map((p: any) => {
+          // Función auxiliar para limpiar texto
+          const limpiar = (texto: any): string => {
+            if (!texto) return '';
+            let limpio = String(texto);
+            limpio = limpio.replace(/>>>>>>>[^\n]*/g, '').replace(/<<<<<<<[^\n]*/g, '').replace(/=======[^\n]*/g, '');
+            return limpio.trim().replace(/\s+/g, ' ');
+          };
+
+          // Mapear proveedor - buscar en múltiples fuentes
+          let proveedorNombre =
+            p.proveedor?.name ||
+            p.supplier?.name ||
+            (Array.isArray(p.suppliers) && p.suppliers.length > 0 ? p.suppliers[0]?.name : null) ||
+            p.supplier_name ||
+            p.provider?.name ||
+            (typeof p.proveedor === 'string' ? p.proveedor : null);
+
+          // Si no se encontró en el producto, buscar en el mapa de proveedores (desde inventarios/entradas)
+          if (!proveedorNombre && proveedoresPorProducto.has(p.id)) {
+            proveedorNombre = proveedoresPorProducto.get(p.id);
+          }
+
+          // Si aún no se encontró, buscar en inventarios del objeto producto
+          if (!proveedorNombre && p.inventories && Array.isArray(p.inventories) && p.inventories.length > 0) {
+            const firstInv = p.inventories[0];
+            proveedorNombre =
+              firstInv.product?.supplier?.name ||
+              (Array.isArray(firstInv.product?.suppliers) && firstInv.product.suppliers.length > 0 ? firstInv.product.suppliers[0]?.name : null) ||
+              firstInv.supplier?.name ||
+              firstInv.proveedor?.name;
+          }
+
+          const proveedor = limpiar(proveedorNombre || 'Sin proveedor');
+
+          // Obtener stock total desde inventarios
+          const invsDelProducto = inventariosPorProducto.get(p.id) || [];
+          const stockTotal = invsDelProducto.reduce((sum: number, inv: any) => {
+            return sum + (Number(inv.stock_actual ?? inv.stock ?? 0) || 0);
+          }, 0);
+
+          // Mapear lote - buscar en diferentes lugares posibles
+          let batch = p.batch || p.lote || null;
+          if (batch) batch = limpiar(batch);
+
+          // Si no hay lote en el producto, buscar en inventarios
+          if (!batch && invsDelProducto.length > 0) {
+            const firstInv = invsDelProducto[0];
+            batch = limpiar(firstInv.lot || firstInv.batch || firstInv.lote || null);
+          }
+
+          // Si no hay lote en el producto, buscar en inventarios del objeto
+          if (!batch) {
+            // Si hay inventarios, tomar el primer lote
+            if (p.inventories && Array.isArray(p.inventories) && p.inventories.length > 0) {
+              const firstInventory = p.inventories[0];
+              batch = limpiar(firstInventory.lot || firstInventory.batch || firstInventory.lote || null);
+            }
+            // Si hay lotes como relación
+            if (!batch && p.lotes && Array.isArray(p.lotes) && p.lotes.length > 0) {
+              batch = limpiar(p.lotes[0].batch || p.lotes[0].lot || p.lotes[0].lote || null);
+            }
+            // Si aún no hay lote, buscar en el mapa de entradas
+            if (!batch && p.id && lotesPorProducto.has(p.id)) {
+              batch = limpiar(lotesPorProducto.get(p.id) || null);
+            }
+          }
+
+          return {
+            ...p, // Incluir TODOS los datos del producto
+            name: limpiar(p.name),
+            codigo_de_barras: limpiar(p.codigo_de_barras || p.reference || ''),
+            reference: limpiar(p.codigo_de_barras || p.reference || ''), // Mantener por compatibilidad
+            proveedor,
+            batch: batch || undefined, // Mantener undefined si no hay lote para que el valueAccessor lo maneje
+            lote: batch || undefined,
+            stock: stockTotal, // Agregar stock total
+            categoria: p.categoria ? { ...p.categoria, name: limpiar(p.categoria.name) } : p.categoria
+          };
+        });
+
+        // Aplicar filtros de búsqueda localmente
+        const { search, lote, referencia } = this.filtrosProductos;
+
+        if (search) {
+          productos = productos.filter((p: any) =>
+            p.name?.toLowerCase().includes(search.toLowerCase()) ||
+            p.reference?.toLowerCase().includes(search.toLowerCase())
+          );
+        }
+
+        if (lote) {
+          productos = productos.filter((p: any) => {
+            const batchValue = p.batch || p.lote || '';
+            return batchValue.toString().toLowerCase().includes(lote.toLowerCase());
+          });
+        }
+
+        if (referencia) {
+          productos = productos.filter((p: any) =>
+            (p.codigo_de_barras || p.reference || '').toLowerCase().includes(referencia.toLowerCase())
+          );
+        }
+
+        this.datos = productos;
+        this.datosFiltrados = [...this.datos];
+        console.log('Productos en inventario cargados:', productos);
+        this.loading = false;
+        this.updateSummaryMetrics();
+      },
+      error: (err) => {
+        console.error('Error obteniendo entradas para lotes:', err);
+        // Continuar sin los lotes de entradas
+        this.procesarProductosSinLotes(productos);
+      }
+    });
+  }
+
+  // Procesar productos sin obtener lotes de entradas (fallback)
+  private procesarProductosSinLotes(productos: any[]): void {
+    productos = productos.map((p: any) => {
+      // Función auxiliar para limpiar texto
+      const limpiar = (texto: any): string => {
+        if (!texto) return '';
+        let limpio = String(texto);
+        limpio = limpio.replace(/>>>>>>>[^\n]*/g, '').replace(/<<<<<<<[^\n]*/g, '').replace(/=======[^\n]*/g, '');
+        return limpio.trim().replace(/\s+/g, ' ');
+      };
+
+      // Buscar proveedor en múltiples fuentes
+      let proveedorNombre =
+        p.proveedor?.name ||
+        p.supplier?.name ||
+        (Array.isArray(p.suppliers) && p.suppliers.length > 0 ? p.suppliers[0]?.name : null) ||
+        p.supplier_name ||
+        p.provider?.name ||
+        (typeof p.proveedor === 'string' ? p.proveedor : null);
+
+      // Si no se encontró, buscar en inventarios del objeto producto
+      if (!proveedorNombre && p.inventories && Array.isArray(p.inventories) && p.inventories.length > 0) {
+        const firstInv = p.inventories[0];
+        proveedorNombre =
+          firstInv.product?.supplier?.name ||
+          (Array.isArray(firstInv.product?.suppliers) && firstInv.product.suppliers.length > 0 ? firstInv.product.suppliers[0]?.name : null) ||
+          firstInv.supplier?.name ||
+          firstInv.proveedor?.name;
+      }
+
+      const proveedor = limpiar(proveedorNombre || 'Sin proveedor');
 
       const batch = p.batch || p.lote || null;
+
+      // Obtener stock desde inventarios si está disponible
+      let stock = 0;
+      if (p.inventories && Array.isArray(p.inventories)) {
+        stock = p.inventories.reduce((sum: number, inv: any) => {
+          return sum + (Number(inv.stock_actual ?? inv.stock ?? 0) || 0);
+        }, 0);
+      } else if (p.stock !== undefined) {
+        stock = Number(p.stock) || 0;
+      }
 
       return {
         ...p,
         proveedor,
         batch: batch || undefined,
-        lote: batch || undefined
+        lote: batch || undefined,
+        stock: stock
       };
     });
 
@@ -718,8 +881,8 @@ export class InformesComponent implements OnInit {
   }
 
   // Generar informe de inventario
- // ✅ Generar informe de inventario con proveedor incluido
-generarInformeInventario(): void {
+  // ✅ Generar informe de inventario con proveedor incluido
+  generarInformeInventario(): void {
   const headers = this.getAuthHeaders();
   const { fechaInicio, fechaFin, lote: filtroLote } = (this.filtrosInventario as any) || {};
   // ✅ NO enviar filtros de fecha si no están especificados para obtener TODAS las entradas
@@ -734,7 +897,7 @@ generarInformeInventario(): void {
   const paramsAll: any = {};
   if (fechaInicio && fechaInicio.trim() !== '') paramsAll.from = fechaInicio;
   if (fechaFin && fechaFin.trim() !== '') paramsAll.to = fechaFin;
-  
+
   this.http.get(`${environment.apiUrl}/inventories`, { headers, params: paramsAll }).subscribe({
     next: (inventariosRes: any) => {
       const inventarios = Array.isArray(inventariosRes?.data)
@@ -932,7 +1095,7 @@ generarInformeInventario(): void {
                 if (stock < 0) stock = 0;
 
                 const stockMin = Number(r.stock_minimo ?? 0);
-                
+
                 // Usar código de barras como clave de agrupación, si no hay usar product_id
                 const codigoBarras = r.codigo_de_barras || r.reference || `PROD_${r.product_id}`;
                 const agrupacionKey = codigoBarras || `PROD_${r.product_id}`;
@@ -1111,12 +1274,20 @@ generarInformeInventario(): void {
     try {
       const doc = new jsPDF();
 
+      // Si es productos, usar formato mejorado
+      if (this.tipoInforme === 'productos') {
+        this.generarPDFProductos(doc);
+        return;
+      }
+
       // Título
       doc.setFontSize(16);
+      doc.setFont('helvetica', 'bold');
       doc.text(`Informe de ${this.getTituloInforme()}`, 14, 15);
 
       // Fecha de generación
       doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
       const fecha = this.datePipe.transform(new Date(), 'dd/MM/yyyy HH:mm');
       doc.text(`Generado el: ${fecha}`, 14, 25);
 
@@ -1144,6 +1315,74 @@ generarInformeInventario(): void {
       console.error('Error al generar PDF:', error);
       alert('Error al generar el PDF. Por favor, verifica la consola para más detalles.');
     }
+  }
+
+  // Generar PDF mejorado para productos
+  private generarPDFProductos(doc: jsPDF): void {
+    // Encabezado con estilo profesional
+    doc.setFillColor(59, 130, 246);
+    doc.rect(0, 0, 210, 30, 'F');
+
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(18);
+    doc.setFont('helvetica', 'bold');
+    doc.text('INFORME DE PRODUCTOS EN INVENTARIO', 105, 15, { align: 'center' });
+
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    const fecha = this.datePipe.transform(new Date(), 'dd/MM/yyyy HH:mm');
+    doc.text(`Generado el: ${fecha}`, 105, 22, { align: 'center' });
+
+    // Información del informe
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(9);
+    doc.text(`Total de productos: ${this.datosFiltrados.length}`, 14, 38);
+
+    const { headers, rows } = this.generateTabularData();
+    const startY = 45;
+
+    // Tabla profesional con autoTable
+    if (typeof (doc as any).autoTable === 'function') {
+      (doc as any).autoTable({
+        head: [headers],
+        body: rows,
+        startY,
+        styles: {
+          fontSize: 8,
+          cellPadding: 2,
+          overflow: 'linebreak',
+          cellWidth: 'wrap'
+        },
+        headStyles: {
+          fillColor: [30, 64, 175],
+          textColor: [255, 255, 255],
+          fontStyle: 'bold',
+          halign: 'center'
+        },
+        alternateRowStyles: { fillColor: [249, 250, 251] },
+        columnStyles: {
+          0: { cellWidth: 15, halign: 'center' }, // ID
+          1: { cellWidth: 50 }, // Nombre
+          2: { cellWidth: 40 }, // Proveedor
+          3: { cellWidth: 35 }, // Código de barras
+          4: { cellWidth: 25, halign: 'center' }, // Lote
+          5: { cellWidth: 30 }, // Categoría
+          6: { cellWidth: 40, halign: 'center' } // Fecha
+        },
+        margin: { top: startY, left: 14, right: 14 },
+        tableWidth: 'wrap'
+      });
+
+      // Pie de página
+      const finalY = (doc as any).lastAutoTable.finalY + 10;
+      doc.setFontSize(8);
+      doc.setTextColor(128, 128, 128);
+      doc.text('Este informe contiene únicamente productos con stock disponible en inventario.', 105, finalY, { align: 'center' });
+    } else {
+      this.crearTablaPDFManual(doc, [headers, ...rows], startY);
+    }
+
+    doc.save(`informe_productos_inventario_${Date.now()}.pdf`);
   }
 
   // Generar PDF de inventario con o sin historial
@@ -1347,7 +1586,7 @@ generarInformeInventario(): void {
       doc.text(header.toString(), margin + (index * colWidth) + 2, currentY + 7);
     });
 
-    currentY += 10;
+currentY += 10;
     doc.setTextColor(0, 0, 0);
     doc.setFont('helvetica', 'normal');
 
@@ -1375,6 +1614,19 @@ generarInformeInventario(): void {
   // Exportar a Excel
   exportarExcel(): void {
     const columns = this.currentColumns.filter((col) => col.export !== false);
+
+    // Si es productos, crear formato mejorado
+    if (this.tipoInforme === 'productos') {
+      this.exportarExcelProductos(columns);
+      return;
+    }
+
+    // Si es inventario, crear formato mejorado con historial
+    if (this.tipoInforme === 'inventario') {
+      this.exportarExcelInventario(columns);
+      return;
+    }
+
     const dataset = this.datosFiltrados.map((row) => {
       const record: any = {};
       columns.forEach((col) => {
@@ -1389,8 +1641,66 @@ generarInformeInventario(): void {
     XLSX.writeFile(workbook, `informe_${this.tipoInforme}_${Date.now()}.xlsx`);
   }
 
+  // Exportar Excel mejorado para productos
+  private exportarExcelProductos(columns: ReportColumn[]): void {
+    const workbook = XLSX.utils.book_new();
+
+    // Crear hoja de datos
+    const dataset = this.datosFiltrados.map((row) => {
+      const record: any = {};
+      columns.forEach((col) => {
+        record[col.label] = this.getExportValue(col, row);
+      });
+      return record;
+    });
+
+    const worksheet = XLSX.utils.json_to_sheet(dataset);
+
+    // Ajustar ancho de columnas
+    const colWidths = columns.map((col, index) => {
+      const maxLength = Math.max(
+        col.label.length,
+        ...this.datosFiltrados.map(row => {
+          const value = this.getExportValue(col, row);
+          return value ? value.toString().length : 0;
+        })
+      );
+      return { wch: Math.min(Math.max(maxLength + 2, 10), 50) };
+    });
+    worksheet['!cols'] = colWidths;
+
+    // Agregar información del informe en la primera fila
+    const fecha = this.datePipe.transform(new Date(), 'dd/MM/yyyy HH:mm');
+    XLSX.utils.sheet_add_aoa(worksheet, [
+      ['INFORME DE PRODUCTOS EN INVENTARIO'],
+      [`Generado el: ${fecha}`],
+      [`Total de productos: ${this.datosFiltrados.length}`],
+      [] // Fila vacía
+    ], { origin: 'A1' });
+
+    // Mover los datos hacia abajo
+    const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1');
+    range.s.r = 3; // Empezar desde la fila 4
+    worksheet['!ref'] = XLSX.utils.encode_range(range);
+
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Productos');
+    XLSX.writeFile(workbook, `informe_productos_inventario_${Date.now()}.xlsx`);
+  }
+
   // Exportar a Word (CSV como Word)
   exportarWord(): void {
+    // Si es productos, crear formato mejorado
+    if (this.tipoInforme === 'productos') {
+      this.exportarWordProductos();
+      return;
+    }
+
+    // Si es inventario, crear formato mejorado con historial
+    if (this.tipoInforme === 'inventario') {
+      this.exportarWordInventario();
+      return;
+    }
+
     // Crear contenido HTML
     let html = '<html><head><meta charset="UTF-8"><title>Informe</title></head><body>';
     html += `<h1>Informe de ${this.getTituloInforme()}</h1>`;
@@ -1417,6 +1727,130 @@ generarInformeInventario(): void {
     // Descargar como .doc
     const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
     saveAs(blob, `informe_${this.tipoInforme}_${Date.now()}.doc`);
+  }
+
+  // Exportar Word mejorado para productos
+  private exportarWordProductos(): void {
+    const fecha = this.datePipe.transform(new Date(), 'dd/MM/yyyy HH:mm');
+    const columns = this.currentColumns.filter((col) => col.export !== false);
+
+    // Crear contenido HTML profesional
+    let html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <title>Informe de Productos en Inventario</title>
+      <style>
+        body {
+          font-family: 'Calibri', Arial, sans-serif;
+          margin: 20px;
+          color: #333;
+        }
+        .header {
+          background-color: #3b82f6;
+          color: white;
+          padding: 20px;
+          text-align: center;
+          margin-bottom: 20px;
+        }
+        .header h1 {
+          margin: 0;
+          font-size: 24px;
+        }
+        .info {
+          margin-bottom: 20px;
+          padding: 10px;
+          background-color: #f3f4f6;
+          border-left: 4px solid #3b82f6;
+        }
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 20px;
+          font-size: 11px;
+        }
+        th {
+          background-color: #1e40af;
+          color: white;
+          padding: 12px 8px;
+          text-align: left;
+          font-weight: bold;
+          border: 1px solid #1e3a8a;
+        }
+        td {
+          padding: 10px 8px;
+          border: 1px solid #d1d5db;
+        }
+        tr:nth-child(even) {
+          background-color: #f9fafb;
+        }
+        tr:hover {
+          background-color: #f3f4f6;
+        }
+        .footer {
+          margin-top: 30px;
+          padding: 10px;
+          font-size: 10px;
+          color: #6b7280;
+          text-align: center;
+          border-top: 1px solid #e5e7eb;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        <h1>INFORME DE PRODUCTOS EN INVENTARIO</h1>
+      </div>
+      <div class="info">
+        <strong>Generado el:</strong> ${fecha}<br>
+        <strong>Total de productos:</strong> ${this.datosFiltrados.length}
+      </div>
+      <table>
+        <thead>
+          <tr>
+    `;
+
+    // Headers
+    columns.forEach(col => {
+      html += `<th>${col.label}</th>`;
+    });
+    html += `</tr></thead><tbody>`;
+
+    // Rows
+    this.datosFiltrados.forEach((row: any, index: number) => {
+      html += '<tr>';
+      columns.forEach((col) => {
+        const value = this.getExportValue(col, row) || '';
+        html += `<td>${this.escapeHtml(value.toString())}</td>`;
+      });
+      html += '</tr>';
+    });
+
+    html += `
+        </tbody>
+      </table>
+      <div class="footer">
+        Este informe contiene únicamente productos con stock disponible en inventario.
+      </div>
+    </body>
+    </html>`;
+
+    // Descargar como .doc
+    const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+    saveAs(blob, `informe_productos_inventario_${Date.now()}.doc`);
+  }
+
+  // Helper para escapar HTML
+  private escapeHtml(text: string): string {
+    const map: { [key: string]: string } = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#039;'
+    };
+    return text.replace(/[&<>"']/g, (m) => map[m]);
   }
 
   // Helpers
@@ -1482,6 +1916,26 @@ generarInformeInventario(): void {
     return this.historialExpandido[key] || false;
   }
 
+  // Abrir modal de detalles del producto
+  abrirModalDetalleProducto(producto: any): void {
+    this.productoSeleccionado = producto;
+    this.mostrarModalDetalleProducto = true;
+  }
+
+  // Cerrar modal de detalles del producto
+  cerrarModalDetalleProducto(): void {
+    this.mostrarModalDetalleProducto = false;
+    this.productoSeleccionado = null;
+  }
+
+  // Verificar si el producto tiene historial
+  tieneHistorial(producto: any): boolean {
+    if (!producto.lotes || !Array.isArray(producto.lotes)) return false;
+    return producto.lotes.some((lote: any) =>
+      lote.historial && Array.isArray(lote.historial) && lote.historial.length > 0
+    );
+  }
+
   getRowData(row: any): any[] {
     return this.currentColumns
       .filter((col) => col.export !== false)
@@ -1516,18 +1970,18 @@ generarInformeInventario(): void {
   private limpiarTexto(texto: any): string {
     if (!texto) return '';
     let textoLimpio = String(texto);
-    
+
     // Eliminar marcadores de conflicto de Git
     textoLimpio = textoLimpio.replace(/>>>>>>>[^\n]*/g, '');
     textoLimpio = textoLimpio.replace(/<<<<<<<[^\n]*/g, '');
     textoLimpio = textoLimpio.replace(/=======[^\n]*/g, '');
-    
+
     // Eliminar espacios múltiples y saltos de línea al inicio/final
     textoLimpio = textoLimpio.trim();
-    
+
     // Eliminar espacios múltiples
     textoLimpio = textoLimpio.replace(/\s+/g, ' ');
-    
+
     return textoLimpio;
   }
 
@@ -1556,7 +2010,7 @@ generarInformeInventario(): void {
       default:
         valor = raw.toString();
     }
-    
+
     // Limpiar el valor antes de retornarlo
     return this.limpiarTexto(valor);
   }
@@ -1577,7 +2031,7 @@ generarInformeInventario(): void {
       default:
         valor = raw.toString();
     }
-    
+
     // Limpiar el valor antes de retornarlo para exportación
     return this.limpiarTexto(valor);
   }
@@ -1750,5 +2204,215 @@ generarInformeInventario(): void {
       default:
         this.summaryMetrics = [];
     }
+  }
+
+  // Exportar Excel mejorado para inventario con historial
+  private exportarExcelInventario(columns: ReportColumn[]): void {
+    const workbook = XLSX.utils.book_new();
+
+    // Crear hoja principal de inventario
+    const datosInventario: any[][] = [];
+
+    // Encabezados
+    const headers = ['Producto', 'Lote', 'Stock', 'Stock Mínimo', 'Ubicación', 'Estado'];
+    datosInventario.push(headers);
+
+    // Datos de productos y lotes
+    this.datosFiltrados.forEach((producto: any) => {
+      if (Array.isArray(producto.lotes) && producto.lotes.length > 0) {
+        producto.lotes.forEach((lote: any) => {
+          datosInventario.push([
+            producto.name || 'N/A',
+            lote.batch || 'N/A',
+            lote.stock || 0,
+            producto.min_stock || 0,
+            producto.ubicacion_interna || 'N/A',
+            lote.estado || 'Normal'
+          ]);
+        });
+      } else {
+        datosInventario.push([
+          producto.name || 'N/A',
+          'Sin lote',
+          producto.stock || 0,
+          producto.min_stock || 0,
+          producto.ubicacion_interna || 'N/A',
+          producto.estado || 'Normal'
+        ]);
+      }
+    });
+
+    const wsInventario = XLSX.utils.aoa_to_sheet(datosInventario);
+
+    // Ajustar ancho de columnas
+    wsInventario['!cols'] = [
+      { wch: 30 }, // Producto
+      { wch: 15 }, // Lote
+      { wch: 10 }, // Stock
+      { wch: 12 }, // Stock Mínimo
+      { wch: 20 }, // Ubicación
+      { wch: 12 }  // Estado
+    ];
+
+    XLSX.utils.book_append_sheet(workbook, wsInventario, 'Inventario');
+
+    // Crear hoja de historial detallado
+    const datosHistorial: any[][] = [];
+    datosHistorial.push(['Producto', 'Lote', 'Tipo', 'Cantidad', 'Fecha', 'Usuario']);
+
+    this.datosFiltrados.forEach((producto: any) => {
+      if (Array.isArray(producto.lotes)) {
+        producto.lotes.forEach((lote: any) => {
+          if (Array.isArray(lote.historial) && lote.historial.length > 0) {
+            lote.historial.forEach((h: any) => {
+              datosHistorial.push([
+                producto.name || 'N/A',
+                lote.batch || 'N/A',
+                h.type === 'entry' ? 'Entrada' : 'Salida',
+                h.quantity || 0,
+                this.formatearFecha(h.date),
+                h.user || 'N/A'
+              ]);
+            });
+          }
+        });
+      }
+    });
+
+    if (datosHistorial.length > 1) {
+      const wsHistorial = XLSX.utils.aoa_to_sheet(datosHistorial);
+      wsHistorial['!cols'] = [
+        { wch: 30 }, // Producto
+        { wch: 15 }, // Lote
+        { wch: 10 }, // Tipo
+        { wch: 10 }, // Cantidad
+        { wch: 18 }, // Fecha
+        { wch: 20 }  // Usuario
+      ];
+      XLSX.utils.book_append_sheet(workbook, wsHistorial, 'Historial');
+    }
+
+    const fecha = this.datePipe.transform(new Date(), 'yyyyMMdd_HHmmss');
+    XLSX.writeFile(workbook, `Inventario_Completo_${fecha}.xlsx`);
+  }
+
+  // Exportar Word mejorado para inventario con historial
+  private exportarWordInventario(): void {
+    const fecha = this.datePipe.transform(new Date(), 'dd/MM/yyyy HH:mm');
+
+    let html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <style>
+          body { font-family: Arial, sans-serif; margin: 20px; }
+          h1 { color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px; }
+          h2 { color: #34495e; margin-top: 30px; border-bottom: 2px solid #95a5a6; padding-bottom: 5px; }
+          .meta { color: #7f8c8d; font-size: 14px; margin-bottom: 20px; }
+          table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+          th { background-color: #3498db; color: white; padding: 12px; text-align: left; border: 1px solid #2980b9; }
+          td { padding: 10px; border: 1px solid #ddd; }
+          tr:nth-child(even) { background-color: #f2f2f2; }
+          .producto-header { background-color: #ecf0f1; font-weight: bold; }
+          .lote-row { background-color: #f8f9fa; }
+          .historial-row { background-color: #e8f4f8; font-size: 12px; }
+          .entrada { color: #27ae60; font-weight: bold; }
+          .salida { color: #e74c3c; font-weight: bold; }
+        </style>
+      </head>
+      <body>
+        <h1>📦 Informe de Inventario Completo</h1>
+        <p class="meta">Generado el: ${fecha}</p>
+
+        <h2>Resumen de Inventario</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th>Lote</th>
+              <th>Stock</th>
+              <th>Stock Mínimo</th>
+              <th>Ubicación</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>`;
+
+    this.datosFiltrados.forEach((producto: any) => {
+      if (Array.isArray(producto.lotes) && producto.lotes.length > 0) {
+        producto.lotes.forEach((lote: any, index: number) => {
+          html += `
+            <tr class="${index === 0 ? 'producto-header' : 'lote-row'}">
+              <td>${index === 0 ? producto.name || 'N/A' : ''}</td>
+              <td>${lote.batch || 'N/A'}</td>
+              <td>${lote.stock || 0}</td>
+              <td>${index === 0 ? producto.min_stock || 0 : ''}</td>
+              <td>${index === 0 ? producto.ubicacion_interna || 'N/A' : ''}</td>
+              <td>${lote.estado || 'Normal'}</td>
+            </tr>`;
+        });
+      } else {
+        html += `
+          <tr class="producto-header">
+            <td>${producto.name || 'N/A'}</td>
+            <td>Sin lote</td>
+            <td>${producto.stock || 0}</td>
+            <td>${producto.min_stock || 0}</td>
+            <td>${producto.ubicacion_interna || 'N/A'}</td>
+            <td>${producto.estado || 'Normal'}</td>
+          </tr>`;
+      }
+    });
+
+    html += `
+          </tbody>
+        </table>
+
+        <h2>Historial Detallado de Movimientos</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th>Lote</th>
+              <th>Tipo</th>
+              <th>Cantidad</th>
+              <th>Fecha</th>
+              <th>Usuario</th>
+            </tr>
+          </thead>
+          <tbody>`;
+
+    this.datosFiltrados.forEach((producto: any) => {
+      if (Array.isArray(producto.lotes)) {
+        producto.lotes.forEach((lote: any) => {
+          if (Array.isArray(lote.historial) && lote.historial.length > 0) {
+            lote.historial.forEach((h: any) => {
+              const tipoClass = h.type === 'entry' ? 'entrada' : 'salida';
+              const tipoTexto = h.type === 'entry' ? '📥 Entrada' : '📤 Salida';
+              html += `
+                <tr class="historial-row">
+                  <td>${producto.name || 'N/A'}</td>
+                  <td>${lote.batch || 'N/A'}</td>
+                  <td class="${tipoClass}">${tipoTexto}</td>
+                  <td>${h.quantity || 0}</td>
+                  <td>${this.formatearFecha(h.date)}</td>
+                  <td>${h.user || 'N/A'}</td>
+                </tr>`;
+            });
+          }
+        });
+      }
+    });
+
+    html += `
+          </tbody>
+        </table>
+      </body>
+      </html>`;
+
+    const blob = new Blob([html], { type: 'application/msword' });
+    const fechaArchivo = this.datePipe.transform(new Date(), 'yyyyMMdd_HHmmss');
+    saveAs(blob, `Inventario_Completo_${fechaArchivo}.doc`);
   }
 }

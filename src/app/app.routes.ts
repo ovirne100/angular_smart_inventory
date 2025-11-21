@@ -1,6 +1,21 @@
 /*import { Routes } from '@angular/router';
 import { MainLoginComponent } from './login/main-login/main-login.component';
 import { MainRegisterComponent } from './register/main-register/main-register.component';
+import { ServiciosComponent } from './pages/servicios/servicios.component';
+import { ContactoComponent } from './pages/contacto/contacto.component';
+import { AyudaComponent } from './pages/ayuda/ayuda.component';
+import { ServiciosComponent } from './pages/servicios/servicios.component';
+import { ContactoComponent } from './pages/contacto/contacto.component';
+import { AyudaComponent } from './pages/ayuda/ayuda.component';
+import { ServiciosComponent } from './pages/servicios/servicios.component';
+import { ContactoComponent } from './pages/contacto/contacto.component';
+import { AyudaComponent } from './pages/ayuda/ayuda.component';
+import { ServiciosComponent } from './pages/servicios/servicios.component';
+import { ContactoComponent } from './pages/contacto/contacto.component';
+import { AyudaComponent } from './pages/ayuda/ayuda.component';
+import { ServiciosComponent } from './pages/servicios/servicios.component';
+import { ContactoComponent } from './pages/contacto/contacto.component';
+import { AyudaComponent } from './pages/ayuda/ayuda.component';
 
 export const routes: Routes = [
   { path: 'register', component: MainRegisterComponent },
@@ -17,6 +32,9 @@ import { Routes } from '@angular/router';
 // Login y Register publicas
 import { MainLoginComponent } from './login/main-login/main-login.component';
 import { MainRegisterComponent } from './register/main-register/main-register.component';
+import { ServiciosComponent } from './pages/servicios/servicios.component';
+import { ContactoComponent } from './pages/contacto/contacto.component';
+import { AyudaComponent } from './pages/ayuda/ayuda.component';
 
 // 📊 Dashboard principal y sus páginas
 import { DashboardComponent } from './dashboard/dashboard.component';
@@ -42,6 +60,9 @@ export const routes: Routes = [
   // ✅ Rutas públicas
   { path: 'register', component: MainRegisterComponent },
   { path: 'login', component: MainLoginComponent },
+  { path: 'servicios', component: ServiciosComponent },
+  { path: 'contacto', component: ContactoComponent },
+  { path: 'ayuda', component: AyudaComponent },
 
   // Rutas del dashboard
  {

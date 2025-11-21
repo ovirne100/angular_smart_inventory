@@ -23,8 +23,13 @@ export interface Alert {
     batch?: string;
     lot?: string;
     reference?: string;
+    codigo_de_barras?: string;
   };
-  inventory?: any;
+  inventory?: {
+    stock?: number;
+    stock_actual?: number;
+    min_stock?: number;
+  };
 }
 
 export interface AlertResponse {

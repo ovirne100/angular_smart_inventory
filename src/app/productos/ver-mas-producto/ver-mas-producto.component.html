@@ -10,7 +10,7 @@
         <strong>Fecha de vencimiento Principal:</strong> {{ producto.expiration_date }}
       </p>
 
-      <p><strong>Referencia:</strong> {{ producto.reference || 'N/A' }}</p>
+      <p><strong>Código de barras:</strong> {{ producto.codigo_de_barras || producto.reference || 'N/A' }}</p>
       <p><strong>Categoría:</strong> {{ producto.categoria?.name || producto.category_id || 'N/A' }}</p>
     </div>
 

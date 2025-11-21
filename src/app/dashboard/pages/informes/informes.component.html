@@ -312,8 +312,10 @@
               <td *ngFor="let col of currentColumns" [ngClass]="getColumnAlignment(col)">
                 <ng-container [ngSwitch]="col.type">
                   <ng-container *ngSwitchCase="'text'">
-                    <strong *ngIf="col.key === 'name'" class="inventory-primary">
-                      {{ getCellDisplayValue(col, item) }}
+                    <strong *ngIf="col.key === 'name'" class="inventory-primary clickable-product"
+                            (click)="abrirModalDetalleProducto(item)"
+                            title="Click para ver detalles completos">
+                      {{ getCellDisplayValue(col, item) }} <i class="fa-solid fa-up-right-from-square"></i>
                     </strong>
                     <span *ngIf="col.key !== 'name'">
                       {{ getCellDisplayValue(col, item) }}
@@ -362,11 +364,11 @@
                         <td><strong>{{ lote.stock }}</strong></td>
                         <td>{{ formatearFecha(lote.fecha) }}</td>
                         <td>
-                          <button 
+                          <button
                             class="btn-historial-small"
                             (click)="toggleHistorial(item.product_id, lote.batch)"
                             [title]="isHistorialExpandido(item.product_id, lote.batch) ? 'Ocultar historial' : 'Ver historial'">
-                            <i class="fa-solid" 
+                            <i class="fa-solid"
                                [class.fa-chevron-down]="!isHistorialExpandido(item.product_id, lote.batch)"
                                [class.fa-chevron-up]="isHistorialExpandido(item.product_id, lote.batch)"></i>
                             Historial
@@ -375,7 +377,7 @@
                       </tr>
                     </tbody>
                   </table>
-                  
+
                   <!-- Historial detallado de cada lote -->
                   <ng-container *ngFor="let lote of item.lotes">
                     <div *ngIf="isHistorialExpandido(item.product_id, lote.batch)" class="historial-lote">
@@ -403,7 +405,7 @@
                             </tbody>
                           </table>
                         </div>
-                        
+
                         <!-- Salidas -->
                         <div class="historial-section" *ngIf="lote.historialSalidas && lote.historialSalidas.length > 0">
                           <h6><i class="fa-solid fa-arrow-up"></i> Salidas (Total: {{ lote.salidas }})</h6>
@@ -426,7 +428,7 @@
                             </tbody>
                           </table>
                         </div>
-                        
+
                         <div *ngIf="(!lote.historialEntradas || lote.historialEntradas.length === 0) && (!lote.historialSalidas || lote.historialSalidas.length === 0)" class="text-center">
                           <p>No hay movimientos registrados para este lote</p>
                         </div>
@@ -446,6 +448,102 @@
   <div class="sin-resultados" *ngIf="!loading && datos.length === 0 && datosFiltrados.length === 0">
     <i class="fa-solid fa-inbox"></i>
     <p>No hay datos para mostrar. Genera un informe para comenzar.</p>
+  </div>
+
+  <!-- Modal de Detalles del Producto -->
+  <div *ngIf="mostrarModalDetalleProducto && productoSeleccionado" class="modal-overlay" (click)="cerrarModalDetalleProducto()">
+    <div class="modal-detalle-producto" (click)="$event.stopPropagation()">
+      <div class="modal-detalle-header">
+        <h3><i class="fa-solid fa-box-open"></i> {{ productoSeleccionado.name }}</h3>
+        <button class="btn-cerrar-modal" (click)="cerrarModalDetalleProducto()">
+          <i class="fa-solid fa-times"></i>
+        </button>
+      </div>
+
+      <div class="modal-detalle-body">
+        <!-- Información General -->
+        <div class="detalle-section">
+          <h4><i class="fa-solid fa-info-circle"></i> Información General</h4>
+          <div class="detalle-grid">
+            <div class="detalle-item">
+              <span class="detalle-label">Stock Total:</span>
+              <span class="detalle-value">{{ productoSeleccionado.stock || 0 }} unidades</span>
+            </div>
+            <div class="detalle-item">
+              <span class="detalle-label">Stock Mínimo:</span>
+              <span class="detalle-value">{{ productoSeleccionado.min_stock || 0 }} unidades</span>
+            </div>
+            <div class="detalle-item">
+              <span class="detalle-label">Ubicación:</span>
+              <span class="detalle-value">{{ productoSeleccionado.ubicacion_interna || 'N/A' }}</span>
+            </div>
+            <div class="detalle-item">
+              <span class="detalle-label">Estado:</span>
+              <span class="detalle-value" [ngClass]="{'estado-critico': productoSeleccionado.estado === 'Crítico', 'estado-normal': productoSeleccionado.estado === 'Normal'}">
+                {{ productoSeleccionado.estado || 'Normal' }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lotes Disponibles -->
+        <div class="detalle-section" *ngIf="productoSeleccionado.lotes && productoSeleccionado.lotes.length > 0">
+          <h4><i class="fa-solid fa-layer-group"></i> Lotes Disponibles ({{ productoSeleccionado.lotes.length }})</h4>
+          <div class="lotes-grid">
+            <div class="lote-card" *ngFor="let lote of productoSeleccionado.lotes">
+              <div class="lote-header">
+                <span class="lote-batch">{{ lote.batch || 'Sin lote' }}</span>
+                <span class="lote-stock" [ngClass]="{'stock-bajo': lote.stock <= productoSeleccionado.min_stock}">
+                  {{ lote.stock }} unidades
+                </span>
+              </div>
+              <div class="lote-info">
+                <div><strong>Entradas:</strong> {{ lote.entradas }}</div>
+                <div><strong>Salidas:</strong> {{ lote.salidas }}</div>
+                <div><strong>Última actualización:</strong> {{ formatearFecha(lote.fecha) }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Historial Completo -->
+        <div class="detalle-section">
+          <h4><i class="fa-solid fa-clock-rotate-left"></i> Historial de Movimientos</h4>
+          <div class="historial-completo">
+            <ng-container *ngFor="let lote of productoSeleccionado.lotes">
+              <div class="lote-historial-section" *ngIf="lote.historial && lote.historial.length > 0">
+                <h5>Lote: {{ lote.batch || 'Sin lote' }}</h5>
+                <table class="tabla-historial-modal">
+                  <thead>
+                    <tr>
+                      <th>Tipo</th>
+                      <th>Cantidad</th>
+                      <th>Fecha</th>
+                      <th>Usuario</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let h of lote.historial" [ngClass]="{'entrada-row': h.type === 'entry', 'salida-row': h.type === 'output'}">
+                      <td>
+                        <span class="badge-tipo" [ngClass]="{'badge-entrada': h.type === 'entry', 'badge-salida': h.type === 'output'}">
+                          {{ h.type === 'entry' ? '📥 Entrada' : '📤 Salida' }}
+                        </span>
+                      </td>
+                      <td class="cantidad">{{ h.quantity || 0 }}</td>
+                      <td>{{ formatearFecha(h.date) }}</td>
+                      <td>{{ h.user || 'N/A' }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </ng-container>
+            <p *ngIf="!productoSeleccionado.lotes || productoSeleccionado.lotes.length === 0 || !tieneHistorial(productoSeleccionado)" class="sin-historial">
+              No hay historial de movimientos disponible.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 

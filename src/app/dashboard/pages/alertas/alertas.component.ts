@@ -1,15 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AlertsService, AlertFilters, Alert } from '../../../services/alertas/alerts.service';
 import { OrdersService } from '../../../services/orders/orders.service';
 import { AuthService, User } from '../../../services/auth.service';
 import { SuppliersService } from '../../../services/proveedores/suppliers.service';
+import { ColombiaDatePipe } from '../../../pipes/colombia-date.pipe';
 
 @Component({
   selector: 'app-alertas',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ColombiaDatePipe],
   templateUrl: './alertas.component.html',
   styleUrls: ['./alertas.component.css']
 })
@@ -18,6 +20,7 @@ export class AlertasComponent implements OnInit {
   cargando: boolean = false;
   error: string = '';
   filtroActivo: string = 'todas';
+  alertaIdDestacada: number | null = null; // ID de la alerta a destacar desde el correo
 
   // Variables para el modal de orden
   mostrarOrden: boolean = false;
@@ -34,10 +37,20 @@ export class AlertasComponent implements OnInit {
     private alertsService: AlertsService,
     private ordersService: OrdersService,
     private authService: AuthService,
-    private suppliersService: SuppliersService
+    private suppliersService: SuppliersService,
+    private route: ActivatedRoute,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
+    // Verificar si hay un parámetro de query para una alerta específica
+    this.route.queryParams.subscribe(params => {
+      if (params['alerta']) {
+        this.alertaIdDestacada = parseInt(params['alerta'], 10);
+        console.log('🔗 Alerta específica solicitada desde correo:', this.alertaIdDestacada);
+      }
+    });
+    
     this.obtenerAlertas();
   }
 
@@ -50,6 +63,13 @@ export class AlertasComponent implements OnInit {
         console.log('Alertas recibidas:', res.data);
         this.alertas = res.data;
         this.cargando = false;
+        
+        // Si hay una alerta específica solicitada, hacer scroll a ella
+        if (this.alertaIdDestacada) {
+          setTimeout(() => {
+            this.scrollToAlerta(this.alertaIdDestacada!);
+          }, 300); // Esperar a que se renderice el DOM
+        }
       },
       error: (err) => {
         console.error('Error al obtener alertas:', err);
@@ -57,6 +77,23 @@ export class AlertasComponent implements OnInit {
         this.cargando = false;
       }
     });
+  }
+
+  /**
+   * Hacer scroll a una alerta específica por su ID
+   */
+  scrollToAlerta(alertaId: number): void {
+    const alertaElement = document.getElementById(`alerta-${alertaId}`);
+    if (alertaElement) {
+      alertaElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // Agregar clase de destacado temporalmente
+      alertaElement.classList.add('alerta-destacada');
+      setTimeout(() => {
+        alertaElement.classList.remove('alerta-destacada');
+      }, 3000); // Remover después de 3 segundos
+    } else {
+      console.warn('⚠️ No se encontró la alerta con ID:', alertaId);
+    }
   }
 
   filtrarPor(tipo: string): void {

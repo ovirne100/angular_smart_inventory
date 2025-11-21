@@ -6,9 +6,9 @@
 
         <div class="menu">
             <ul>
-                <li><a href="#">SERVICIOS</a></li>
-                <li><a href="#">CONTACTO</a></li>
-                <li><a href="#">AYUDA</a></li>
+                <li><a routerLink="/servicios" routerLinkActive="active-link">SERVICIOS</a></li>
+                <li><a routerLink="/contacto" routerLinkActive="active-link">CONTACTO</a></li>
+                <li><a routerLink="/ayuda" routerLinkActive="active-link">AYUDA</a></li>
             </ul>
         </div>
 <a *ngIf="showLoginLink" [routerLink]="['/login']" class="ir button-like">INGRESAR</a>

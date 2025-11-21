@@ -25,21 +25,21 @@
         <i class="fa-solid fa-barcode"></i>
         {{ mostrarScanner ? 'Ocultar Escáner' : 'Escanear Código de Barras' }}
       </button>
-      
+
       <div *ngIf="mostrarScanner" class="scanner-content">
         <!-- Input manual -->
         <div class="scanner-input-container">
-          <input 
-            type="text" 
-            [(ngModel)]="codigoBarrasInput" 
+          <input
+            type="text"
+            [(ngModel)]="codigoBarrasInput"
             (keyup.enter)="buscarProductoPorCodigo()"
             (input)="onCodigoInputChange()"
             placeholder="Ingrese el código de barras manualmente"
             class="scanner-input"
             [disabled]="escaneando">
-          <button 
-            type="button" 
-            (click)="buscarProductoPorCodigo()" 
+          <button
+            type="button"
+            (click)="buscarProductoPorCodigo()"
             class="btn-buscar"
             [disabled]="escaneando || !codigoBarrasInput || codigoBarrasInput.trim().length === 0">
             <i class="fa-solid fa-search" *ngIf="!escaneando"></i>
@@ -55,15 +55,15 @@
 
         <!-- Cámara -->
         <div *ngIf="scannerSupported" class="scanner-camera-section">
-          <button 
-            type="button" 
-            (click)="isScanning ? stopScanning() : startCameraScanning()" 
+          <button
+            type="button"
+            (click)="isScanning ? stopScanning() : startCameraScanning()"
             class="btn-camera"
             [class.scanning]="isScanning">
             <i class="fa-solid" [class.fa-camera]="!isScanning" [class.fa-stop]="isScanning"></i>
             {{ isScanning ? 'Detener Cámara' : 'Iniciar Cámara' }}
           </button>
-          
+
           <div #scannerContainer class="scanner-container" [style.display]="isScanning ? 'block' : 'none'">
             <!-- QuaggaJS renderizará aquí -->
           </div>
@@ -119,15 +119,12 @@
     </div>
 
     <div class="form-group">
-      <label>Motivo</label>
-      <input type="text" formControlName="motivo" placeholder="Ej: venta, traslado, consumo interno...">
-      <small class="form-hint" *ngIf="productoSeleccionado && lotesDisponibles.length > 0">
-        💡 Seleccione un lote de las entradas registradas. Total de lotes: {{ lotesDisponibles.length }}
-      </small>
+
+     
       <small class="form-hint" *ngIf="productoSeleccionado && lotesDisponibles.length === 0">
         ⚠️ Este producto no tiene lotes registrados en entradas. Debe registrar una entrada primero.
       </small>
->>>>>>> ede7a69 (mejorando la aplicacion en general)
+
     </div>
 
     <div class="form-group">

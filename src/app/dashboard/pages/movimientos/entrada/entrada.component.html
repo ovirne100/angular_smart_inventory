@@ -1,6 +1,5 @@
 <div class="form-container">
 
-  <!-- Botón toggle -->
   <div class="header">
     <h2>📥 Entradas de Productos</h2>
     <button (click)="toggleForm()" class="btn-toggle">
@@ -8,18 +7,15 @@
     </button>
   </div>
 
-  <!-- Mensajes -->
   <div class="messages" *ngIf="successMessage || errorMessage || warningMessage">
     <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
     <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
     <div *ngIf="warningMessage" class="alert alert-warning">{{ warningMessage }}</div>
   </div>
 
-  <!-- Formulario de Entrada -->
   <form *ngIf="showForm" [formGroup]="entradaForm" (ngSubmit)="onSubmit()" class="form-box" novalidate>
     <h3>📥 Registrar Nueva Entrada</h3>
 
-    <!-- Escáner de código de barras -->
     <div class="form-group scanner-group">
       <button type="button" (click)="toggleScanner()" class="btn-scanner" [class.active]="mostrarScanner">
         <i class="fa-solid fa-barcode"></i>
@@ -27,7 +23,6 @@
       </button>
 
       <div *ngIf="mostrarScanner" class="scanner-content">
-        <!-- Input manual -->
         <div class="scanner-input-container">
           <input
             type="text"
@@ -36,8 +31,8 @@
             (input)="onCodigoInputChange()"
             placeholder="Ingrese el código de barras manualmente"
             class="scanner-input"
-            [disabled]="escaneando">
-          <button
+            [disabled]="escaneando"
+            [ngModelOptions]="{standalone: true}"> <button
             type="button"
             (click)="buscarProductoPorCodigo()"
             class="btn-buscar"
@@ -48,12 +43,10 @@
           </button>
         </div>
 
-        <!-- Separador -->
         <div class="scanner-divider" *ngIf="scannerSupported">
           <span>O</span>
         </div>
 
-        <!-- Cámara -->
         <div *ngIf="scannerSupported" class="scanner-camera-section">
           <button
             type="button"
@@ -64,8 +57,8 @@
             {{ isScanning ? 'Detener Cámara' : 'Iniciar Cámara' }}
           </button>
 
-          <div #scannerContainer class="scanner-container" [style.display]="isScanning ? 'block' : 'none'">
-            <!-- QuaggaJS renderizará aquí -->
+          <div #scannerContainer class="scanner-container" *ngIf="isScanning">
+            <div class="scan-area-overlay"></div>
           </div>
         </div>
 
@@ -76,7 +69,6 @@
       </div>
     </div>
 
-    <!-- Producto -->
     <div class="form-group">
       <label>Producto *</label>
       <select formControlName="product_id" (change)="onProductoChange()">
@@ -88,7 +80,6 @@
       </div>
     </div>
 
-    <!-- Cantidad -->
     <div class="form-group">
       <label>Cantidad *</label>
       <input type="number" formControlName="quantity" placeholder="Ej: 50" min="1" />
@@ -97,13 +88,11 @@
       </div>
     </div>
 
-    <!-- Unidad -->
     <div class="form-group">
       <label>Unidad</label>
       <input type="text" formControlName="unit" placeholder="unidad, caja, paquete..." />
     </div>
 
-    <!-- Lote -->
     <div class="form-group">
       <label>Lote</label>
       <input type="text" formControlName="lot" (input)="onLoteChange()" placeholder="Ingrese el lote (ej: 1234, 5678, etc.)" />
@@ -117,21 +106,21 @@
         ✓ Este es el lote principal del catálogo. Usará la fecha de vencimiento del catálogo.
       </small>
       <small class="form-hint" *ngIf="productoSeleccionado && !esLotePrincipal && entradaForm.get('lot')?.value?.trim()" style="color: #ff9800; font-weight: 600;">
-        ⚠ Este es un lote nuevo. Puede especificar una fecha de vencimiento diferente.
+        ⚠ Este es un lote nuevo. **Debe especificar una fecha de vencimiento.**
       </small>
     </div>
 
-    <!-- Fecha de Vencimiento del Lote (solo para lotes nuevos) -->
     <div class="form-group" *ngIf="!esLotePrincipal">
       <label>Fecha de Vencimiento del Lote <span style="color: #ff9800;">*</span></label>
       <input type="date" formControlName="expiration_date" />
       <small class="form-hint">
         💡 Especifique la fecha de vencimiento de este lote nuevo.
->>>>>>> ede7a69 (mejorando la aplicacion en general)
       </small>
+      <div class="error" *ngIf="entradaForm.controls['expiration_date'].invalid && entradaForm.controls['expiration_date'].touched && !esLotePrincipal">
+        La fecha de vencimiento es obligatoria para lotes nuevos.
+      </div>
     </div>
 
-    <!-- Proveedor -->
     <div class="form-group">
       <label>Proveedor *</label>
       <select formControlName="supplier_id">
@@ -143,7 +132,6 @@
       </div>
     </div>
 
-    <!-- Ubicación interna -->
     <div class="form-group">
       <label>Ubicación Interna *</label>
       <input type="text" formControlName="ubicacion_interna" placeholder="Ej: Almacén A-3" />
@@ -152,7 +140,6 @@
       </div>
     </div>
 
-    <!-- Stock mínimo -->
     <div class="form-group">
       <label>Stock Mínimo *</label>
       <input type="number" formControlName="min_stock" placeholder="Ej: 10" min="0" />
@@ -161,36 +148,31 @@
       </div>
     </div>
 
-    <!-- Usuario -->
-<div class="form-group">
-  <label>Usuario</label>
-  <input
-    type="text"
-    [value]="currentUser?.name || 'Cargando...'"
-    readonly
-    class="readonly-input"
-  />
-  <!-- Este input oculto mantiene el ID en el formulario -->
-  <input type="hidden" formControlName="user_id" />
-</div>
+    <div class="form-group">
+      <label>Usuario</label>
+      <input
+        type="text"
+        [value]="currentUser?.name || 'Cargando...'"
+        readonly
+        class="readonly-input"
+      />
+      <input type="hidden" formControlName="user_id" />
+    </div>
 
 
-<!-- Almacén -->
-<!-- Almacén -->
-<div class="form-group">
-  <label>Almacén (Warehouse)</label>
-  <select formControlName="warehouse_id">
-    <option value="">Seleccione un Almacén</option>
-    <option *ngFor="let w of warehouses" [value]="w.id">{{ w.name }}</option>
-  </select>
+    <div class="form-group">
+      <label>Almacén (Warehouse)</label>
+      <select formControlName="warehouse_id">
+        <option value="">Seleccione un Almacén</option>
+        <option *ngFor="let w of warehouses" [value]="w.id">{{ w.name }}</option>
+      </select>
 
-  <button type="button" class="btn-small" (click)="abrirModalAlmacen()">
-    + Crear nuevo almacén
-  </button>
-</div>
+      <button type="button" class="btn-small" (click)="abrirModalAlmacen()">
+        + Crear nuevo almacén
+      </button>
+    </div>
 
 
-    <!-- Botón enviar -->
     <button type="submit" class="btn-submit" [disabled]="saving || entradaForm.invalid">
       {{ saving ? 'Guardando...' : '✅ Guardar Entrada' }}
     </button>
@@ -199,7 +181,6 @@
 
 </div>
 
-<!-- Modal para crear nuevo almacén -->
 <div *ngIf="mostrarModalAlmacen" class="modal-overlay" (click)="cerrarModalAlmacen()">
   <div class="modal-content" (click)="$event.stopPropagation()">
     <div class="modal-header">

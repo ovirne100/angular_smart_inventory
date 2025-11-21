@@ -28,7 +28,10 @@ export class DashboardComponent implements OnInit {
   ngOnInit() {
     // Verificar si el usuario está autenticado
     if (!this.authService.isAuthenticated()) {
-      this.router.navigate(['/register']);
+      // Guardar la URL actual para redirigir después del login
+      const currentUrl = this.router.url;
+      localStorage.setItem('returnUrl', currentUrl);
+      this.router.navigate(['/login'], { queryParams: { returnUrl: currentUrl } });
       return;
     }
 

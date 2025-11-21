@@ -3,6 +3,8 @@ import { Producto, Proveedor } from '../../../interfaces/producto';
 import { SuppliersService } from '../../../services/proveedores/suppliers.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-product-suppliers',
@@ -43,7 +45,10 @@ export class ProductSuppliersComponent implements OnChanges {
   sortBy: 'name' | 'reference' | 'cost' | 'batch' = 'name';
   sortOrder: 'asc' | 'desc' = 'asc';
 
-  constructor(private suppliersService: SuppliersService) {}
+  constructor(
+    private suppliersService: SuppliersService,
+    private http: HttpClient
+  ) {}
 
   ngOnChanges(): void {
     if (this.proveedorId) {
@@ -75,8 +80,8 @@ export class ProductSuppliersComponent implements OnChanges {
       const term = this.searchTerm.toLowerCase();
       productos = productos.filter(p =>
         p.name?.toLowerCase().includes(term) ||
-        p.reference?.toLowerCase().includes(term) ||
-        p.batch?.toLowerCase().includes(term)
+        (p.codigo_de_barras || p.reference || '')?.toLowerCase().includes(term) ||
+        (p.batch || p.lote || '')?.toLowerCase().includes(term)
       );
     }
 
@@ -91,8 +96,8 @@ export class ProductSuppliersComponent implements OnChanges {
           bValue = b.name?.toLowerCase() || '';
           break;
         case 'reference':
-          aValue = a.reference?.toLowerCase() || '';
-          bValue = b.reference?.toLowerCase() || '';
+          aValue = (a.codigo_de_barras || a.reference || '')?.toLowerCase() || '';
+          bValue = (b.codigo_de_barras || b.reference || '')?.toLowerCase() || '';
           break;
         case 'cost':
           aValue = parseFloat(a.pivot?.unit_cost || '0') || 0;
@@ -207,7 +212,67 @@ export class ProductSuppliersComponent implements OnChanges {
     this.productosCatalogo = this.productos.filter(p =>
       !this.productosProveedor.some(pp => pp.id === p.id)
     );
+
+    // Cargar lotes desde entradas para cada producto
+    this.cargarLotesDesdeEntradas();
     this.filtrarCatalogo();
+  }
+
+  // Cargar lotes desde entradas para los productos del catálogo
+  private cargarLotesDesdeEntradas(): void {
+    const headers = this.getAuthHeaders();
+
+    this.http.get<any>(`${environment.apiUrl}/entries`, { headers }).subscribe({
+      next: (res: any) => {
+        const entradas = Array.isArray(res.data) ? res.data : (Array.isArray(res) ? res : []);
+
+        // Crear un mapa de lotes por producto
+        const lotesPorProducto = new Map<number, string>();
+
+        entradas.forEach((entrada: any) => {
+          const productId = entrada.product_id || entrada.product?.id;
+          if (!productId) return;
+
+          // Si el producto ya tiene un lote mapeado, no sobrescribir (tomar el primero)
+          if (!lotesPorProducto.has(productId)) {
+            const lot = String(entrada.lot || entrada.lote || entrada.batch || '').trim();
+            if (lot && lot !== 'SIN_LOTE') {
+              lotesPorProducto.set(productId, lot);
+            }
+          }
+        });
+
+        // Actualizar productos con lotes desde entradas si no tienen lote
+        this.productosCatalogo = this.productosCatalogo.map((p: any) => {
+          // Si el producto no tiene lote, buscar en el mapa de entradas
+          if (!p.batch && !p.lote && lotesPorProducto.has(p.id)) {
+            return {
+              ...p,
+              batch: lotesPorProducto.get(p.id),
+              lote: lotesPorProducto.get(p.id)
+            };
+          }
+          return p;
+        });
+
+        this.filtrarCatalogo();
+      },
+      error: (err) => {
+        console.error('Error cargando lotes desde entradas:', err);
+        // Continuar sin los lotes de entradas
+        this.filtrarCatalogo();
+      }
+    });
+  }
+
+  // Helper para obtener headers de autenticación
+  private getAuthHeaders(): HttpHeaders {
+    const token = localStorage.getItem('token');
+    return new HttpHeaders({
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      ...(token && { 'Authorization': `Bearer ${token}` })
+    });
   }
 
   filtrarCatalogo(): void {
@@ -219,8 +284,8 @@ export class ProductSuppliersComponent implements OnChanges {
     const term = this.searchTermAsociar.toLowerCase().trim();
     this.productosCatalogoFiltrados = this.productosCatalogo.filter(p =>
       p.name?.toLowerCase().includes(term) ||
-      p.reference?.toLowerCase().includes(term) ||
-      p.batch?.toLowerCase().includes(term)
+      (p.codigo_de_barras || p.reference || '')?.toLowerCase().includes(term) ||
+      (p.batch || p.lote || '')?.toLowerCase().includes(term)
     );
   }
 

@@ -1076,3 +1076,247 @@
     font-size: 20px;
   }
 }
+
+/* ===================== MODAL DETALLE PRODUCTO ===================== */
+.clickable-product {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #2563eb;
+}
+
+.clickable-product:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
+}
+
+.clickable-product i {
+  font-size: 10px;
+  margin-left: 5px;
+  opacity: 0.7;
+}
+
+.modal-detalle-producto {
+  background: white;
+  border-radius: 20px;
+  max-width: 900px;
+  width: 90%;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  animation: slideIn 0.3s ease-out;
+}
+
+.modal-detalle-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 24px 32px;
+  border-radius: 20px 20px 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.modal-detalle-header h3 {
+  margin: 0;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.modal-detalle-body {
+  padding: 32px;
+}
+
+.detalle-section {
+  margin-bottom: 32px;
+}
+
+.detalle-section h4 {
+  color: #1e293b;
+  font-size: 18px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.detalle-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.detalle-item {
+  background: #f8fafc;
+  padding: 16px;
+  border-radius: 12px;
+  border-left: 4px solid #3b82f6;
+}
+
+.detalle-label {
+  display: block;
+  font-size: 13px;
+  color: #64748b;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.detalle-value {
+  display: block;
+  font-size: 16px;
+  color: #1e293b;
+  font-weight: 600;
+}
+
+.estado-critico {
+  color: #dc2626 !important;
+}
+
+.estado-normal {
+  color: #16a34a !important;
+}
+
+.lotes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.lote-card {
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+  transition: all 0.3s ease;
+}
+
+.lote-card:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+  transform: translateY(-2px);
+}
+
+.lote-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.lote-batch {
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 15px;
+}
+
+.lote-stock {
+  background: #10b981;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.lote-stock.stock-bajo {
+  background: #ef4444;
+}
+
+.lote-info {
+  font-size: 13px;
+  color: #64748b;
+}
+
+.lote-info div {
+  padding: 4px 0;
+}
+
+.historial-completo {
+  margin-top: 16px;
+}
+
+.lote-historial-section {
+  margin-bottom: 24px;
+  background: #f8fafc;
+  padding: 16px;
+  border-radius: 12px;
+}
+
+.lote-historial-section h5 {
+  color: #475569;
+  font-size: 15px;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #cbd5e1;
+}
+
+.tabla-historial-modal {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.tabla-historial-modal thead {
+  background: #e2e8f0;
+}
+
+.tabla-historial-modal th {
+  padding: 10px;
+  text-align: left;
+  font-weight: 600;
+  color: #475569;
+}
+
+.tabla-historial-modal td {
+  padding: 10px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.tabla-historial-modal tr.entrada-row {
+  background: #f0fdf4;
+}
+
+.tabla-historial-modal tr.salida-row {
+  background: #fef2f2;
+}
+
+.badge-tipo {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badge-entrada {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.badge-salida {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.tabla-historial-modal .cantidad {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.sin-historial {
+  text-align: center;
+  color: #94a3b8;
+  font-style: italic;
+  padding: 40px;
+  background: #f8fafc;
+  border-radius: 12px;
+}

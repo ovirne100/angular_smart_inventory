@@ -225,23 +225,25 @@ export class ProductosComponent implements OnInit {
     // Si vino un campo 'image' o 'image_url', actualizamos image_url y añadimos timestamp anti-cache
     const backendBase = 'http://127.0.0.1:8000/storage/';
 
-    // Si image_url es null o undefined explícitamente, significa que se eliminó la imagen
-    if (productoActualizado.image_url === null || productoActualizado.image_url === undefined) {
-      if (productoActualizado.image === null || productoActualizado.image === undefined) {
-        combinado.image_url = undefined;
-        combinado.image = undefined;
-      } else if (productoActualizado.image) {
-        combinado.image_url = `${backendBase}${productoActualizado.image}?t=${Date.now()}`;
-      }
+    // Si image o image_url son null/undefined explícitamente, significa que se eliminó la imagen
+    if (productoActualizado.image === null || productoActualizado.image === undefined || 
+        productoActualizado.image === '' || productoActualizado.image_url === null) {
+      // Imagen eliminada: limpiar ambos campos
+      combinado.image_url = undefined;
+      combinado.image = undefined;
     } else if (productoActualizado.image) {
+      // Hay una imagen nueva o existente
       combinado.image_url = `${backendBase}${productoActualizado.image}?t=${Date.now()}`;
+      combinado.image = productoActualizado.image;
     } else if (productoActualizado.image_url) {
       // si backend ya devolvió image_url, solo le agregamos timestamp
       const sep = productoActualizado.image_url.includes('?') ? '&' : '?';
       combinado.image_url = `${productoActualizado.image_url}${sep}t=${Date.now()}`;
+      combinado.image = productoActualizado.image || this.productos[index].image;
     } else {
       // si no vino nada nuevo de imagen, conservamos la que había
       combinado.image_url = this.productos[index].image_url;
+      combinado.image = this.productos[index].image;
     }
 
     // La categoría ya viene correctamente desde la lista completa de productos
