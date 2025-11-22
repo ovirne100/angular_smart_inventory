@@ -60,7 +60,16 @@ export class ProveedoresComponent implements OnInit {
   }
 
   verProductos(proveedor: Proveedor): void {
-    this.proveedorSeleccionado = proveedor;
+    // Si ya está seleccionado el mismo proveedor, primero limpiar para forzar recreación del componente
+    if (this.proveedorSeleccionado?.id === proveedor.id) {
+      this.proveedorSeleccionado = undefined;
+      // Usar setTimeout para asegurar que el componente se destruya antes de recrearlo
+      setTimeout(() => {
+        this.proveedorSeleccionado = proveedor;
+      }, 0);
+    } else {
+      this.proveedorSeleccionado = proveedor;
+    }
     this.suppliersService.getSupplierProducts(proveedor.id).subscribe({
       next: (res: { data: Producto[] }) => this.productosProveedor = Array.isArray(res.data) ? res.data : [],
       error: (err: unknown) => console.error('Error cargando productos del proveedor:', err)

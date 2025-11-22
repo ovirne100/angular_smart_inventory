@@ -89,6 +89,10 @@ export class InformesComponent implements OnInit {
   // Estado para modal de detalles de producto
   mostrarModalDetalleProducto: boolean = false;
   productoSeleccionado: any = null;
+  
+  // Estados para modales de Excel y Word
+  mostrarModalExcel: boolean = false;
+  mostrarModalWord: boolean = false;
 
   // Filtros por tipo de informe
   filtrosProductos = {
@@ -110,7 +114,7 @@ export class InformesComponent implements OnInit {
     producto: '',
     almacen: '',
     lote: '',
-    stockMinimo: '',
+    codigoBarras: '',
     mostrarAgotados: false,
     fechaInicio: '',
     fechaFin: ''
@@ -429,6 +433,108 @@ export class InformesComponent implements OnInit {
     this.summaryMetrics = [];
   }
 
+  // Aplicar filtros en tiempo real
+  aplicarFiltros(): void {
+    if (this.datos.length === 0) return;
+
+    switch (this.tipoInforme) {
+      case 'productos':
+        this.datosFiltrados = this.aplicarFiltrosProductos([...this.datos]);
+        break;
+      case 'inventario':
+        this.datosFiltrados = this.aplicarFiltrosInventario([...this.datos]);
+        break;
+      default:
+        this.datosFiltrados = [...this.datos];
+    }
+    this.updateSummaryMetrics();
+  }
+
+  // Aplicar filtros para productos
+  private aplicarFiltrosProductos(productos: any[]): any[] {
+    let filtrados = productos;
+    const { search, lote, referencia } = this.filtrosProductos;
+
+    // Filtro de búsqueda general (busca en nombre, lote y código de barras)
+    if (search && search.trim()) {
+      const query = search.trim().toLowerCase();
+      filtrados = filtrados.filter((p: any) => {
+        const nombre = (p.name || '').toLowerCase();
+        const codigoBarras = (p.codigo_de_barras || p.reference || '').toLowerCase();
+        const loteProducto = (p.batch || p.lote || '').toLowerCase();
+        return nombre.includes(query) || codigoBarras.includes(query) || loteProducto.includes(query);
+      });
+    }
+
+    // Filtro específico por lote
+    if (lote && lote.trim()) {
+      const query = lote.trim().toLowerCase();
+      filtrados = filtrados.filter((p: any) => {
+        const batchValue = (p.batch || p.lote || '').toLowerCase();
+        return batchValue.includes(query);
+      });
+    }
+
+    // Filtro específico por código de barras
+    if (referencia && referencia.trim()) {
+      const query = referencia.trim().toLowerCase();
+      filtrados = filtrados.filter((p: any) => {
+        const codigoBarras = (p.codigo_de_barras || p.reference || '').toLowerCase();
+        return codigoBarras.includes(query);
+      });
+    }
+
+    return filtrados;
+  }
+
+  // Aplicar filtros para inventario
+  private aplicarFiltrosInventario(inventario: any[]): any[] {
+    let filtrados = inventario;
+    const { producto, lote, codigoBarras, mostrarAgotados } = this.filtrosInventario as any;
+
+    // Filtro por producto (busca en nombre, lote y código de barras)
+    if (producto && producto.trim()) {
+      const query = producto.trim().toLowerCase();
+      filtrados = filtrados.filter((i: any) => {
+        const nombre = (i.name || '').toLowerCase();
+        const codigoBarrasProducto = (i.codigo_de_barras || i.reference || '').toLowerCase();
+        const tieneLote = i.lotes && Array.isArray(i.lotes) && i.lotes.some((l: any) =>
+          String(l.batch || '').toLowerCase().includes(query)
+        );
+        return nombre.includes(query) || codigoBarrasProducto.includes(query) || tieneLote;
+      });
+    }
+
+    // Filtro específico por lote
+    if (lote && lote.trim()) {
+      const query = lote.trim().toLowerCase();
+      filtrados = filtrados.filter((i: any) => {
+        if (i.lotes && Array.isArray(i.lotes)) {
+          return i.lotes.some((l: any) =>
+            String(l.batch || '').toLowerCase().includes(query)
+          );
+        }
+        return false;
+      });
+    }
+
+    // Filtro específico por código de barras
+    if (codigoBarras && codigoBarras.trim()) {
+      const query = codigoBarras.trim().toLowerCase();
+      filtrados = filtrados.filter((i: any) => {
+        const codigoBarrasProducto = (i.codigo_de_barras || i.reference || '').toLowerCase();
+        return codigoBarrasProducto.includes(query);
+      });
+    }
+
+    // Filtro de productos agotados
+    if (mostrarAgotados) {
+      filtrados = filtrados.filter((i: any) => (i.stock || 0) <= 0);
+    }
+
+    return filtrados;
+  }
+
   // Generar informe
   generarInforme(): void {
     this.loading = true;
@@ -744,31 +850,8 @@ export class InformesComponent implements OnInit {
           };
         });
 
-        // Aplicar filtros de búsqueda localmente
-        const { search, lote, referencia } = this.filtrosProductos;
-
-        if (search) {
-          productos = productos.filter((p: any) =>
-            p.name?.toLowerCase().includes(search.toLowerCase()) ||
-            p.reference?.toLowerCase().includes(search.toLowerCase())
-          );
-        }
-
-        if (lote) {
-          productos = productos.filter((p: any) => {
-            const batchValue = p.batch || p.lote || '';
-            return batchValue.toString().toLowerCase().includes(lote.toLowerCase());
-          });
-        }
-
-        if (referencia) {
-          productos = productos.filter((p: any) =>
-            (p.codigo_de_barras || p.reference || '').toLowerCase().includes(referencia.toLowerCase())
-          );
-        }
-
         this.datos = productos;
-        this.datosFiltrados = [...this.datos];
+        this.datosFiltrados = this.aplicarFiltrosProductos([...productos]);
         console.log('Productos en inventario cargados:', productos);
         this.loading = false;
         this.updateSummaryMetrics();
@@ -830,12 +913,14 @@ export class InformesComponent implements OnInit {
         proveedor,
         batch: batch || undefined,
         lote: batch || undefined,
-        stock: stock
+        stock: stock,
+        codigo_de_barras: p.codigo_de_barras || p.reference || '',
+        reference: p.codigo_de_barras || p.reference || ''
       };
     });
 
     this.datos = productos;
-    this.datosFiltrados = [...this.datos];
+    this.datosFiltrados = this.aplicarFiltrosProductos([...productos]);
     this.loading = false;
     this.updateSummaryMetrics();
   }
@@ -1057,6 +1142,8 @@ export class InformesComponent implements OnInit {
                 reference: string;
                 proveedor: string;
                 stock_minimo: number;
+                ubicacion_interna?: string;
+                ubicacion?: string;
                 lotes: Array<{
                   batch: string;
                   entradas: number;
@@ -1100,6 +1187,9 @@ export class InformesComponent implements OnInit {
                 const codigoBarras = r.codigo_de_barras || r.reference || `PROD_${r.product_id}`;
                 const agrupacionKey = codigoBarras || `PROD_${r.product_id}`;
 
+                // Obtener ubicación del inventario
+                const ubicacion = r.ubicacion_interna || r.ubicacion || r.location || 'No especificada';
+
                 // Si el producto no existe en el mapa, crearlo
                 if (!productosMap.has(agrupacionKey)) {
                   productosMap.set(agrupacionKey, {
@@ -1109,6 +1199,8 @@ export class InformesComponent implements OnInit {
                     reference: r.reference || codigoBarras,
                     proveedor: proveedor,
                     stock_minimo: stockMin,
+                    ubicacion_interna: ubicacion,
+                    ubicacion: ubicacion,
                     lotes: []
                   });
                 }
@@ -1160,39 +1252,15 @@ export class InformesComponent implements OnInit {
                   stock: totalStock,
                   quantity: totalStock,
                   estado: estado,
+                  ubicacion_interna: producto.ubicacion_interna || producto.ubicacion || 'No especificada',
+                  ubicacion: producto.ubicacion_interna || producto.ubicacion || 'No especificada',
                   isGrouped: true // Flag para identificar que es un producto agrupado
                 };
               });
 
               // ======== 5️⃣ Aplicar filtros ========
               let inventarioFiltrado = merged;
-              const { producto, lote, stockMinimo, mostrarAgotados } = this.filtrosInventario as any;
-
-              if (producto) {
-                const q = producto.toLowerCase();
-                inventarioFiltrado = inventarioFiltrado.filter((i: any) =>
-                  (i.name || '').toLowerCase().includes(q)
-                );
-              }
-              if (lote) {
-                const ql = lote.trim().toUpperCase();
-                // Filtrar por lote en los lotes del producto
-                inventarioFiltrado = inventarioFiltrado.filter((i: any) => {
-                  if (i.lotes && Array.isArray(i.lotes)) {
-                    return i.lotes.some((l: any) =>
-                      String(l.batch || '').toUpperCase().includes(ql)
-                    );
-                  }
-                  return false;
-                });
-              }
-              if (stockMinimo) {
-                const min = Number(stockMinimo);
-                inventarioFiltrado = inventarioFiltrado.filter((i: any) => i.stock <= min);
-              }
-              if (mostrarAgotados) {
-                inventarioFiltrado = inventarioFiltrado.filter((i: any) => i.stock <= 0);
-              }
+              inventarioFiltrado = this.aplicarFiltrosInventario(inventarioFiltrado);
 
               // ======== 6️⃣ Asignar resultados ========
               this.datos = inventarioFiltrado;
@@ -1267,6 +1335,42 @@ export class InformesComponent implements OnInit {
   cancelarPDF(): void {
     this.mostrarModalPDF = false;
     this.tipoExportacionPDF = '';
+  }
+
+  // Confirmar exportación Excel con historial
+  confirmarExcelConHistorial(): void {
+    this.mostrarModalExcel = false;
+    const columns = this.currentColumns.filter((col) => col.export !== false);
+    this.exportarExcelInventario(columns, true);
+  }
+
+  // Confirmar exportación Excel sin historial
+  confirmarExcelSinHistorial(): void {
+    this.mostrarModalExcel = false;
+    const columns = this.currentColumns.filter((col) => col.export !== false);
+    this.exportarExcelInventario(columns, false);
+  }
+
+  // Cancelar exportación Excel
+  cancelarExcel(): void {
+    this.mostrarModalExcel = false;
+  }
+
+  // Confirmar exportación Word con historial
+  confirmarWordConHistorial(): void {
+    this.mostrarModalWord = false;
+    this.exportarWordInventario(true);
+  }
+
+  // Confirmar exportación Word sin historial
+  confirmarWordSinHistorial(): void {
+    this.mostrarModalWord = false;
+    this.exportarWordInventario(false);
+  }
+
+  // Cancelar exportación Word
+  cancelarWord(): void {
+    this.mostrarModalWord = false;
   }
 
   // Generar PDF normal (sin historial)
@@ -1404,13 +1508,13 @@ export class InformesComponent implements OnInit {
       if (!incluirHistorial) {
         // PDF sin historial - solo tabla resumida
         const rows: any[] = [];
-        rows.push(['Producto', 'Proveedor', 'Referencia', 'Lote/Batch', 'Entradas', 'Salidas', 'Stock Actual', 'Stock Mínimo', 'Estado']);
+        rows.push(['Producto', 'Proveedor', 'Código de Barras', 'Lote/Batch', 'Entradas', 'Salidas', 'Stock Actual', 'Stock Mínimo', 'Estado']);
 
         this.datosFiltrados.forEach((i: any) => {
           rows.push([
             i.name || i.producto || '',
             i.proveedor || 'Sin proveedor',
-            i.reference || i.referencia || '',
+            i.codigo_de_barras || i.reference || i.referencia || 'N/A',
             i.batch || i.lote || '',
             i.entradas || 0,
             i.salidas || 0,
@@ -1449,7 +1553,8 @@ export class InformesComponent implements OnInit {
 
           doc.setFontSize(10);
           doc.setFont('helvetica', 'normal');
-          doc.text(`Proveedor: ${item.proveedor || 'Sin proveedor'} | Referencia: ${item.reference || item.referencia || 'N/A'} | Stock Total: ${item.stock || item.quantity || 0} | Estado: ${item.estado || 'N/A'}`, 14, y);
+          const codigoBarras = item.codigo_de_barras || item.reference || item.referencia || 'N/A';
+          doc.text(`Proveedor: ${item.proveedor || 'Sin proveedor'} | Código de Barras: ${codigoBarras} | Stock Total: ${item.stock || item.quantity || 0} | Estado: ${item.estado || 'N/A'}`, 14, y);
           y += 10;
 
           // Listado de lotes del producto
@@ -1621,9 +1726,9 @@ currentY += 10;
       return;
     }
 
-    // Si es inventario, crear formato mejorado con historial
+    // Si es inventario, mostrar modal de confirmación
     if (this.tipoInforme === 'inventario') {
-      this.exportarExcelInventario(columns);
+      this.mostrarModalExcel = true;
       return;
     }
 
@@ -1695,9 +1800,9 @@ currentY += 10;
       return;
     }
 
-    // Si es inventario, crear formato mejorado con historial
+    // Si es inventario, mostrar modal de confirmación
     if (this.tipoInforme === 'inventario') {
-      this.exportarWordInventario();
+      this.mostrarModalWord = true;
       return;
     }
 
@@ -2206,37 +2311,49 @@ currentY += 10;
     }
   }
 
-  // Exportar Excel mejorado para inventario con historial
-  private exportarExcelInventario(columns: ReportColumn[]): void {
+  // Exportar Excel mejorado para inventario con o sin historial
+  private exportarExcelInventario(columns: ReportColumn[], incluirHistorial: boolean = true): void {
     const workbook = XLSX.utils.book_new();
 
     // Crear hoja principal de inventario
     const datosInventario: any[][] = [];
 
-    // Encabezados
-    const headers = ['Producto', 'Lote', 'Stock', 'Stock Mínimo', 'Ubicación', 'Estado'];
+    // Encabezados mejorados
+    const headers = ['Producto', 'Proveedor', 'Código de Barras', 'Lote/Batch', 'Entradas', 'Salidas', 'Stock Actual', 'Stock Mínimo', 'Ubicación', 'Estado'];
     datosInventario.push(headers);
 
     // Datos de productos y lotes
     this.datosFiltrados.forEach((producto: any) => {
+      const proveedor = producto.proveedor || 'Sin proveedor';
+      const codigoBarras = producto.codigo_de_barras || producto.reference || 'N/A';
+      const ubicacion = producto.ubicacion_interna || producto.ubicacion || 'No especificada';
+      
       if (Array.isArray(producto.lotes) && producto.lotes.length > 0) {
         producto.lotes.forEach((lote: any) => {
           datosInventario.push([
             producto.name || 'N/A',
-            lote.batch || 'N/A',
+            proveedor,
+            codigoBarras,
+            lote.batch || 'SIN_LOTE',
+            lote.entradas || 0,
+            lote.salidas || 0,
             lote.stock || 0,
-            producto.min_stock || 0,
-            producto.ubicacion_interna || 'N/A',
-            lote.estado || 'Normal'
+            producto.stock_minimo || producto.min_stock || 0,
+            ubicacion,
+            producto.estado || 'Normal'
           ]);
         });
       } else {
         datosInventario.push([
           producto.name || 'N/A',
+          proveedor,
+          codigoBarras,
           'Sin lote',
-          producto.stock || 0,
-          producto.min_stock || 0,
-          producto.ubicacion_interna || 'N/A',
+          producto.entradas || 0,
+          producto.salidas || 0,
+          producto.stock || producto.quantity || 0,
+          producto.stock_minimo || producto.min_stock || 0,
+          ubicacion,
           producto.estado || 'Normal'
         ]);
       }
@@ -2247,8 +2364,12 @@ currentY += 10;
     // Ajustar ancho de columnas
     wsInventario['!cols'] = [
       { wch: 30 }, // Producto
-      { wch: 15 }, // Lote
-      { wch: 10 }, // Stock
+      { wch: 25 }, // Proveedor
+      { wch: 18 }, // Código de Barras
+      { wch: 15 }, // Lote/Batch
+      { wch: 10 }, // Entradas
+      { wch: 10 }, // Salidas
+      { wch: 12 }, // Stock Actual
       { wch: 12 }, // Stock Mínimo
       { wch: 20 }, // Ubicación
       { wch: 12 }  // Estado
@@ -2256,48 +2377,88 @@ currentY += 10;
 
     XLSX.utils.book_append_sheet(workbook, wsInventario, 'Inventario');
 
-    // Crear hoja de historial detallado
-    const datosHistorial: any[][] = [];
-    datosHistorial.push(['Producto', 'Lote', 'Tipo', 'Cantidad', 'Fecha', 'Usuario']);
+    // Crear hoja de historial detallado (solo si se incluye historial)
+    if (incluirHistorial) {
+      // Hoja de Entradas
+      const datosEntradas: any[][] = [];
+      datosEntradas.push(['Producto', 'Lote', 'Fecha', 'Cantidad', 'Proveedor', 'Usuario']);
 
-    this.datosFiltrados.forEach((producto: any) => {
-      if (Array.isArray(producto.lotes)) {
-        producto.lotes.forEach((lote: any) => {
-          if (Array.isArray(lote.historial) && lote.historial.length > 0) {
-            lote.historial.forEach((h: any) => {
-              datosHistorial.push([
-                producto.name || 'N/A',
-                lote.batch || 'N/A',
-                h.type === 'entry' ? 'Entrada' : 'Salida',
-                h.quantity || 0,
-                this.formatearFecha(h.date),
-                h.user || 'N/A'
-              ]);
-            });
-          }
-        });
+      this.datosFiltrados.forEach((producto: any) => {
+        if (Array.isArray(producto.lotes)) {
+          producto.lotes.forEach((lote: any) => {
+            if (Array.isArray(lote.historialEntradas) && lote.historialEntradas.length > 0) {
+              lote.historialEntradas.forEach((h: any) => {
+                datosEntradas.push([
+                  producto.name || 'N/A',
+                  lote.batch || 'SIN_LOTE',
+                  this.formatearFecha(h.fecha),
+                  h.cantidad || 0,
+                  h.proveedor || 'N/A',
+                  h.usuario || 'N/A'
+                ]);
+              });
+            }
+          });
+        }
+      });
+
+      if (datosEntradas.length > 1) {
+        const wsEntradas = XLSX.utils.aoa_to_sheet(datosEntradas);
+        wsEntradas['!cols'] = [
+          { wch: 30 }, // Producto
+          { wch: 15 }, // Lote
+          { wch: 18 }, // Fecha
+          { wch: 10 }, // Cantidad
+          { wch: 25 }, // Proveedor
+          { wch: 25 }  // Usuario
+        ];
+        XLSX.utils.book_append_sheet(workbook, wsEntradas, 'Historial Entradas');
       }
-    });
 
-    if (datosHistorial.length > 1) {
-      const wsHistorial = XLSX.utils.aoa_to_sheet(datosHistorial);
-      wsHistorial['!cols'] = [
-        { wch: 30 }, // Producto
-        { wch: 15 }, // Lote
-        { wch: 10 }, // Tipo
-        { wch: 10 }, // Cantidad
-        { wch: 18 }, // Fecha
-        { wch: 20 }  // Usuario
-      ];
-      XLSX.utils.book_append_sheet(workbook, wsHistorial, 'Historial');
+      // Hoja de Salidas
+      const datosSalidas: any[][] = [];
+      datosSalidas.push(['Producto', 'Lote', 'Fecha', 'Cantidad', 'Motivo', 'Usuario']);
+
+      this.datosFiltrados.forEach((producto: any) => {
+        if (Array.isArray(producto.lotes)) {
+          producto.lotes.forEach((lote: any) => {
+            if (Array.isArray(lote.historialSalidas) && lote.historialSalidas.length > 0) {
+              lote.historialSalidas.forEach((h: any) => {
+                datosSalidas.push([
+                  producto.name || 'N/A',
+                  lote.batch || 'SIN_LOTE',
+                  this.formatearFecha(h.fecha),
+                  h.cantidad || 0,
+                  h.motivo || 'N/A',
+                  h.usuario || 'N/A'
+                ]);
+              });
+            }
+          });
+        }
+      });
+
+      if (datosSalidas.length > 1) {
+        const wsSalidas = XLSX.utils.aoa_to_sheet(datosSalidas);
+        wsSalidas['!cols'] = [
+          { wch: 30 }, // Producto
+          { wch: 15 }, // Lote
+          { wch: 18 }, // Fecha
+          { wch: 10 }, // Cantidad
+          { wch: 30 }, // Motivo
+          { wch: 25 }  // Usuario
+        ];
+        XLSX.utils.book_append_sheet(workbook, wsSalidas, 'Historial Salidas');
+      }
     }
 
     const fecha = this.datePipe.transform(new Date(), 'yyyyMMdd_HHmmss');
-    XLSX.writeFile(workbook, `Inventario_Completo_${fecha}.xlsx`);
+    const nombreArchivo = `Inventario${incluirHistorial ? '_Completo' : ''}_${fecha}.xlsx`;
+    XLSX.writeFile(workbook, nombreArchivo);
   }
 
-  // Exportar Word mejorado para inventario con historial
-  private exportarWordInventario(): void {
+  // Exportar Word mejorado para inventario con o sin historial
+  private exportarWordInventario(incluirHistorial: boolean = true): void {
     const fecha = this.datePipe.transform(new Date(), 'dd/MM/yyyy HH:mm');
 
     let html = `
@@ -2305,61 +2466,168 @@ currentY += 10;
       <html>
       <head>
         <meta charset="UTF-8">
+        <meta name="ProgId" content="Word.Document">
+        <meta name="Generator" content="Microsoft Word">
+        <meta name="Originator" content="Microsoft Word">
         <style>
-          body { font-family: Arial, sans-serif; margin: 20px; }
-          h1 { color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px; }
-          h2 { color: #34495e; margin-top: 30px; border-bottom: 2px solid #95a5a6; padding-bottom: 5px; }
-          .meta { color: #7f8c8d; font-size: 14px; margin-bottom: 20px; }
-          table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-          th { background-color: #3498db; color: white; padding: 12px; text-align: left; border: 1px solid #2980b9; }
-          td { padding: 10px; border: 1px solid #ddd; }
-          tr:nth-child(even) { background-color: #f2f2f2; }
-          .producto-header { background-color: #ecf0f1; font-weight: bold; }
-          .lote-row { background-color: #f8f9fa; }
-          .historial-row { background-color: #e8f4f8; font-size: 12px; }
-          .entrada { color: #27ae60; font-weight: bold; }
-          .salida { color: #e74c3c; font-weight: bold; }
+          @page {
+            size: A4 landscape;
+            margin: 1.5cm;
+          }
+          body { 
+            font-family: Arial, sans-serif; 
+            margin: 0;
+            padding: 15px;
+            font-size: 9pt;
+          }
+          h1 { 
+            color: #2c3e50; 
+            border-bottom: 3px solid #3498db; 
+            padding-bottom: 8px;
+            margin-bottom: 10px;
+            font-size: 18pt;
+          }
+          h2 { 
+            color: #34495e; 
+            margin-top: 25px; 
+            border-bottom: 2px solid #95a5a6; 
+            padding-bottom: 5px;
+            font-size: 14pt;
+          }
+          h3 {
+            color: #34495e;
+            margin-top: 20px;
+            font-size: 12pt;
+          }
+          h4 {
+            color: #475569;
+            margin-top: 15px;
+            font-size: 11pt;
+          }
+          h5 {
+            color: #64748b;
+            margin-top: 12px;
+            font-size: 10pt;
+          }
+          .meta { 
+            color: #7f8c8d; 
+            font-size: 10pt; 
+            margin-bottom: 15px; 
+          }
+          table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin: 15px 0;
+            table-layout: auto;
+            font-size: 8pt;
+            page-break-inside: auto;
+          }
+          th { 
+            background-color: #3498db; 
+            color: white; 
+            padding: 6px 4px; 
+            text-align: left; 
+            border: 1px solid #2980b9;
+            font-weight: bold;
+            font-size: 8pt;
+            word-wrap: break-word;
+          }
+          td { 
+            padding: 5px 4px; 
+            border: 1px solid #ddd;
+            word-wrap: break-word;
+            vertical-align: top;
+            font-size: 8pt;
+          }
+          tr:nth-child(even) { 
+            background-color: #f2f2f2; 
+          }
+          .producto-header { 
+            background-color: #ecf0f1; 
+            font-weight: bold; 
+          }
+          .lote-row { 
+            background-color: #f8f9fa; 
+          }
+          .historial-row { 
+            background-color: #e8f4f8; 
+            font-size: 7pt; 
+          }
+          .entrada-row {
+            background-color: #f0fdf4;
+          }
+          .salida-row {
+            background-color: #fef2f2;
+          }
+          .entrada { 
+            color: #27ae60; 
+            font-weight: bold; 
+          }
+          .salida { 
+            color: #e74c3c; 
+            font-weight: bold; 
+          }
+          p {
+            margin: 8px 0;
+            font-size: 9pt;
+          }
         </style>
       </head>
       <body>
-        <h1>📦 Informe de Inventario Completo</h1>
+        <h1>📦 Informe de Inventario ${incluirHistorial ? 'Completo' : ''}</h1>
         <p class="meta">Generado el: ${fecha}</p>
 
         <h2>Resumen de Inventario</h2>
         <table>
           <thead>
             <tr>
-              <th>Producto</th>
-              <th>Lote</th>
-              <th>Stock</th>
-              <th>Stock Mínimo</th>
-              <th>Ubicación</th>
-              <th>Estado</th>
+              <th style="width: 20%;">Producto</th>
+              <th style="width: 15%;">Proveedor</th>
+              <th style="width: 12%;">Código de Barras</th>
+              <th style="width: 10%;">Lote/Batch</th>
+              <th style="width: 7%;">Entradas</th>
+              <th style="width: 7%;">Salidas</th>
+              <th style="width: 8%;">Stock Actual</th>
+              <th style="width: 8%;">Stock Mínimo</th>
+              <th style="width: 8%;">Ubicación</th>
+              <th style="width: 7%;">Estado</th>
             </tr>
           </thead>
           <tbody>`;
 
     this.datosFiltrados.forEach((producto: any) => {
+      const proveedor = producto.proveedor || 'Sin proveedor';
+      const codigoBarras = producto.codigo_de_barras || producto.reference || 'N/A';
+      const ubicacion = producto.ubicacion_interna || producto.ubicacion || 'No especificada';
+      
       if (Array.isArray(producto.lotes) && producto.lotes.length > 0) {
         producto.lotes.forEach((lote: any, index: number) => {
           html += `
             <tr class="${index === 0 ? 'producto-header' : 'lote-row'}">
               <td>${index === 0 ? producto.name || 'N/A' : ''}</td>
-              <td>${lote.batch || 'N/A'}</td>
+              <td>${index === 0 ? proveedor : ''}</td>
+              <td>${index === 0 ? codigoBarras : ''}</td>
+              <td>${lote.batch || 'SIN_LOTE'}</td>
+              <td>${lote.entradas || 0}</td>
+              <td>${lote.salidas || 0}</td>
               <td>${lote.stock || 0}</td>
-              <td>${index === 0 ? producto.min_stock || 0 : ''}</td>
-              <td>${index === 0 ? producto.ubicacion_interna || 'N/A' : ''}</td>
-              <td>${lote.estado || 'Normal'}</td>
+              <td>${index === 0 ? (producto.stock_minimo || producto.min_stock || 0) : ''}</td>
+              <td>${index === 0 ? ubicacion : ''}</td>
+              <td>${producto.estado || 'Normal'}</td>
             </tr>`;
         });
       } else {
         html += `
           <tr class="producto-header">
             <td>${producto.name || 'N/A'}</td>
+            <td>${proveedor}</td>
+            <td>${codigoBarras}</td>
             <td>Sin lote</td>
-            <td>${producto.stock || 0}</td>
-            <td>${producto.min_stock || 0}</td>
-            <td>${producto.ubicacion_interna || 'N/A'}</td>
+            <td>${producto.entradas || 0}</td>
+            <td>${producto.salidas || 0}</td>
+            <td>${producto.stock || producto.quantity || 0}</td>
+            <td>${producto.stock_minimo || producto.min_stock || 0}</td>
+            <td>${ubicacion}</td>
             <td>${producto.estado || 'Normal'}</td>
           </tr>`;
       }
@@ -2367,43 +2635,120 @@ currentY += 10;
 
     html += `
           </tbody>
-        </table>
+        </table>`;
 
-        <h2>Historial Detallado de Movimientos</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Producto</th>
-              <th>Lote</th>
-              <th>Tipo</th>
-              <th>Cantidad</th>
-              <th>Fecha</th>
-              <th>Usuario</th>
-            </tr>
-          </thead>
-          <tbody>`;
+    // Agregar historial completo si se solicita
+    if (incluirHistorial) {
+      html += `
+        <h2>Historial Detallado de Movimientos</h2>`;
 
-    this.datosFiltrados.forEach((producto: any) => {
-      if (Array.isArray(producto.lotes)) {
-        producto.lotes.forEach((lote: any) => {
-          if (Array.isArray(lote.historial) && lote.historial.length > 0) {
-            lote.historial.forEach((h: any) => {
-              const tipoClass = h.type === 'entry' ? 'entrada' : 'salida';
-              const tipoTexto = h.type === 'entry' ? '📥 Entrada' : '📤 Salida';
+      this.datosFiltrados.forEach((producto: any) => {
+        if (Array.isArray(producto.lotes) && producto.lotes.length > 0) {
+          html += `
+            <h3>${producto.name || 'N/A'}</h3>
+            <p><strong>Proveedor:</strong> ${producto.proveedor || 'Sin proveedor'} | 
+               <strong>Código de Barras:</strong> ${producto.codigo_de_barras || producto.reference || 'N/A'} | 
+               <strong>Stock Total:</strong> ${producto.stock || 0} | 
+               <strong>Estado:</strong> ${producto.estado || 'Normal'}</p>`;
+
+          // Tabla resumen de lotes
+          html += `
+            <h4>Resumen de Lotes</h4>
+            <table>
+              <thead>
+                <tr>
+                  <th style="width: 20%;">Lote/Batch</th>
+                  <th style="width: 15%;">Entradas</th>
+                  <th style="width: 15%;">Salidas</th>
+                  <th style="width: 15%;">Stock</th>
+                  <th style="width: 35%;">Fecha última entrada</th>
+                </tr>
+              </thead>
+              <tbody>`;
+
+          producto.lotes.forEach((lote: any) => {
+            html += `
+              <tr>
+                <td>${lote.batch || 'SIN_LOTE'}</td>
+                <td>${lote.entradas || 0}</td>
+                <td>${lote.salidas || 0}</td>
+                <td>${lote.stock || 0}</td>
+                <td>${this.formatearFecha(lote.fecha)}</td>
+              </tr>`;
+          });
+
+          html += `
+              </tbody>
+            </table>`;
+
+          // Historial detallado por lote
+          producto.lotes.forEach((lote: any) => {
+            html += `
+              <h4>Lote: ${lote.batch || 'SIN_LOTE'}</h4>`;
+
+            // Historial de entradas
+            if (Array.isArray(lote.historialEntradas) && lote.historialEntradas.length > 0) {
               html += `
-                <tr class="historial-row">
-                  <td>${producto.name || 'N/A'}</td>
-                  <td>${lote.batch || 'N/A'}</td>
-                  <td class="${tipoClass}">${tipoTexto}</td>
-                  <td>${h.quantity || 0}</td>
-                  <td>${this.formatearFecha(h.date)}</td>
-                  <td>${h.user || 'N/A'}</td>
-                </tr>`;
-            });
-          }
-        });
-      }
-    });
+                <h5>📥 Entradas</h5>
+                <table>
+                  <thead>
+                    <tr>
+                      <th style="width: 20%;">Fecha</th>
+                      <th style="width: 15%;">Cantidad</th>
+                      <th style="width: 30%;">Proveedor</th>
+                      <th style="width: 35%;">Usuario</th>
+                    </tr>
+                  </thead>
+                  <tbody>`;
+
+              lote.historialEntradas.forEach((h: any) => {
+                html += `
+                  <tr class="historial-row entrada-row">
+                    <td>${this.formatearFecha(h.fecha)}</td>
+                    <td>${h.cantidad || 0}</td>
+                    <td>${h.proveedor || 'N/A'}</td>
+                    <td>${h.usuario || 'N/A'}</td>
+                  </tr>`;
+              });
+
+              html += `
+                  </tbody>
+                </table>`;
+            }
+
+            // Historial de salidas
+            if (Array.isArray(lote.historialSalidas) && lote.historialSalidas.length > 0) {
+              html += `
+                <h5>📤 Salidas</h5>
+                <table>
+                  <thead>
+                    <tr>
+                      <th style="width: 20%;">Fecha</th>
+                      <th style="width: 15%;">Cantidad</th>
+                      <th style="width: 35%;">Motivo</th>
+                      <th style="width: 30%;">Usuario</th>
+                    </tr>
+                  </thead>
+                  <tbody>`;
+
+              lote.historialSalidas.forEach((h: any) => {
+                html += `
+                  <tr class="historial-row salida-row">
+                    <td>${this.formatearFecha(h.fecha)}</td>
+                    <td>${h.cantidad || 0}</td>
+                    <td>${h.motivo || 'N/A'}</td>
+                    <td>${h.usuario || 'N/A'}</td>
+                  </tr>`;
+              });
+
+              html += `
+                  </tbody>
+                </table>`;
+            }
+          });
+        }
+      });
+    }
 
     html += `
           </tbody>
@@ -2411,8 +2756,13 @@ currentY += 10;
       </body>
       </html>`;
 
+    html += `
+      </body>
+      </html>`;
+
     const blob = new Blob([html], { type: 'application/msword' });
     const fechaArchivo = this.datePipe.transform(new Date(), 'yyyyMMdd_HHmmss');
-    saveAs(blob, `Inventario_Completo_${fechaArchivo}.doc`);
+    const nombreArchivo = `Inventario${incluirHistorial ? '_Completo' : ''}_${fechaArchivo}.doc`;
+    saveAs(blob, nombreArchivo);
   }
 }

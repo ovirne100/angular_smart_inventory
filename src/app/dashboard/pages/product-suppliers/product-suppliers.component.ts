@@ -52,11 +52,33 @@ export class ProductSuppliersComponent implements OnChanges {
 
   ngOnChanges(): void {
     if (this.proveedorId) {
+      // Resetear estado cuando cambia el proveedor
+      this.resetearEstado();
       this.cargarProductos();
       if (this.modoModal && this.autoAbrir) {
         this.mostrarProductos = true;
       }
+    } else {
+      // Si no hay proveedorId, resetear todo
+      this.resetearEstado();
     }
+  }
+
+  // Resetear estado del componente
+  private resetearEstado(): void {
+    this.mostrarProductos = false;
+    this.mostrarAsociar = false;
+    this.productosProveedor = [];
+    this.productosFiltrados = [];
+    this.productosCatalogo = [];
+    this.productosCatalogoFiltrados = [];
+    this.productosSeleccionados.clear();
+    this.costos = {};
+    this.searchTerm = '';
+    this.searchTermAsociar = '';
+    this.currentPage = 1;
+    this.sortBy = 'name';
+    this.sortOrder = 'asc';
   }
 
   cargarProductos(): void {
@@ -181,11 +203,18 @@ export class ProductSuppliersComponent implements OnChanges {
   }
 
   onCerrar(): void {
+    this.resetearEstado();
     this.cerrar.emit();
   }
 
   onAbrirProductos(): void {
+    // Resetear búsqueda y paginación antes de abrir
+    this.searchTerm = '';
+    this.currentPage = 1;
+    this.sortBy = 'name';
+    this.sortOrder = 'asc';
     this.mostrarProductos = true;
+    // Recargar productos para asegurar datos actualizados
     this.cargarProductos();
   }
 
@@ -193,6 +222,10 @@ export class ProductSuppliersComponent implements OnChanges {
     this.mostrarProductos = false;
     this.searchTerm = '';
     this.currentPage = 1;
+    // Si está en modo modal, emitir evento de cierre
+    if (this.modoModal) {
+      this.cerrar.emit();
+    }
   }
 
   onAbrirAsociar(): void {

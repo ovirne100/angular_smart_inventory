@@ -8,6 +8,8 @@ export interface User {
   name: string;
   lastname: string;
   email: string;
+  image?: string;
+  image_url?: string;
   role: {
     id: number;
     name: string;
@@ -63,6 +65,11 @@ export class AuthService {
     localStorage.setItem('currentUser', JSON.stringify(user));
   }
 
+  // Actualizar usuario actual (método público)
+  updateCurrentUser(user: User): void {
+    this.setCurrentUser(user);
+  }
+
   // Cargar usuario del localStorage
   private loadUserFromStorage(): void {
     const userStr = localStorage.getItem('currentUser');
@@ -92,5 +99,30 @@ export class AuthService {
   // Verificar si está autenticado
   isAuthenticated(): boolean {
     return !!localStorage.getItem('token');
+  }
+
+  // Actualizar imagen del usuario
+  updateUserImage(image: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('image', image);
+    
+    return this.http.post(`${this.apiUrl}/user/update-image`, formData).pipe(
+      tap((response: any) => {
+        if (response.user) {
+          this.setCurrentUser(response.user);
+        }
+      })
+    );
+  }
+
+  // Actualizar usuario
+  updateUser(data: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/user`, data).pipe(
+      tap((response: any) => {
+        if (response.user) {
+          this.setCurrentUser(response.user);
+        }
+      })
+    );
   }
 }

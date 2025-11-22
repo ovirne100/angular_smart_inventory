@@ -74,17 +74,17 @@
       <div class="filtros-grid">
         <div class="filtro-item">
           <label>Búsqueda:</label>
-          <input type="text" [(ngModel)]="filtrosProductos.search" placeholder="Nombre, referencia...">
+          <input type="text" [(ngModel)]="filtrosProductos.search" (ngModelChange)="aplicarFiltros()" placeholder="Nombre, lote, código de barras...">
         </div>
 
         <div class="filtro-item">
           <label>Lote:</label>
-          <input type="text" [(ngModel)]="filtrosProductos.lote" placeholder="Número de lote">
+          <input type="text" [(ngModel)]="filtrosProductos.lote" (ngModelChange)="aplicarFiltros()" placeholder="Número de lote">
         </div>
 
         <div class="filtro-item">
           <label>Código de Barras:</label>
-          <input type="text" [(ngModel)]="filtrosProductos.referencia" placeholder="Código de barras">
+          <input type="text" [(ngModel)]="filtrosProductos.referencia" (ngModelChange)="aplicarFiltros()" placeholder="Código de barras">
         </div>
 
         <div class="filtro-item">
@@ -160,17 +160,17 @@
       <div class="filtros-grid">
         <div class="filtro-item">
           <label>Producto:</label>
-          <input type="text" [(ngModel)]="filtrosInventario.producto" placeholder="Nombre del producto">
+          <input type="text" [(ngModel)]="filtrosInventario.producto" (ngModelChange)="aplicarFiltros()" placeholder="Nombre del producto">
         </div>
 
         <div class="filtro-item">
           <label>Lote:</label>
-          <input type="text" [(ngModel)]="filtrosInventario.lote" placeholder="Número de lote">
+          <input type="text" [(ngModel)]="filtrosInventario.lote" (ngModelChange)="aplicarFiltros()" placeholder="Número de lote">
         </div>
 
         <div class="filtro-item">
-          <label>Stock Mínimo:</label>
-          <input type="number" [(ngModel)]="filtrosInventario.stockMinimo" placeholder="Cantidad mínima">
+          <label>Código de Barras:</label>
+          <input type="text" [(ngModel)]="filtrosInventario.codigoBarras" (ngModelChange)="aplicarFiltros()" placeholder="Código de barras">
         </div>
 
         <div class="filtro-item">
@@ -185,7 +185,7 @@
 
         <div class="filtro-item checkbox">
           <label>
-            <input type="checkbox" [(ngModel)]="filtrosInventario.mostrarAgotados">
+            <input type="checkbox" [(ngModel)]="filtrosInventario.mostrarAgotados" (ngModelChange)="aplicarFiltros()">
             Mostrar solo productos agotados
           </label>
         </div>
@@ -264,6 +264,90 @@
             <i class="fa-solid fa-table"></i> Sin Historial
           </button>
           <button class="btn-modal btn-con-historial" (click)="confirmarPDFConHistorial()">
+            <i class="fa-solid fa-list-check"></i> Con Historial
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de confirmación para Excel de Inventario -->
+    <div *ngIf="mostrarModalExcel" class="modal-overlay" (click)="cancelarExcel()">
+      <div class="modal-content-pdf" (click)="$event.stopPropagation()">
+        <div class="modal-header-pdf">
+          <h3><i class="fa-solid fa-file-excel"></i> Exportar Inventario a Excel</h3>
+          <button class="btn-cerrar-modal" (click)="cancelarExcel()">
+            <i class="fa-solid fa-times"></i>
+          </button>
+        </div>
+        <div class="modal-body-pdf">
+          <p class="pregunta-modal">¿Cómo deseas exportar el inventario?</p>
+          <div class="opciones-exportacion">
+            <div class="opcion-item">
+              <i class="fa-solid fa-list-check"></i>
+              <div class="opcion-info">
+                <strong>Con Historial Completo</strong>
+                <span>Incluye todas las entradas y salidas detalladas de cada producto</span>
+              </div>
+            </div>
+            <div class="opcion-item">
+              <i class="fa-solid fa-table"></i>
+              <div class="opcion-info">
+                <strong>Datos Resumidos</strong>
+                <span>Solo tabla resumida con totales de entradas y salidas</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer-pdf">
+          <button class="btn-modal btn-cancelar" (click)="cancelarExcel()">
+            <i class="fa-solid fa-times"></i> Cancelar
+          </button>
+          <button class="btn-modal btn-sin-historial" (click)="confirmarExcelSinHistorial()">
+            <i class="fa-solid fa-table"></i> Sin Historial
+          </button>
+          <button class="btn-modal btn-con-historial" (click)="confirmarExcelConHistorial()">
+            <i class="fa-solid fa-list-check"></i> Con Historial
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de confirmación para Word de Inventario -->
+    <div *ngIf="mostrarModalWord" class="modal-overlay" (click)="cancelarWord()">
+      <div class="modal-content-pdf" (click)="$event.stopPropagation()">
+        <div class="modal-header-pdf">
+          <h3><i class="fa-solid fa-file-word"></i> Exportar Inventario a Word</h3>
+          <button class="btn-cerrar-modal" (click)="cancelarWord()">
+            <i class="fa-solid fa-times"></i>
+          </button>
+        </div>
+        <div class="modal-body-pdf">
+          <p class="pregunta-modal">¿Cómo deseas exportar el inventario?</p>
+          <div class="opciones-exportacion">
+            <div class="opcion-item">
+              <i class="fa-solid fa-list-check"></i>
+              <div class="opcion-info">
+                <strong>Con Historial Completo</strong>
+                <span>Incluye todas las entradas y salidas detalladas de cada producto</span>
+              </div>
+            </div>
+            <div class="opcion-item">
+              <i class="fa-solid fa-table"></i>
+              <div class="opcion-info">
+                <strong>Datos Resumidos</strong>
+                <span>Solo tabla resumida con totales de entradas y salidas</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer-pdf">
+          <button class="btn-modal btn-cancelar" (click)="cancelarWord()">
+            <i class="fa-solid fa-times"></i> Cancelar
+          </button>
+          <button class="btn-modal btn-sin-historial" (click)="confirmarWordSinHistorial()">
+            <i class="fa-solid fa-table"></i> Sin Historial
+          </button>
+          <button class="btn-modal btn-con-historial" (click)="confirmarWordConHistorial()">
             <i class="fa-solid fa-list-check"></i> Con Historial
           </button>
         </div>
