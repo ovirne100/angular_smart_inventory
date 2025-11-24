@@ -2,13 +2,13 @@ import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Producto, LoteInventario } from '../../interfaces/producto';
 import { UnitsService } from '../../services/units/units.service';
-import { CommonModule } from '@angular/common';
+
 import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-ver-mas-producto',
   templateUrl: './ver-mas-producto.component.html',
-  imports: [CommonModule],
+  imports: [],
   styleUrls: ['./ver-mas-producto.component.css']
 })
 export class VerMasProductoComponent implements OnInit {

@@ -1,124 +1,145 @@
 <!-- Modal Crear -->
-<app-crear-producto
-  *ngIf="mostrarCrear"
-  (cancelar)="cancelarCrearProducto()"
-  (productoCreado)="onProductoCreado()">
-</app-crear-producto>
+@if (mostrarCrear) {
+  <app-crear-producto
+    (cancelar)="cancelarCrearProducto()"
+    (productoCreado)="onProductoCreado()">
+  </app-crear-producto>
+}
 
 <!-- Modal Actualizar -->
-<app-actualizar-producto
-  *ngIf="mostrarEditar && productoEnEdicion"
-  [producto]="productoEnEdicion"
-  (actualizado)="onProductoActualizado($event)"
-  (cancelar)="cerrarEditar()">
-</app-actualizar-producto>
+@if (mostrarEditar && productoEnEdicion) {
+  <app-actualizar-producto
+    [producto]="productoEnEdicion"
+    (actualizado)="onProductoActualizado($event)"
+    (cancelar)="cerrarEditar()">
+  </app-actualizar-producto>
+}
 
 
 
 <!-- Modal Ver Más -->
-<app-ver-mas-producto
-  *ngIf="mostrarVerMas && productoEnDetalle"
-  [producto]="productoEnDetalle"
-  (cerrar)="cerrarVerMas()">
-</app-ver-mas-producto>
+@if (mostrarVerMas && productoEnDetalle) {
+  <app-ver-mas-producto
+    [producto]="productoEnDetalle"
+    (cerrar)="cerrarVerMas()">
+  </app-ver-mas-producto>
+}
 
 <!-- Header con botón-->
-<div *ngIf="!mostrarCrear && !mostrarEditar && !mostrarVerMas" class="productos-header">
-  <h2>Gestión de Productos</h2>
-</div>
+@if (!mostrarCrear && !mostrarEditar && !mostrarVerMas) {
+  <div class="productos-header">
+    <h2>Gestión de Productos</h2>
+  </div>
+}
 
 <!-- 🔍 Barra de búsqueda fija con crear producto-->
- <div id="crear_busqueda_producto">
-<div class="filtro-fijo">
-  <input
-    type="text"
-    placeholder="Buscar producto..."
-    [(ngModel)]="search"
-    (input)="onBuscar()"
-    class="input-busqueda"/>
-</div>
-<button class="btn-crear-principal" (click)="cargarCrearProducto()">
-    <i class="fa-solid fa-plus"></i>
-    Crear Nuevo Producto
-  </button>
-</div>
-
-<!-- Lista de productos -->
-<div *ngIf="!mostrarCrear && !mostrarEditar && !mostrarVerMas" class="productos-container">
-  <div *ngIf="productosFiltrados.length === 0" class="no-productos">
-    <div class="no-productos-content">
-      <i class="fa-solid fa-box-open"></i>
-      <h3>No hay productos registrados</h3>
-      <p>Comienza agregando tu primer producto al inventario</p>
+<div id="crear_busqueda_producto">
+  <div class="filtro-fijo">
+    <input
+      type="text"
+      placeholder="Buscar producto..."
+      [(ngModel)]="search"
+      (input)="onBuscar()"
+      class="input-busqueda"/>
     </div>
+    <button class="btn-crear-principal" (click)="cargarCrearProducto()">
+      <i class="fa-solid fa-plus"></i>
+      Crear Nuevo Producto
+    </button>
   </div>
 
-  <div *ngIf="productosFiltrados.length > 0" class="productos-lista">
-    <div *ngFor="let producto of productosFiltrados; trackBy: trackByProducto" class="producto-item">
-      <div class="info-img">
-        <div class="producto-info">
-          <div class="producto-header">
-            <h3>{{ producto.name }}</h3>
-            <span class="producto-id">#{{ producto.id }}</span>
+  <!-- Lista de productos -->
+  @if (!mostrarCrear && !mostrarEditar && !mostrarVerMas) {
+    <div class="productos-container">
+      @if (productosFiltrados.length === 0) {
+        <div class="no-productos">
+          <div class="no-productos-content">
+            <i class="fa-solid fa-box-open"></i>
+            <h3>No hay productos registrados</h3>
+            <p>Comienza agregando tu primer producto al inventario</p>
           </div>
-          <div class="producto-details">
-            <div class="detail-row">
-              <span class="detail-label"><i class="fa-solid fa-barcode"></i> Código de Barras:</span>
-              <span class="detail-value" style="font-weight: 600; color: #ffbf00;">{{ producto.codigo_de_barras || producto.reference || 'Sin código' }}</span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label"><i class="fa-solid fa-ruler"></i> Unidad:</span>
-              <span class="detail-value">{{ obtenerNombreUnidad(producto.unit_measurement) || 'N/A' }}</span>
-            </div>
-            <div class="detail-row" *ngIf="producto.expiration_date">
-              <span class="detail-label"><i class="fa-solid fa-calendar"></i> Vencimiento Principal:</span>
-              <span class="detail-value">{{ formatearFecha(producto.expiration_date) }}</span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label"><i class="fa-solid fa-folder"></i> Categoría:</span>
-              <span class="detail-value">{{ producto.categoria?.name || 'Sin categoría' }}</span>
-            </div>
-
-            <!-- Lotes de Inventario -->
-            <div class="detail-row lotes-inventario" *ngIf="producto.lotesInventario && producto.lotesInventario.length > 0">
-              <div class="lotes-header">
-                <span class="detail-label">
-                  <i class="fa-solid fa-boxes"></i> Lotes en Inventario ({{ producto.lotesInventario.length }}):
-                </span>
-              </div>
-              <div class="lotes-list">
-                <div *ngFor="let lote of producto.lotesInventario" class="lote-item">
-                  <div class="lote-info">
-                    <span class="lote-numero"><strong>Lote:</strong> {{ lote.lot }}</span>
-                    <span class="lote-fecha" *ngIf="lote.expiration_date">
-                      <i class="fa-solid fa-calendar"></i> Vence: {{ formatearFecha(lote.expiration_date) }}
-                    </span>
+        </div>
+      }
+      @if (productosFiltrados.length > 0) {
+        <div class="productos-lista">
+          @for (producto of productosFiltrados; track trackByProducto($index, producto)) {
+            <div class="producto-item">
+              <div class="info-img">
+                <div class="producto-info">
+                  <div class="producto-header">
+                    <h3>{{ producto.name }}</h3>
+                    <span class="producto-id">#{{ producto.id }}</span>
+                  </div>
+                  <div class="producto-details">
+                    <div class="detail-row">
+                      <span class="detail-label"><i class="fa-solid fa-barcode"></i> Código de Barras:</span>
+                      <span class="detail-value" style="font-weight: 600; color: #ffbf00;">{{ producto.codigo_de_barras || producto.reference || 'Sin código' }}</span>
+                    </div>
+                    <div class="detail-row">
+                      <span class="detail-label"><i class="fa-solid fa-ruler"></i> Unidad:</span>
+                      <span class="detail-value">{{ obtenerNombreUnidad(producto.unit_measurement) || 'N/A' }}</span>
+                    </div>
+                    @if (producto.expiration_date) {
+                      <div class="detail-row">
+                        <span class="detail-label"><i class="fa-solid fa-calendar"></i> Vencimiento Principal:</span>
+                        <span class="detail-value">{{ formatearFecha(producto.expiration_date) }}</span>
+                      </div>
+                    }
+                    <div class="detail-row">
+                      <span class="detail-label"><i class="fa-solid fa-folder"></i> Categoría:</span>
+                      <span class="detail-value">{{ producto.categoria?.name || 'Sin categoría' }}</span>
+                    </div>
+                    <!-- Lotes de Inventario -->
+                    @if (producto.lotesInventario && producto.lotesInventario.length > 0) {
+                      <div class="detail-row lotes-inventario">
+                        <div class="lotes-header">
+                          <span class="detail-label">
+                            <i class="fa-solid fa-boxes"></i> Lotes en Inventario ({{ producto.lotesInventario.length }}):
+                          </span>
+                        </div>
+                        <div class="lotes-list">
+                          @for (lote of producto.lotesInventario; track lote) {
+                            <div class="lote-item">
+                              <div class="lote-info">
+                                <span class="lote-numero"><strong>Lote:</strong> {{ lote.lot }}</span>
+                                @if (lote.expiration_date) {
+                                  <span class="lote-fecha">
+                                    <i class="fa-solid fa-calendar"></i> Vence: {{ formatearFecha(lote.expiration_date) }}
+                                  </span>
+                                }
+                              </div>
+                            </div>
+                          }
+                        </div>
+                      </div>
+                    }
                   </div>
                 </div>
+                @if (producto.image_url) {
+                  <div class="img">
+                    <img [src]="producto.image_url" alt="Imagen de {{ producto.name }}" />
+                  </div>
+                }
+              </div>
+              <div class="acciones">
+                <button class="btn_actualizar" (click)="abrirEditar(producto)">
+                  <i class="fa-solid fa-edit"></i> Editar
+                </button>
+                <button class="btn-ver" (click)="abrirVerMas(producto)">
+                  <i class="fa-solid fa-eye"></i> Ver más
+                </button>
+                <button class="btn-eliminar" (click)="eliminarProducto(producto)">
+                  <i class="fa-solid fa-trash"></i> Eliminar
+                </button>
               </div>
             </div>
-          </div>
+          }
         </div>
-        <div class="img" *ngIf="producto.image_url">
-          <img [src]="producto.image_url" alt="Imagen de {{ producto.name }}" />
+      }
+      @if (loading) {
+        <div class="loading">
+          Cargando más productos...
         </div>
-      </div>
-
-      <div class="acciones">
-        <button class="btn_actualizar" (click)="abrirEditar(producto)">
-          <i class="fa-solid fa-edit"></i> Editar
-        </button>
-        <button class="btn-ver" (click)="abrirVerMas(producto)">
-          <i class="fa-solid fa-eye"></i> Ver más
-        </button>
-        <button class="btn-eliminar" (click)="eliminarProducto(producto)">
-          <i class="fa-solid fa-trash"></i> Eliminar
-        </button>
-      </div>
+      }
     </div>
-  </div>
-
-  <div *ngIf="loading" class="loading">
-    Cargando más productos...
-  </div>
-</div>
+  }

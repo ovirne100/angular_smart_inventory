@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { CommonModule } from '@angular/common';
+
 import { Subject, takeUntil } from 'rxjs';
 import { MovimientosService } from '../../../../services/movimientos/movimientos';
 import { AlertsService } from '../../../../services/alertas/alerts.service';
@@ -28,7 +28,7 @@ interface CreateOutputResponse {
 @Component({
   selector: 'app-salida',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule],
+  imports: [ReactiveFormsModule, FormsModule],
   templateUrl: './salida.component.html',
   styleUrls: ['./salida.component.css']
 })

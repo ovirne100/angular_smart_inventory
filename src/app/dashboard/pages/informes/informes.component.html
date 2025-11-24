@@ -40,594 +40,649 @@
   </div>
 
   <!-- ===================== META Y RESUMEN ===================== -->
-  <div class="report-meta-card" *ngIf="currentReportMeta">
-    <div class="meta-header">
-      <div class="meta-icon">
-        <i class="fa-solid" [ngClass]="currentReportMeta.icon"></i>
-      </div>
-      <div class="meta-content">
-        <h3>{{ currentReportMeta.title }}</h3>
-        <p>{{ currentReportMeta.description }}</p>
-      </div>
-    </div>
-
-    <div class="summary-grid" *ngIf="summaryMetrics.length">
-      <div class="summary-card" *ngFor="let metric of summaryMetrics" [ngClass]="metric.accent">
-        <div class="summary-icon">
-          <i class="fa-solid" [ngClass]="metric.icon"></i>
+  @if (currentReportMeta) {
+    <div class="report-meta-card">
+      <div class="meta-header">
+        <div class="meta-icon">
+          <i class="fa-solid" [ngClass]="currentReportMeta.icon"></i>
         </div>
-        <div class="summary-info">
-          <span class="summary-label">{{ metric.label }}</span>
-          <span class="summary-value">{{ metric.value }}</span>
-          <small *ngIf="metric.helper">{{ metric.helper }}</small>
+        <div class="meta-content">
+          <h3>{{ currentReportMeta.title }}</h3>
+          <p>{{ currentReportMeta.description }}</p>
         </div>
       </div>
+      @if (summaryMetrics.length) {
+        <div class="summary-grid">
+          @for (metric of summaryMetrics; track metric) {
+            <div class="summary-card" [ngClass]="metric.accent">
+              <div class="summary-icon">
+                <i class="fa-solid" [ngClass]="metric.icon"></i>
+              </div>
+              <div class="summary-info">
+                <span class="summary-label">{{ metric.label }}</span>
+                <span class="summary-value">{{ metric.value }}</span>
+                @if (metric.helper) {
+                  <small>{{ metric.helper }}</small>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
     </div>
-  </div>
+  }
 
   <!-- ===================== FILTROS ===================== -->
-  <div class="filtros-container" *ngIf="mostrarFiltros">
-
-    <!-- Filtros para Productos -->
-    <div *ngIf="tipoInforme === 'productos'" class="filtros-panel">
-      <h3>🔍 Filtros de Productos</h3>
-      <div class="filtros-grid">
-        <div class="filtro-item">
-          <label>Búsqueda:</label>
-          <input type="text" [(ngModel)]="filtrosProductos.search" (ngModelChange)="aplicarFiltros()" placeholder="Nombre, lote, código de barras...">
+  @if (mostrarFiltros) {
+    <div class="filtros-container">
+      <!-- Filtros para Productos -->
+      @if (tipoInforme === 'productos') {
+        <div class="filtros-panel">
+          <h3>🔍 Filtros de Productos</h3>
+          <div class="filtros-grid">
+            <div class="filtro-item">
+              <label>Búsqueda:</label>
+              <input type="text" [(ngModel)]="filtrosProductos.search" (ngModelChange)="aplicarFiltros()" placeholder="Nombre, lote, código de barras...">
+            </div>
+            <div class="filtro-item">
+              <label>Lote:</label>
+              <input type="text" [(ngModel)]="filtrosProductos.lote" (ngModelChange)="aplicarFiltros()" placeholder="Número de lote">
+            </div>
+            <div class="filtro-item">
+              <label>Código de Barras:</label>
+              <input type="text" [(ngModel)]="filtrosProductos.referencia" (ngModelChange)="aplicarFiltros()" placeholder="Código de barras">
+            </div>
+            <div class="filtro-item">
+              <label>Fecha Inicio:</label>
+              <input type="date" [(ngModel)]="filtrosProductos.fechaInicio">
+            </div>
+            <div class="filtro-item">
+              <label>Fecha Fin:</label>
+              <input type="date" [(ngModel)]="filtrosProductos.fechaFin">
+            </div>
+          </div>
         </div>
-
-        <div class="filtro-item">
-          <label>Lote:</label>
-          <input type="text" [(ngModel)]="filtrosProductos.lote" (ngModelChange)="aplicarFiltros()" placeholder="Número de lote">
+      }
+      <!-- Filtros para Proveedores -->
+      @if (tipoInforme === 'proveedores') {
+        <div class="filtros-panel">
+          <h3>🔍 Filtros de Proveedores</h3>
+          <div class="filtros-grid">
+            <div class="filtro-item">
+              <label>Búsqueda:</label>
+              <input type="text" [(ngModel)]="filtrosProveedores.search" placeholder="Nombre, email, teléfono...">
+            </div>
+            <div class="filtro-item">
+              <label>Fecha Inicio:</label>
+              <input type="date" [(ngModel)]="filtrosProveedores.fechaInicio">
+            </div>
+            <div class="filtro-item">
+              <label>Fecha Fin:</label>
+              <input type="date" [(ngModel)]="filtrosProveedores.fechaFin">
+            </div>
+          </div>
         </div>
-
-        <div class="filtro-item">
-          <label>Código de Barras:</label>
-          <input type="text" [(ngModel)]="filtrosProductos.referencia" (ngModelChange)="aplicarFiltros()" placeholder="Código de barras">
+      }
+      <!-- Filtros para Alertas -->
+      @if (tipoInforme === 'alertas') {
+        <div class="filtros-panel">
+          <h3>🔍 Filtros de Alertas</h3>
+          <div class="filtros-grid">
+            <div class="filtro-item">
+              <label>Tipo:</label>
+              <select [(ngModel)]="filtrosAlertas.tipo">
+                <option value="">Todos</option>
+                <option value="bajo_stock">Bajo Stock</option>
+                <option value="sin_stock">Sin Stock</option>
+              </select>
+            </div>
+            <div class="filtro-item">
+              <label>Estado:</label>
+              <select [(ngModel)]="filtrosAlertas.estado">
+                <option value="">Todos</option>
+                <option value="pendiente">Pendiente</option>
+                <option value="resuelta">Resuelta</option>
+              </select>
+            </div>
+            <div class="filtro-item">
+              <label>Fecha Inicio:</label>
+              <input type="date" [(ngModel)]="filtrosAlertas.fechaInicio">
+            </div>
+            <div class="filtro-item">
+              <label>Fecha Fin:</label>
+              <input type="date" [(ngModel)]="filtrosAlertas.fechaFin">
+            </div>
+          </div>
         </div>
-
-        <div class="filtro-item">
-          <label>Fecha Inicio:</label>
-          <input type="date" [(ngModel)]="filtrosProductos.fechaInicio">
+      }
+      <!-- Filtros para Inventario -->
+      @if (tipoInforme === 'inventario') {
+        <div class="filtros-panel">
+          <h3>🔍 Filtros de Inventario</h3>
+          <div class="filtros-grid">
+            <div class="filtro-item">
+              <label>Producto:</label>
+              <input type="text" [(ngModel)]="filtrosInventario.producto" (ngModelChange)="aplicarFiltros()" placeholder="Nombre del producto">
+            </div>
+            <div class="filtro-item">
+              <label>Lote:</label>
+              <input type="text" [(ngModel)]="filtrosInventario.lote" (ngModelChange)="aplicarFiltros()" placeholder="Número de lote">
+            </div>
+            <div class="filtro-item">
+              <label>Código de Barras:</label>
+              <input type="text" [(ngModel)]="filtrosInventario.codigoBarras" (ngModelChange)="aplicarFiltros()" placeholder="Código de barras">
+            </div>
+            <div class="filtro-item">
+              <label>Fecha Inicio:</label>
+              <input type="date" [(ngModel)]="filtrosInventario.fechaInicio">
+            </div>
+            <div class="filtro-item">
+              <label>Fecha Fin:</label>
+              <input type="date" [(ngModel)]="filtrosInventario.fechaFin">
+            </div>
+            <div class="filtro-item checkbox">
+              <label>
+                <input type="checkbox" [(ngModel)]="filtrosInventario.mostrarAgotados" (ngModelChange)="aplicarFiltros()">
+                Mostrar solo productos agotados
+              </label>
+            </div>
+          </div>
         </div>
-
-        <div class="filtro-item">
-          <label>Fecha Fin:</label>
-          <input type="date" [(ngModel)]="filtrosProductos.fechaFin">
+      }
+      <!-- Botones de acción rápida -->
+      <div class="filtros-acciones">
+        <div class="botones-rapidos">
+          <button class="btn-rapido" (click)="setQuick('today')">Hoy</button>
+          <button class="btn-rapido" (click)="setQuick('week')">Semana</button>
+          <button class="btn-rapido" (click)="setQuick('month')">Mes</button>
+          <button class="btn-rapido" (click)="setQuick('year')">Año</button>
+        </div>
+        <div class="botones-accion">
+          <button class="btn-generar" (click)="generarInforme()" [disabled]="loading">
+            @if (!loading) {
+              <i class="fa-solid fa-magic"></i>
+            }
+            @if (loading) {
+              <i class="fa-solid fa-spinner fa-spin"></i>
+            }
+            {{ loading ? 'Generando...' : 'Generar Informe' }}
+          </button>
         </div>
       </div>
     </div>
-
-    <!-- Filtros para Proveedores -->
-    <div *ngIf="tipoInforme === 'proveedores'" class="filtros-panel">
-      <h3>🔍 Filtros de Proveedores</h3>
-      <div class="filtros-grid">
-        <div class="filtro-item">
-          <label>Búsqueda:</label>
-          <input type="text" [(ngModel)]="filtrosProveedores.search" placeholder="Nombre, email, teléfono...">
-        </div>
-
-        <div class="filtro-item">
-          <label>Fecha Inicio:</label>
-          <input type="date" [(ngModel)]="filtrosProveedores.fechaInicio">
-        </div>
-
-        <div class="filtro-item">
-          <label>Fecha Fin:</label>
-          <input type="date" [(ngModel)]="filtrosProveedores.fechaFin">
-        </div>
-      </div>
-    </div>
-
-    <!-- Filtros para Alertas -->
-    <div *ngIf="tipoInforme === 'alertas'" class="filtros-panel">
-      <h3>🔍 Filtros de Alertas</h3>
-      <div class="filtros-grid">
-        <div class="filtro-item">
-          <label>Tipo:</label>
-          <select [(ngModel)]="filtrosAlertas.tipo">
-            <option value="">Todos</option>
-            <option value="bajo_stock">Bajo Stock</option>
-            <option value="sin_stock">Sin Stock</option>
-          </select>
-        </div>
-
-        <div class="filtro-item">
-          <label>Estado:</label>
-          <select [(ngModel)]="filtrosAlertas.estado">
-            <option value="">Todos</option>
-            <option value="pendiente">Pendiente</option>
-            <option value="resuelta">Resuelta</option>
-          </select>
-        </div>
-
-        <div class="filtro-item">
-          <label>Fecha Inicio:</label>
-          <input type="date" [(ngModel)]="filtrosAlertas.fechaInicio">
-        </div>
-
-        <div class="filtro-item">
-          <label>Fecha Fin:</label>
-          <input type="date" [(ngModel)]="filtrosAlertas.fechaFin">
-        </div>
-      </div>
-    </div>
-
-    <!-- Filtros para Inventario -->
-    <div *ngIf="tipoInforme === 'inventario'" class="filtros-panel">
-      <h3>🔍 Filtros de Inventario</h3>
-      <div class="filtros-grid">
-        <div class="filtro-item">
-          <label>Producto:</label>
-          <input type="text" [(ngModel)]="filtrosInventario.producto" (ngModelChange)="aplicarFiltros()" placeholder="Nombre del producto">
-        </div>
-
-        <div class="filtro-item">
-          <label>Lote:</label>
-          <input type="text" [(ngModel)]="filtrosInventario.lote" (ngModelChange)="aplicarFiltros()" placeholder="Número de lote">
-        </div>
-
-        <div class="filtro-item">
-          <label>Código de Barras:</label>
-          <input type="text" [(ngModel)]="filtrosInventario.codigoBarras" (ngModelChange)="aplicarFiltros()" placeholder="Código de barras">
-        </div>
-
-        <div class="filtro-item">
-          <label>Fecha Inicio:</label>
-          <input type="date" [(ngModel)]="filtrosInventario.fechaInicio">
-        </div>
-
-        <div class="filtro-item">
-          <label>Fecha Fin:</label>
-          <input type="date" [(ngModel)]="filtrosInventario.fechaFin">
-        </div>
-
-        <div class="filtro-item checkbox">
-          <label>
-            <input type="checkbox" [(ngModel)]="filtrosInventario.mostrarAgotados" (ngModelChange)="aplicarFiltros()">
-            Mostrar solo productos agotados
-          </label>
-        </div>
-      </div>
-    </div>
-
-    <!-- Botones de acción rápida -->
-    <div class="filtros-acciones">
-      <div class="botones-rapidos">
-        <button class="btn-rapido" (click)="setQuick('today')">Hoy</button>
-        <button class="btn-rapido" (click)="setQuick('week')">Semana</button>
-        <button class="btn-rapido" (click)="setQuick('month')">Mes</button>
-        <button class="btn-rapido" (click)="setQuick('year')">Año</button>
-      </div>
-
-      <div class="botones-accion">
-        <button class="btn-generar" (click)="generarInforme()" [disabled]="loading">
-          <i class="fa-solid fa-magic" *ngIf="!loading"></i>
-          <i class="fa-solid fa-spinner fa-spin" *ngIf="loading"></i>
-          {{ loading ? 'Generando...' : 'Generar Informe' }}
-        </button>
-      </div>
-    </div>
-  </div>
+  }
 
   <!-- ===================== RESULTADOS ===================== -->
-  <div class="resultados-container" *ngIf="datosFiltrados.length > 0">
-    <div class="resultados-header">
-      <h3>📊 Resultados ({{ datosFiltrados.length }})</h3>
-      <div class="botones-exportar">
-        <button class="btn-exportar" (click)="exportarPDF()" title="Exportar PDF">
-          <i class="fa-solid fa-file-pdf"></i> PDF
-        </button>
-        <button class="btn-exportar" (click)="exportarExcel()" title="Exportar Excel">
-          <i class="fa-solid fa-file-excel"></i> Excel
-        </button>
-        <button class="btn-exportar" (click)="exportarWord()" title="Exportar Word">
-          <i class="fa-solid fa-file-word"></i> Word
-        </button>
-      </div>
-    </div>
-
-    <!-- Modal de confirmación para PDF de Inventario -->
-    <div *ngIf="mostrarModalPDF" class="modal-overlay" (click)="cancelarPDF()">
-      <div class="modal-content-pdf" (click)="$event.stopPropagation()">
-        <div class="modal-header-pdf">
-          <h3><i class="fa-solid fa-file-pdf"></i> Exportar Inventario a PDF</h3>
-          <button class="btn-cerrar-modal" (click)="cancelarPDF()">
-            <i class="fa-solid fa-times"></i>
+  @if (datosFiltrados.length > 0) {
+    <div class="resultados-container">
+      <div class="resultados-header">
+        <h3>📊 Resultados ({{ datosFiltrados.length }})</h3>
+        <div class="botones-exportar">
+          <button class="btn-exportar" (click)="exportarPDF()" title="Exportar PDF">
+            <i class="fa-solid fa-file-pdf"></i> PDF
           </button>
-        </div>
-        <div class="modal-body-pdf">
-          <p class="pregunta-modal">¿Cómo deseas exportar el inventario?</p>
-          <div class="opciones-exportacion">
-            <div class="opcion-item">
-              <i class="fa-solid fa-list-check"></i>
-              <div class="opcion-info">
-                <strong>Con Historial Completo</strong>
-                <span>Incluye todas las entradas y salidas detalladas de cada producto</span>
-              </div>
-            </div>
-            <div class="opcion-item">
-              <i class="fa-solid fa-table"></i>
-              <div class="opcion-info">
-                <strong>Datos Resumidos</strong>
-                <span>Solo tabla resumida con totales de entradas y salidas</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer-pdf">
-          <button class="btn-modal btn-cancelar" (click)="cancelarPDF()">
-            <i class="fa-solid fa-times"></i> Cancelar
+          <button class="btn-exportar" (click)="exportarExcel()" title="Exportar Excel">
+            <i class="fa-solid fa-file-excel"></i> Excel
           </button>
-          <button class="btn-modal btn-sin-historial" (click)="confirmarPDFSinHistorial()">
-            <i class="fa-solid fa-table"></i> Sin Historial
-          </button>
-          <button class="btn-modal btn-con-historial" (click)="confirmarPDFConHistorial()">
-            <i class="fa-solid fa-list-check"></i> Con Historial
+          <button class="btn-exportar" (click)="exportarWord()" title="Exportar Word">
+            <i class="fa-solid fa-file-word"></i> Word
           </button>
         </div>
       </div>
-    </div>
-
-    <!-- Modal de confirmación para Excel de Inventario -->
-    <div *ngIf="mostrarModalExcel" class="modal-overlay" (click)="cancelarExcel()">
-      <div class="modal-content-pdf" (click)="$event.stopPropagation()">
-        <div class="modal-header-pdf">
-          <h3><i class="fa-solid fa-file-excel"></i> Exportar Inventario a Excel</h3>
-          <button class="btn-cerrar-modal" (click)="cancelarExcel()">
-            <i class="fa-solid fa-times"></i>
-          </button>
-        </div>
-        <div class="modal-body-pdf">
-          <p class="pregunta-modal">¿Cómo deseas exportar el inventario?</p>
-          <div class="opciones-exportacion">
-            <div class="opcion-item">
-              <i class="fa-solid fa-list-check"></i>
-              <div class="opcion-info">
-                <strong>Con Historial Completo</strong>
-                <span>Incluye todas las entradas y salidas detalladas de cada producto</span>
-              </div>
+      <!-- Modal de confirmación para PDF de Inventario -->
+      @if (mostrarModalPDF) {
+        <div class="modal-overlay" (click)="cancelarPDF()">
+          <div class="modal-content-pdf" (click)="$event.stopPropagation()">
+            <div class="modal-header-pdf">
+              <h3><i class="fa-solid fa-file-pdf"></i> Exportar Inventario a PDF</h3>
+              <button class="btn-cerrar-modal" (click)="cancelarPDF()">
+                <i class="fa-solid fa-times"></i>
+              </button>
             </div>
-            <div class="opcion-item">
-              <i class="fa-solid fa-table"></i>
-              <div class="opcion-info">
-                <strong>Datos Resumidos</strong>
-                <span>Solo tabla resumida con totales de entradas y salidas</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer-pdf">
-          <button class="btn-modal btn-cancelar" (click)="cancelarExcel()">
-            <i class="fa-solid fa-times"></i> Cancelar
-          </button>
-          <button class="btn-modal btn-sin-historial" (click)="confirmarExcelSinHistorial()">
-            <i class="fa-solid fa-table"></i> Sin Historial
-          </button>
-          <button class="btn-modal btn-con-historial" (click)="confirmarExcelConHistorial()">
-            <i class="fa-solid fa-list-check"></i> Con Historial
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Modal de confirmación para Word de Inventario -->
-    <div *ngIf="mostrarModalWord" class="modal-overlay" (click)="cancelarWord()">
-      <div class="modal-content-pdf" (click)="$event.stopPropagation()">
-        <div class="modal-header-pdf">
-          <h3><i class="fa-solid fa-file-word"></i> Exportar Inventario a Word</h3>
-          <button class="btn-cerrar-modal" (click)="cancelarWord()">
-            <i class="fa-solid fa-times"></i>
-          </button>
-        </div>
-        <div class="modal-body-pdf">
-          <p class="pregunta-modal">¿Cómo deseas exportar el inventario?</p>
-          <div class="opciones-exportacion">
-            <div class="opcion-item">
-              <i class="fa-solid fa-list-check"></i>
-              <div class="opcion-info">
-                <strong>Con Historial Completo</strong>
-                <span>Incluye todas las entradas y salidas detalladas de cada producto</span>
-              </div>
-            </div>
-            <div class="opcion-item">
-              <i class="fa-solid fa-table"></i>
-              <div class="opcion-info">
-                <strong>Datos Resumidos</strong>
-                <span>Solo tabla resumida con totales de entradas y salidas</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer-pdf">
-          <button class="btn-modal btn-cancelar" (click)="cancelarWord()">
-            <i class="fa-solid fa-times"></i> Cancelar
-          </button>
-          <button class="btn-modal btn-sin-historial" (click)="confirmarWordSinHistorial()">
-            <i class="fa-solid fa-table"></i> Sin Historial
-          </button>
-          <button class="btn-modal btn-con-historial" (click)="confirmarWordConHistorial()">
-            <i class="fa-solid fa-list-check"></i> Con Historial
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Tabla de resultados - Productos -->
-    <div *ngIf="tipoInforme !== 'inventario'" class="tabla-resultados">
-      <table>
-        <thead>
-          <tr>
-            <th *ngFor="let col of currentColumns" [ngClass]="getColumnAlignment(col)">{{ col.label }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let item of datosFiltrados">
-            <td *ngFor="let col of currentColumns" [ngClass]="getColumnAlignment(col)">
-              <ng-container [ngSwitch]="col.type">
-                <span *ngSwitchCase="'badge'" [class]="getBadgeClass(col, item)">
-                  {{ getCellDisplayValue(col, item) }}
-                </span>
-                <span *ngSwitchDefault>
-                  {{ getCellDisplayValue(col, item) }}
-                </span>
-              </ng-container>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Tabla de resultados - Inventario -->
-    <div *ngIf="tipoInforme === 'inventario'" class="tabla-resultados">
-      <table>
-        <thead>
-          <tr>
-            <th *ngFor="let col of currentColumns" [ngClass]="getColumnAlignment(col)">
-              {{ col.label }}
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <ng-container *ngFor="let item of datosFiltrados">
-            <!-- Fila principal del producto -->
-            <tr class="producto-row">
-              <td *ngFor="let col of currentColumns" [ngClass]="getColumnAlignment(col)">
-                <ng-container [ngSwitch]="col.type">
-                  <ng-container *ngSwitchCase="'text'">
-                    <strong *ngIf="col.key === 'name'" class="inventory-primary clickable-product"
-                            (click)="abrirModalDetalleProducto(item)"
-                            title="Click para ver detalles completos">
-                      {{ getCellDisplayValue(col, item) }} <i class="fa-solid fa-up-right-from-square"></i>
-                    </strong>
-                    <span *ngIf="col.key !== 'name'">
-                      {{ getCellDisplayValue(col, item) }}
-                    </span>
-                  </ng-container>
-                  <span *ngSwitchCase="'badge'" [class]="getBadgeClass(col, item)">
-                    {{ getCellDisplayValue(col, item) }}
-                  </span>
-                  <button
-                    *ngSwitchCase="'detailToggle'"
-                    class="btn-historial"
-                    (click)="toggleHistorial(item.product_id, 'all')"
-                    [title]="isHistorialExpandido(item.product_id, 'all') ? 'Ocultar lotes' : 'Ver lotes'">
-                    <i class="fa-solid"
-                      [class.fa-chevron-down]="!isHistorialExpandido(item.product_id, 'all')"
-                      [class.fa-chevron-up]="isHistorialExpandido(item.product_id, 'all')"></i>
-                    Ver Lotes ({{ getCellDisplayValue(col, item) }})
-                  </button>
-                  <span *ngSwitchDefault>
-                    {{ getCellDisplayValue(col, item) }}
-                  </span>
-                </ng-container>
-              </td>
-            </tr>
-            <!-- Fila expandible con lotes -->
-            <tr *ngIf="isHistorialExpandido(item.product_id, 'all') && item.lotes" class="lotes-row">
-              <td [attr.colspan]="currentColumns.length" class="lotes-container">
-                <div class="lotes-content">
-                  <h4><i class="fa-solid fa-boxes"></i> Lotes del Producto</h4>
-                  <table class="lotes-table">
-                    <thead>
-                      <tr>
-                        <th>Lote</th>
-                        <th>Entradas</th>
-                        <th>Salidas</th>
-                        <th>Stock</th>
-                        <th>Fecha Entrada</th>
-                        <th>Historial</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr *ngFor="let lote of item.lotes">
-                        <td><strong>{{ lote.batch }}</strong></td>
-                        <td><strong>{{ lote.entradas }}</strong></td>
-                        <td><strong>{{ lote.salidas }}</strong></td>
-                        <td><strong>{{ lote.stock }}</strong></td>
-                        <td>{{ formatearFecha(lote.fecha) }}</td>
-                        <td>
-                          <button
-                            class="btn-historial-small"
-                            (click)="toggleHistorial(item.product_id, lote.batch)"
-                            [title]="isHistorialExpandido(item.product_id, lote.batch) ? 'Ocultar historial' : 'Ver historial'">
-                            <i class="fa-solid"
-                               [class.fa-chevron-down]="!isHistorialExpandido(item.product_id, lote.batch)"
-                               [class.fa-chevron-up]="isHistorialExpandido(item.product_id, lote.batch)"></i>
-                            Historial
-                          </button>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-
-                  <!-- Historial detallado de cada lote -->
-                  <ng-container *ngFor="let lote of item.lotes">
-                    <div *ngIf="isHistorialExpandido(item.product_id, lote.batch)" class="historial-lote">
-                      <h5>Historial del Lote: {{ lote.batch }}</h5>
-                      <div class="historial-content">
-                        <!-- Entradas -->
-                        <div class="historial-section" *ngIf="lote.historialEntradas && lote.historialEntradas.length > 0">
-                          <h6><i class="fa-solid fa-arrow-down"></i> Entradas (Total: {{ lote.entradas }})</h6>
-                          <table class="historial-table">
-                            <thead>
-                              <tr>
-                                <th>Fecha</th>
-                                <th>Cantidad</th>
-                                <th>Proveedor</th>
-                                <th>Usuario</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              <tr *ngFor="let entrada of lote.historialEntradas">
-                                <td>{{ formatearFecha(entrada.fecha) }}</td>
-                                <td><strong>{{ entrada.cantidad }}</strong></td>
-                                <td>{{ entrada.proveedor }}</td>
-                                <td>{{ entrada.usuario }}</td>
-                              </tr>
-                            </tbody>
-                          </table>
-                        </div>
-
-                        <!-- Salidas -->
-                        <div class="historial-section" *ngIf="lote.historialSalidas && lote.historialSalidas.length > 0">
-                          <h6><i class="fa-solid fa-arrow-up"></i> Salidas (Total: {{ lote.salidas }})</h6>
-                          <table class="historial-table">
-                            <thead>
-                              <tr>
-                                <th>Fecha</th>
-                                <th>Cantidad</th>
-                                <th>Motivo</th>
-                                <th>Usuario</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              <tr *ngFor="let salida of lote.historialSalidas">
-                                <td>{{ formatearFecha(salida.fecha) }}</td>
-                                <td><strong>{{ salida.cantidad }}</strong></td>
-                                <td>{{ salida.motivo }}</td>
-                                <td>{{ salida.usuario }}</td>
-                              </tr>
-                            </tbody>
-                          </table>
-                        </div>
-
-                        <div *ngIf="(!lote.historialEntradas || lote.historialEntradas.length === 0) && (!lote.historialSalidas || lote.historialSalidas.length === 0)" class="text-center">
-                          <p>No hay movimientos registrados para este lote</p>
-                        </div>
-                      </div>
-                    </div>
-                  </ng-container>
+            <div class="modal-body-pdf">
+              <p class="pregunta-modal">¿Cómo deseas exportar el inventario?</p>
+              <div class="opciones-exportacion">
+                <div class="opcion-item">
+                  <i class="fa-solid fa-list-check"></i>
+                  <div class="opcion-info">
+                    <strong>Con Historial Completo</strong>
+                    <span>Incluye todas las entradas y salidas detalladas de cada producto</span>
+                  </div>
                 </div>
-              </td>
-            </tr>
-          </ng-container>
-        </tbody>
-      </table>
+                <div class="opcion-item">
+                  <i class="fa-solid fa-table"></i>
+                  <div class="opcion-info">
+                    <strong>Datos Resumidos</strong>
+                    <span>Solo tabla resumida con totales de entradas y salidas</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer-pdf">
+              <button class="btn-modal btn-cancelar" (click)="cancelarPDF()">
+                <i class="fa-solid fa-times"></i> Cancelar
+              </button>
+              <button class="btn-modal btn-sin-historial" (click)="confirmarPDFSinHistorial()">
+                <i class="fa-solid fa-table"></i> Sin Historial
+              </button>
+              <button class="btn-modal btn-con-historial" (click)="confirmarPDFConHistorial()">
+                <i class="fa-solid fa-list-check"></i> Con Historial
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+      <!-- Modal de confirmación para Excel de Inventario -->
+      @if (mostrarModalExcel) {
+        <div class="modal-overlay" (click)="cancelarExcel()">
+          <div class="modal-content-pdf" (click)="$event.stopPropagation()">
+            <div class="modal-header-pdf">
+              <h3><i class="fa-solid fa-file-excel"></i> Exportar Inventario a Excel</h3>
+              <button class="btn-cerrar-modal" (click)="cancelarExcel()">
+                <i class="fa-solid fa-times"></i>
+              </button>
+            </div>
+            <div class="modal-body-pdf">
+              <p class="pregunta-modal">¿Cómo deseas exportar el inventario?</p>
+              <div class="opciones-exportacion">
+                <div class="opcion-item">
+                  <i class="fa-solid fa-list-check"></i>
+                  <div class="opcion-info">
+                    <strong>Con Historial Completo</strong>
+                    <span>Incluye todas las entradas y salidas detalladas de cada producto</span>
+                  </div>
+                </div>
+                <div class="opcion-item">
+                  <i class="fa-solid fa-table"></i>
+                  <div class="opcion-info">
+                    <strong>Datos Resumidos</strong>
+                    <span>Solo tabla resumida con totales de entradas y salidas</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer-pdf">
+              <button class="btn-modal btn-cancelar" (click)="cancelarExcel()">
+                <i class="fa-solid fa-times"></i> Cancelar
+              </button>
+              <button class="btn-modal btn-sin-historial" (click)="confirmarExcelSinHistorial()">
+                <i class="fa-solid fa-table"></i> Sin Historial
+              </button>
+              <button class="btn-modal btn-con-historial" (click)="confirmarExcelConHistorial()">
+                <i class="fa-solid fa-list-check"></i> Con Historial
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+      <!-- Modal de confirmación para Word de Inventario -->
+      @if (mostrarModalWord) {
+        <div class="modal-overlay" (click)="cancelarWord()">
+          <div class="modal-content-pdf" (click)="$event.stopPropagation()">
+            <div class="modal-header-pdf">
+              <h3><i class="fa-solid fa-file-word"></i> Exportar Inventario a Word</h3>
+              <button class="btn-cerrar-modal" (click)="cancelarWord()">
+                <i class="fa-solid fa-times"></i>
+              </button>
+            </div>
+            <div class="modal-body-pdf">
+              <p class="pregunta-modal">¿Cómo deseas exportar el inventario?</p>
+              <div class="opciones-exportacion">
+                <div class="opcion-item">
+                  <i class="fa-solid fa-list-check"></i>
+                  <div class="opcion-info">
+                    <strong>Con Historial Completo</strong>
+                    <span>Incluye todas las entradas y salidas detalladas de cada producto</span>
+                  </div>
+                </div>
+                <div class="opcion-item">
+                  <i class="fa-solid fa-table"></i>
+                  <div class="opcion-info">
+                    <strong>Datos Resumidos</strong>
+                    <span>Solo tabla resumida con totales de entradas y salidas</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer-pdf">
+              <button class="btn-modal btn-cancelar" (click)="cancelarWord()">
+                <i class="fa-solid fa-times"></i> Cancelar
+              </button>
+              <button class="btn-modal btn-sin-historial" (click)="confirmarWordSinHistorial()">
+                <i class="fa-solid fa-table"></i> Sin Historial
+              </button>
+              <button class="btn-modal btn-con-historial" (click)="confirmarWordConHistorial()">
+                <i class="fa-solid fa-list-check"></i> Con Historial
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+      <!-- Tabla de resultados - Productos -->
+      @if (tipoInforme !== 'inventario') {
+        <div class="tabla-resultados">
+          <table>
+            <thead>
+              <tr>
+                @for (col of currentColumns; track col) {
+                  <th [ngClass]="getColumnAlignment(col)">{{ col.label }}</th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of datosFiltrados; track item) {
+                <tr>
+                  @for (col of currentColumns; track col) {
+                    <td [ngClass]="getColumnAlignment(col)">
+                      @switch (col.type) {
+                        @case ('badge') {
+                          <span [class]="getBadgeClass(col, item)">
+                            {{ getCellDisplayValue(col, item) }}
+                          </span>
+                        }
+                        @default {
+                          <span>
+                            {{ getCellDisplayValue(col, item) }}
+                          </span>
+                        }
+                      }
+                    </td>
+                  }
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+      <!-- Tabla de resultados - Inventario -->
+      @if (tipoInforme === 'inventario') {
+        <div class="tabla-resultados">
+          <table>
+            <thead>
+              <tr>
+                @for (col of currentColumns; track col) {
+                  <th [ngClass]="getColumnAlignment(col)">
+                    {{ col.label }}
+                  </th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of datosFiltrados; track item) {
+                <!-- Fila principal del producto -->
+                <tr class="producto-row">
+                  @for (col of currentColumns; track col) {
+                    <td [ngClass]="getColumnAlignment(col)">
+                      @switch (col.type) {
+                        @case ('text') {
+                          @if (col.key === 'name') {
+                            <strong class="inventory-primary clickable-product"
+                              (click)="abrirModalDetalleProducto(item)"
+                              title="Click para ver detalles completos">
+                              {{ getCellDisplayValue(col, item) }} <i class="fa-solid fa-up-right-from-square"></i>
+                            </strong>
+                          }
+                          @if (col.key !== 'name') {
+                            <span>
+                              {{ getCellDisplayValue(col, item) }}
+                            </span>
+                          }
+                        }
+                        @case ('badge') {
+                          <span [class]="getBadgeClass(col, item)">
+                            {{ getCellDisplayValue(col, item) }}
+                          </span>
+                        }
+                        @case ('detailToggle') {
+                          <button
+                            class="btn-historial"
+                            (click)="toggleHistorial(item.product_id, 'all')"
+                            [title]="isHistorialExpandido(item.product_id, 'all') ? 'Ocultar lotes' : 'Ver lotes'">
+                            <i class="fa-solid"
+                              [class.fa-chevron-down]="!isHistorialExpandido(item.product_id, 'all')"
+                            [class.fa-chevron-up]="isHistorialExpandido(item.product_id, 'all')"></i>
+                            Ver Lotes ({{ getCellDisplayValue(col, item) }})
+                          </button>
+                        }
+                        @default {
+                          <span>
+                            {{ getCellDisplayValue(col, item) }}
+                          </span>
+                        }
+                      }
+                    </td>
+                  }
+                </tr>
+                <!-- Fila expandible con lotes -->
+                @if (isHistorialExpandido(item.product_id, 'all') && item.lotes) {
+                  <tr class="lotes-row">
+                    <td [attr.colspan]="currentColumns.length" class="lotes-container">
+                      <div class="lotes-content">
+                        <h4><i class="fa-solid fa-boxes"></i> Lotes del Producto</h4>
+                        <table class="lotes-table">
+                          <thead>
+                            <tr>
+                              <th>Lote</th>
+                              <th>Entradas</th>
+                              <th>Salidas</th>
+                              <th>Stock</th>
+                              <th>Fecha Entrada</th>
+                              <th>Historial</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            @for (lote of item.lotes; track lote) {
+                              <tr>
+                                <td><strong>{{ lote.batch }}</strong></td>
+                                <td><strong>{{ lote.entradas }}</strong></td>
+                                <td><strong>{{ lote.salidas }}</strong></td>
+                                <td><strong>{{ lote.stock }}</strong></td>
+                                <td>{{ formatearFecha(lote.fecha) }}</td>
+                                <td>
+                                  <button
+                                    class="btn-historial-small"
+                                    (click)="toggleHistorial(item.product_id, lote.batch)"
+                                    [title]="isHistorialExpandido(item.product_id, lote.batch) ? 'Ocultar historial' : 'Ver historial'">
+                                    <i class="fa-solid"
+                                      [class.fa-chevron-down]="!isHistorialExpandido(item.product_id, lote.batch)"
+                                    [class.fa-chevron-up]="isHistorialExpandido(item.product_id, lote.batch)"></i>
+                                    Historial
+                                  </button>
+                                </td>
+                              </tr>
+                            }
+                          </tbody>
+                        </table>
+                        <!-- Historial detallado de cada lote -->
+                        @for (lote of item.lotes; track lote) {
+                          @if (isHistorialExpandido(item.product_id, lote.batch)) {
+                            <div class="historial-lote">
+                              <h5>Historial del Lote: {{ lote.batch }}</h5>
+                              <div class="historial-content">
+                                <!-- Entradas -->
+                                @if (lote.historialEntradas && lote.historialEntradas.length > 0) {
+                                  <div class="historial-section">
+                                    <h6><i class="fa-solid fa-arrow-down"></i> Entradas (Total: {{ lote.entradas }})</h6>
+                                    <table class="historial-table">
+                                      <thead>
+                                        <tr>
+                                          <th>Fecha</th>
+                                          <th>Cantidad</th>
+                                          <th>Proveedor</th>
+                                          <th>Usuario</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        @for (entrada of lote.historialEntradas; track entrada) {
+                                          <tr>
+                                            <td>{{ formatearFecha(entrada.fecha) }}</td>
+                                            <td><strong>{{ entrada.cantidad }}</strong></td>
+                                            <td>{{ entrada.proveedor }}</td>
+                                            <td>{{ entrada.usuario }}</td>
+                                          </tr>
+                                        }
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                }
+                                <!-- Salidas -->
+                                @if (lote.historialSalidas && lote.historialSalidas.length > 0) {
+                                  <div class="historial-section">
+                                    <h6><i class="fa-solid fa-arrow-up"></i> Salidas (Total: {{ lote.salidas }})</h6>
+                                    <table class="historial-table">
+                                      <thead>
+                                        <tr>
+                                          <th>Fecha</th>
+                                          <th>Cantidad</th>
+                                          <th>Motivo</th>
+                                          <th>Usuario</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        @for (salida of lote.historialSalidas; track salida) {
+                                          <tr>
+                                            <td>{{ formatearFecha(salida.fecha) }}</td>
+                                            <td><strong>{{ salida.cantidad }}</strong></td>
+                                            <td>{{ salida.motivo }}</td>
+                                            <td>{{ salida.usuario }}</td>
+                                          </tr>
+                                        }
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                }
+                                @if ((!lote.historialEntradas || lote.historialEntradas.length === 0) && (!lote.historialSalidas || lote.historialSalidas.length === 0)) {
+                                  <div class="text-center">
+                                    <p>No hay movimientos registrados para este lote</p>
+                                  </div>
+                                }
+                              </div>
+                            </div>
+                          }
+                        }
+                      </div>
+                    </td>
+                  </tr>
+                }
+              }
+            </tbody>
+          </table>
+        </div>
+      }
     </div>
-  </div>
+  }
 
   <!-- Mensaje cuando no hay datos -->
-  <div class="sin-resultados" *ngIf="!loading && datos.length === 0 && datosFiltrados.length === 0">
-    <i class="fa-solid fa-inbox"></i>
-    <p>No hay datos para mostrar. Genera un informe para comenzar.</p>
-  </div>
+  @if (!loading && datos.length === 0 && datosFiltrados.length === 0) {
+    <div class="sin-resultados">
+      <i class="fa-solid fa-inbox"></i>
+      <p>No hay datos para mostrar. Genera un informe para comenzar.</p>
+    </div>
+  }
 
   <!-- Modal de Detalles del Producto -->
-  <div *ngIf="mostrarModalDetalleProducto && productoSeleccionado" class="modal-overlay" (click)="cerrarModalDetalleProducto()">
-    <div class="modal-detalle-producto" (click)="$event.stopPropagation()">
-      <div class="modal-detalle-header">
-        <h3><i class="fa-solid fa-box-open"></i> {{ productoSeleccionado.name }}</h3>
-        <button class="btn-cerrar-modal" (click)="cerrarModalDetalleProducto()">
-          <i class="fa-solid fa-times"></i>
-        </button>
-      </div>
-
-      <div class="modal-detalle-body">
-        <!-- Información General -->
-        <div class="detalle-section">
-          <h4><i class="fa-solid fa-info-circle"></i> Información General</h4>
-          <div class="detalle-grid">
-            <div class="detalle-item">
-              <span class="detalle-label">Stock Total:</span>
-              <span class="detalle-value">{{ productoSeleccionado.stock || 0 }} unidades</span>
-            </div>
-            <div class="detalle-item">
-              <span class="detalle-label">Stock Mínimo:</span>
-              <span class="detalle-value">{{ productoSeleccionado.min_stock || 0 }} unidades</span>
-            </div>
-            <div class="detalle-item">
-              <span class="detalle-label">Ubicación:</span>
-              <span class="detalle-value">{{ productoSeleccionado.ubicacion_interna || 'N/A' }}</span>
-            </div>
-            <div class="detalle-item">
-              <span class="detalle-label">Estado:</span>
-              <span class="detalle-value" [ngClass]="{'estado-critico': productoSeleccionado.estado === 'Crítico', 'estado-normal': productoSeleccionado.estado === 'Normal'}">
-                {{ productoSeleccionado.estado || 'Normal' }}
-              </span>
-            </div>
-          </div>
+  @if (mostrarModalDetalleProducto && productoSeleccionado) {
+    <div class="modal-overlay" (click)="cerrarModalDetalleProducto()">
+      <div class="modal-detalle-producto" (click)="$event.stopPropagation()">
+        <div class="modal-detalle-header">
+          <h3><i class="fa-solid fa-box-open"></i> {{ productoSeleccionado.name }}</h3>
+          <button class="btn-cerrar-modal" (click)="cerrarModalDetalleProducto()">
+            <i class="fa-solid fa-times"></i>
+          </button>
         </div>
-
-        <!-- Lotes Disponibles -->
-        <div class="detalle-section" *ngIf="productoSeleccionado.lotes && productoSeleccionado.lotes.length > 0">
-          <h4><i class="fa-solid fa-layer-group"></i> Lotes Disponibles ({{ productoSeleccionado.lotes.length }})</h4>
-          <div class="lotes-grid">
-            <div class="lote-card" *ngFor="let lote of productoSeleccionado.lotes">
-              <div class="lote-header">
-                <span class="lote-batch">{{ lote.batch || 'Sin lote' }}</span>
-                <span class="lote-stock" [ngClass]="{'stock-bajo': lote.stock <= productoSeleccionado.min_stock}">
-                  {{ lote.stock }} unidades
+        <div class="modal-detalle-body">
+          <!-- Información General -->
+          <div class="detalle-section">
+            <h4><i class="fa-solid fa-info-circle"></i> Información General</h4>
+            <div class="detalle-grid">
+              <div class="detalle-item">
+                <span class="detalle-label">Stock Total:</span>
+                <span class="detalle-value">{{ productoSeleccionado.stock || 0 }} unidades</span>
+              </div>
+              <div class="detalle-item">
+                <span class="detalle-label">Stock Mínimo:</span>
+                <span class="detalle-value">{{ productoSeleccionado.min_stock || 0 }} unidades</span>
+              </div>
+              <div class="detalle-item">
+                <span class="detalle-label">Ubicación:</span>
+                <span class="detalle-value">{{ productoSeleccionado.ubicacion_interna || 'N/A' }}</span>
+              </div>
+              <div class="detalle-item">
+                <span class="detalle-label">Estado:</span>
+                <span class="detalle-value" [ngClass]="{'estado-critico': productoSeleccionado.estado === 'Crítico', 'estado-normal': productoSeleccionado.estado === 'Normal'}">
+                  {{ productoSeleccionado.estado || 'Normal' }}
                 </span>
               </div>
-              <div class="lote-info">
-                <div><strong>Entradas:</strong> {{ lote.entradas }}</div>
-                <div><strong>Salidas:</strong> {{ lote.salidas }}</div>
-                <div><strong>Última actualización:</strong> {{ formatearFecha(lote.fecha) }}</div>
-              </div>
             </div>
           </div>
-        </div>
-
-        <!-- Historial Completo -->
-        <div class="detalle-section">
-          <h4><i class="fa-solid fa-clock-rotate-left"></i> Historial de Movimientos</h4>
-          <div class="historial-completo">
-            <ng-container *ngFor="let lote of productoSeleccionado.lotes">
-              <div class="lote-historial-section" *ngIf="lote.historial && lote.historial.length > 0">
-                <h5>Lote: {{ lote.batch || 'Sin lote' }}</h5>
-                <table class="tabla-historial-modal">
-                  <thead>
-                    <tr>
-                      <th>Tipo</th>
-                      <th>Cantidad</th>
-                      <th>Fecha</th>
-                      <th>Usuario</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr *ngFor="let h of lote.historial" [ngClass]="{'entrada-row': h.type === 'entry', 'salida-row': h.type === 'output'}">
-                      <td>
-                        <span class="badge-tipo" [ngClass]="{'badge-entrada': h.type === 'entry', 'badge-salida': h.type === 'output'}">
-                          {{ h.type === 'entry' ? '📥 Entrada' : '📤 Salida' }}
-                        </span>
-                      </td>
-                      <td class="cantidad">{{ h.quantity || 0 }}</td>
-                      <td>{{ formatearFecha(h.date) }}</td>
-                      <td>{{ h.user || 'N/A' }}</td>
-                    </tr>
-                  </tbody>
-                </table>
+          <!-- Lotes Disponibles -->
+          @if (productoSeleccionado.lotes && productoSeleccionado.lotes.length > 0) {
+            <div class="detalle-section">
+              <h4><i class="fa-solid fa-layer-group"></i> Lotes Disponibles ({{ productoSeleccionado.lotes.length }})</h4>
+              <div class="lotes-grid">
+                @for (lote of productoSeleccionado.lotes; track lote) {
+                  <div class="lote-card">
+                    <div class="lote-header">
+                      <span class="lote-batch">{{ lote.batch || 'Sin lote' }}</span>
+                      <span class="lote-stock" [ngClass]="{'stock-bajo': lote.stock <= productoSeleccionado.min_stock}">
+                        {{ lote.stock }} unidades
+                      </span>
+                    </div>
+                    <div class="lote-info">
+                      <div><strong>Entradas:</strong> {{ lote.entradas }}</div>
+                      <div><strong>Salidas:</strong> {{ lote.salidas }}</div>
+                      <div><strong>Última actualización:</strong> {{ formatearFecha(lote.fecha) }}</div>
+                    </div>
+                  </div>
+                }
               </div>
-            </ng-container>
-            <p *ngIf="!productoSeleccionado.lotes || productoSeleccionado.lotes.length === 0 || !tieneHistorial(productoSeleccionado)" class="sin-historial">
-              No hay historial de movimientos disponible.
-            </p>
+            </div>
+          }
+          <!-- Historial Completo -->
+          <div class="detalle-section">
+            <h4><i class="fa-solid fa-clock-rotate-left"></i> Historial de Movimientos</h4>
+            <div class="historial-completo">
+              @for (lote of productoSeleccionado.lotes; track lote) {
+                @if (lote.historial && lote.historial.length > 0) {
+                  <div class="lote-historial-section">
+                    <h5>Lote: {{ lote.batch || 'Sin lote' }}</h5>
+                    <table class="tabla-historial-modal">
+                      <thead>
+                        <tr>
+                          <th>Tipo</th>
+                          <th>Cantidad</th>
+                          <th>Fecha</th>
+                          <th>Usuario</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (h of lote.historial; track h) {
+                          <tr [ngClass]="{'entrada-row': h.type === 'entry', 'salida-row': h.type === 'output'}">
+                            <td>
+                              <span class="badge-tipo" [ngClass]="{'badge-entrada': h.type === 'entry', 'badge-salida': h.type === 'output'}">
+                                {{ h.type === 'entry' ? '📥 Entrada' : '📤 Salida' }}
+                              </span>
+                            </td>
+                            <td class="cantidad">{{ h.quantity || 0 }}</td>
+                            <td>{{ formatearFecha(h.date) }}</td>
+                            <td>{{ h.user || 'N/A' }}</td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                }
+              }
+              @if (!productoSeleccionado.lotes || productoSeleccionado.lotes.length === 0 || !tieneHistorial(productoSeleccionado)) {
+                <p class="sin-historial">
+                  No hay historial de movimientos disponible.
+                </p>
+              }
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  }
 </div>
 

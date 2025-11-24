@@ -1,6 +1,6 @@
 // Angular 19 - ProveedoresComponent
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 
 // Servicios e interfaces
@@ -17,7 +17,7 @@ import { ProductosService } from '../../../services/productos/products.service';
 @Component({
   selector: 'app-proveedores',
   standalone: true,
-  imports: [CommonModule, FormsModule, ProductSuppliersComponent, AsociarProductoComponent, CrearProveedorComponent, EditarProveedorComponent],
+  imports: [FormsModule, ProductSuppliersComponent, AsociarProductoComponent, CrearProveedorComponent, EditarProveedorComponent],
   templateUrl: './proveedores.component.html',
   styleUrls: ['./proveedores.component.css']
 })

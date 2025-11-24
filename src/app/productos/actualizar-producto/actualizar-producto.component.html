@@ -3,122 +3,114 @@
   <div class="modal">
     <h2>Actualizar Producto</h2>
 
-    <form *ngIf="producto" #formProducto="ngForm" (ngSubmit)="guardarCambios()">
-
-      <!-- Nombre -->
-      <div class="form-group">
-        <label for="name">Nombre</label>
-        <input
-          type="text"
-          id="name"
-          name="name"
-          [(ngModel)]="producto.name"
-          required
-        />
-      </div>
-
-      <!-- Unidad de medida -->
-      <div class="form-group">
-        <label for="unit_measurement">Unidad de medida</label>
-        <input
-          type="text"
-          id="unit_measurement"
-          name="unit_measurement"
-          [(ngModel)]="producto.unit_measurement"
-        />
-      </div>
-
-      <!-- Lote -->
-      <div class="form-group">
-        <label for="batch">Lote</label>
-        <input
-          type="text"
-          id="batch"
-          name="batch"
-          [(ngModel)]="producto.batch"
-          required
-        />
-      </div>
-
-      <!-- Fecha de expiración -->
-      <div class="form-group">
-        <label for="expiration_date">Fecha de expiración</label>
-        <input
-          type="date"
-          id="expiration_date"
-          name="expiration_date"
-          [(ngModel)]="producto.expiration_date"
-        />
-      </div>
-
-      <!-- Código de Barras -->
-      <div class="form-group">
-        <label for="codigo_de_barras"><i class="fa-solid fa-barcode"></i> Código de Barras</label>
-        <input
-          type="text"
-          id="codigo_de_barras"
-          name="codigo_de_barras"
-          [(ngModel)]="producto.codigo_de_barras"
-          placeholder="Ej: 7703038010067"
-        />
-        <small style="display: block; margin-top: 0.5rem; color: #9ca3af; font-size: 0.875rem;">
-          💡 Este código se usa para escanear el producto al registrar entradas/salidas
-        </small>
-      </div>
-
-      <!-- Categoría -->
-      <div class="form-group">
-        <label for="category_id">Categoría</label>
-        <input
-          type="number"
-          id="category_id"
-          name="category_id"
-          [(ngModel)]="producto.category_id"
-        />
-      </div>
-
-      <div class="form-group full">
-        <label for="image">Imagen</label>
-
-        <!-- Mostrar imagen actual si existe -->
-        <div class="imagen-actual-container" *ngIf="producto.image_url && !eliminarImagen">
-          <img [src]="producto.image_url" alt="Imagen actual" class="imagen-actual" />
-          <button type="button" class="btn-eliminar-imagen" (click)="eliminarImagenActual()">
-            <i class="fa-solid fa-trash"></i> Eliminar Imagen
-          </button>
-        </div>
-
-        <!-- Mostrar mensaje si se va a eliminar -->
-        <div class="imagen-eliminada-mensaje" *ngIf="eliminarImagen">
-          <i class="fa-solid fa-info-circle"></i>
-          <span>La imagen se eliminará al guardar los cambios</span>
-          <button type="button" class="btn-restaurar-imagen" (click)="restaurarImagen()">
-            <i class="fa-solid fa-undo"></i> Restaurar
-          </button>
-        </div>
-
-        <!-- Input para nueva imagen -->
-        <input
-          type="file"
-          id="image"
-          name="image"
-          (change)="onImagenSeleccionada($event)"
-          accept="image/*"
-          class="input-imagen"
-        />
-        <small style="display: block; margin-top: 0.5rem; color: #9ca3af; font-size: 0.875rem;">
-          💡 Selecciona una nueva imagen para reemplazar la actual
-        </small>
-      </div>
-
-
-
-      <!-- Botones -->
-      <div class="modal-buttons">
-        <button type="submit" [disabled]="!producto || !producto.id || !producto.name || !producto.batch">Guardar</button>
-        <button type="button" (click)="cancelar.emit()">Cancelar</button>
-      </div>
-
-    </form>
-  </div>
-</div>
+    @if (producto) {
+      <form #formProducto="ngForm" (ngSubmit)="guardarCambios()">
+        <!-- Nombre -->
+        <div class="form-group">
+          <label for="name">Nombre</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            [(ngModel)]="producto.name"
+            required
+            />
+          </div>
+          <!-- Unidad de medida -->
+          <div class="form-group">
+            <label for="unit_measurement">Unidad de medida</label>
+            <input
+              type="text"
+              id="unit_measurement"
+              name="unit_measurement"
+              [(ngModel)]="producto.unit_measurement"
+              />
+            </div>
+            <!-- Lote -->
+            <div class="form-group">
+              <label for="batch">Lote</label>
+              <input
+                type="text"
+                id="batch"
+                name="batch"
+                [(ngModel)]="producto.batch"
+                required
+                />
+              </div>
+              <!-- Fecha de expiración -->
+              <div class="form-group">
+                <label for="expiration_date">Fecha de expiración</label>
+                <input
+                  type="date"
+                  id="expiration_date"
+                  name="expiration_date"
+                  [(ngModel)]="producto.expiration_date"
+                  />
+                </div>
+                <!-- Código de Barras -->
+                <div class="form-group">
+                  <label for="codigo_de_barras"><i class="fa-solid fa-barcode"></i> Código de Barras</label>
+                  <input
+                    type="text"
+                    id="codigo_de_barras"
+                    name="codigo_de_barras"
+                    [(ngModel)]="producto.codigo_de_barras"
+                    placeholder="Ej: 7703038010067"
+                    />
+                    <small style="display: block; margin-top: 0.5rem; color: #9ca3af; font-size: 0.875rem;">
+                      💡 Este código se usa para escanear el producto al registrar entradas/salidas
+                    </small>
+                  </div>
+                  <!-- Categoría -->
+                  <div class="form-group">
+                    <label for="category_id">Categoría</label>
+                    <input
+                      type="number"
+                      id="category_id"
+                      name="category_id"
+                      [(ngModel)]="producto.category_id"
+                      />
+                    </div>
+                    <div class="form-group full">
+                      <label for="image">Imagen</label>
+                      <!-- Mostrar imagen actual si existe -->
+                      @if (producto.image_url && !eliminarImagen) {
+                        <div class="imagen-actual-container">
+                          <img [src]="producto.image_url" alt="Imagen actual" class="imagen-actual" />
+                          <button type="button" class="btn-eliminar-imagen" (click)="eliminarImagenActual()">
+                            <i class="fa-solid fa-trash"></i> Eliminar Imagen
+                          </button>
+                        </div>
+                      }
+                      <!-- Mostrar mensaje si se va a eliminar -->
+                      @if (eliminarImagen) {
+                        <div class="imagen-eliminada-mensaje">
+                          <i class="fa-solid fa-info-circle"></i>
+                          <span>La imagen se eliminará al guardar los cambios</span>
+                          <button type="button" class="btn-restaurar-imagen" (click)="restaurarImagen()">
+                            <i class="fa-solid fa-undo"></i> Restaurar
+                          </button>
+                        </div>
+                      }
+                      <!-- Input para nueva imagen -->
+                      <input
+                        type="file"
+                        id="image"
+                        name="image"
+                        (change)="onImagenSeleccionada($event)"
+                        accept="image/*"
+                        class="input-imagen"
+                        />
+                        <small style="display: block; margin-top: 0.5rem; color: #9ca3af; font-size: 0.875rem;">
+                          💡 Selecciona una nueva imagen para reemplazar la actual
+                        </small>
+                      </div>
+                      <!-- Botones -->
+                      <div class="modal-buttons">
+                        <button type="submit" [disabled]="!producto || !producto.id || !producto.name || !producto.batch">Guardar</button>
+                        <button type="button" (click)="cancelar.emit()">Cancelar</button>
+                      </div>
+                    </form>
+                  }
+                </div>
+              </div>

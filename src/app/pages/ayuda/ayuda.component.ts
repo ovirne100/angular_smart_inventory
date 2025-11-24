@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 
 @Component({
   selector: 'app-ayuda',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './ayuda.component.html',
   styleUrls: ['./ayuda.component.css']
 })

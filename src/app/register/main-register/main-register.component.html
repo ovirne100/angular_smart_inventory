@@ -15,50 +15,58 @@
   </div>
 
 
-<div class="right">
-  <h2>Regístrate</h2>
-  <!-- REGISTRO -->
-  <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" id="registroForm" autocomplete="off">
-  <div class="form-group">
-    <input type="text" formControlName="name" placeholder="Nombre" required />
-  </div>
+  <div class="right">
+    <h2>Regístrate</h2>
+    <!-- REGISTRO -->
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" id="registroForm" autocomplete="off">
+      <div class="form-group">
+        <input type="text" formControlName="name" placeholder="Nombre" required />
+      </div>
 
-  <div class="form-group">
-    <input type="text" formControlName="lastname" placeholder="Apellido" required />
-  </div>
+      <div class="form-group">
+        <input type="text" formControlName="lastname" placeholder="Apellido" required />
+      </div>
 
-  <div class="form-group">
-    <input type="email" formControlName="email" placeholder="Email" required />
-  </div>
+      <div class="form-group">
+        <input type="email" formControlName="email" placeholder="Email" required />
+      </div>
 
-  <div class="form-group">
-    <input type="password" formControlName="password" placeholder="Contraseña" required />
-  </div>
+      <div class="form-group">
+        <input type="password" formControlName="password" placeholder="Contraseña" required />
+      </div>
 
-  <div class="form-group">
-    <input type="password" formControlName="password_confirmation" placeholder="Confirmar contraseña" required />
-  </div>
+      <div class="form-group">
+        <input type="password" formControlName="password_confirmation" placeholder="Confirmar contraseña" required />
+      </div>
 
-  <!-- Select de roles -->
-  <div class="form-group">
-    <select formControlName="role_id" id="role">
-      <option value="">SELECCIONE UN ROL</option>
-      <option *ngIf="cargandoRoles" value="" disabled>Cargando roles...</option>
-      <option *ngFor="let rol of roles" [value]="rol.id">{{ rol.name }}</option>
-    </select>
-    <div *ngIf="errorRoles" class="error-mensaje-roles" style="color: red; font-size: 12px; margin-top: 5px;">
-      {{ errorRoles }}
+      <!-- Select de roles -->
+      <div class="form-group">
+        <select formControlName="role_id" id="role">
+          <option value="">SELECCIONE UN ROL</option>
+          @if (cargandoRoles) {
+            <option value="" disabled>Cargando roles...</option>
+          }
+          @for (rol of roles; track rol) {
+            <option [value]="rol.id">{{ rol.name }}</option>
+          }
+        </select>
+        @if (errorRoles) {
+          <div class="error-mensaje-roles" style="color: red; font-size: 12px; margin-top: 5px;">
+            {{ errorRoles }}
+          </div>
+        }
+      </div>
+
+      <div class="registro">
+        <button type="submit" class="ir">REGISTRARME</button>
+      </div>
+    </form>
+  </div>
+  <!-- Mensajes de error -->
+  @for (key of errorKeys; track key) {
+    <div>
+      <span class="error">{{ errors[key][0] }}</span>
     </div>
-  </div>
-
-  <div class="registro">
-      <button type="submit" class="ir">REGISTRARME</button>
-    </div>
-</form>
-</div>
-<!-- Mensajes de error -->
-<div *ngFor="let key of errorKeys">
-  <span class="error">{{ errors[key][0] }}</span>
-</div>
+  }
 
 

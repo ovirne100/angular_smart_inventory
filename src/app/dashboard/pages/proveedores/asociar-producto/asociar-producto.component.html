@@ -10,7 +10,9 @@
       <label>Producto</label>
       <select [(ngModel)]="nuevoProducto.product_id" name="producto" required (change)="onProductoSeleccionado()">
         <option [ngValue]="null">-- Selecciona --</option>
-        <option *ngFor="let p of productos" [ngValue]="p.id">{{ p.name }}</option>
+        @for (p of productos; track p) {
+          <option [ngValue]="p.id">{{ p.name }}</option>
+        }
       </select>
 
       <!-- Costo -->
@@ -20,30 +22,30 @@
         [(ngModel)]="nuevoProducto.unit_cost"
         name="unit_cost"
         required
-      />
+        />
 
-      <!-- Código de barras (solo lectura) -->
-      <label>Código de barras</label>
-      <input
-        type="text"
-        [(ngModel)]="nuevoProducto.supplier_reference"
-        name="supplier_reference"
-        readonly
-      />
+        <!-- Código de barras (solo lectura) -->
+        <label>Código de barras</label>
+        <input
+          type="text"
+          [(ngModel)]="nuevoProducto.supplier_reference"
+          name="supplier_reference"
+          readonly
+          />
 
-      <!-- Lote (solo lectura) -->
-      <label>Lote</label>
-      <input
-        type="text"
-        [(ngModel)]="nuevoProducto.batch"
-        name="batch"
-        readonly
-      />
+          <!-- Lote (solo lectura) -->
+          <label>Lote</label>
+          <input
+            type="text"
+            [(ngModel)]="nuevoProducto.batch"
+            name="batch"
+            readonly
+            />
 
-      <div class="modal-footer">
-        <button type="submit">Guardar</button>
-        <button type="button" (click)="cancelar.emit()">Cancelar</button>
+            <div class="modal-footer">
+              <button type="submit">Guardar</button>
+              <button type="button" (click)="cancelar.emit()">Cancelar</button>
+            </div>
+          </form>
+        </div>
       </div>
-    </form>
-  </div>
-</div>

@@ -7,235 +7,268 @@
     </button>
   </div>
 
-  <div class="messages" *ngIf="successMessage || errorMessage || warningMessage">
-    <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
-    <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
-    <div *ngIf="warningMessage" class="alert alert-warning">{{ warningMessage }}</div>
-  </div>
+  @if (successMessage || errorMessage || warningMessage) {
+    <div class="messages">
+      @if (successMessage) {
+        <div class="alert alert-success">{{ successMessage }}</div>
+      }
+      @if (errorMessage) {
+        <div class="alert alert-danger">{{ errorMessage }}</div>
+      }
+      @if (warningMessage) {
+        <div class="alert alert-warning">{{ warningMessage }}</div>
+      }
+    </div>
+  }
 
-  <form *ngIf="showForm" [formGroup]="entradaForm" (ngSubmit)="onSubmit()" class="form-box" novalidate>
-    <h3>📥 Registrar Nueva Entrada</h3>
-
-    <div class="form-group scanner-group">
-      <button type="button" (click)="toggleScanner()" class="btn-scanner" [class.active]="mostrarScanner">
-        <i class="fa-solid fa-barcode"></i>
-        {{ mostrarScanner ? 'Ocultar Escáner' : 'Escanear Código de Barras' }}
-      </button>
-
-      <div *ngIf="mostrarScanner" class="scanner-content">
-        <div class="scanner-input-container">
-          <input
-            type="text"
-            [(ngModel)]="codigoBarrasInput"
-            (keyup.enter)="buscarProductoPorCodigo()"
-            (input)="onCodigoInputChange()"
-            placeholder="Ingrese el código de barras manualmente"
-            class="scanner-input"
-            [disabled]="escaneando"
-            [ngModelOptions]="{standalone: true}"> <button
-            type="button"
-            (click)="buscarProductoPorCodigo()"
-            class="btn-buscar"
-            [disabled]="escaneando || !tieneCodigoValido()">
-            <i class="fa-solid fa-search" *ngIf="!escaneando"></i>
-            <i class="fa-solid fa-spinner fa-spin" *ngIf="escaneando"></i>
-            {{ escaneando ? 'Buscando...' : 'Buscar' }}
+  @if (showForm) {
+    <form [formGroup]="entradaForm" (ngSubmit)="onSubmit()" class="form-box" novalidate>
+      <h3>📥 Registrar Nueva Entrada</h3>
+      <div class="form-group scanner-group">
+        <button type="button" (click)="toggleScanner()" class="btn-scanner" [class.active]="mostrarScanner">
+          <i class="fa-solid fa-barcode"></i>
+          {{ mostrarScanner ? 'Ocultar Escáner' : 'Escanear Código de Barras' }}
+        </button>
+        @if (mostrarScanner) {
+          <div class="scanner-content">
+            <div class="scanner-input-container">
+              <input
+                type="text"
+                [(ngModel)]="codigoBarrasInput"
+                (keyup.enter)="buscarProductoPorCodigo()"
+                (input)="onCodigoInputChange()"
+                placeholder="Ingrese el código de barras manualmente"
+                class="scanner-input"
+                [disabled]="escaneando"
+                [ngModelOptions]="{standalone: true}"> <button
+                type="button"
+                (click)="buscarProductoPorCodigo()"
+                class="btn-buscar"
+                [disabled]="escaneando || !tieneCodigoValido()">
+                @if (!escaneando) {
+                  <i class="fa-solid fa-search"></i>
+                }
+                @if (escaneando) {
+                  <i class="fa-solid fa-spinner fa-spin"></i>
+                }
+                {{ escaneando ? 'Buscando...' : 'Buscar' }}
+              </button>
+            </div>
+            @if (scannerSupported) {
+              <div class="scanner-divider">
+                <span>O</span>
+              </div>
+            }
+            @if (scannerSupported) {
+              <div class="scanner-camera-section">
+                <button
+                  type="button"
+                  (click)="isScanning ? stopScanning() : startCameraScanning()"
+                  class="btn-camera"
+                  [class.scanning]="isScanning">
+                  <i class="fa-solid" [class.fa-camera]="!isScanning" [class.fa-stop]="isScanning"></i>
+                  {{ isScanning ? 'Detener Cámara' : 'Iniciar Cámara' }}
+                </button>
+                @if (isScanning) {
+                  <div #scannerContainer class="scanner-container">
+                    <div class="scan-area-overlay"></div>
+                  </div>
+                }
+              </div>
+            }
+            @if (!scannerSupported) {
+              <div class="scanner-warning">
+                <i class="fa-solid fa-exclamation-triangle"></i>
+                <span>El escáner de cámara no está disponible. Use el modo manual.</span>
+              </div>
+            }
+          </div>
+        }
+      </div>
+      <div class="form-group">
+        <label>Producto *</label>
+        <select formControlName="product_id" (change)="onProductoChange()">
+          <option value="">Seleccione un producto</option>
+          @for (p of productos; track p) {
+            <option [value]="p.id">{{ p.name }}</option>
+          }
+        </select>
+        @if (entradaForm.controls['product_id'].invalid && entradaForm.controls['product_id'].touched) {
+          <div class="error">
+            Selecciona un producto.
+          </div>
+        }
+      </div>
+      <div class="form-group">
+        <label>Cantidad *</label>
+        <input type="number" formControlName="quantity" placeholder="Ej: 50" min="1" />
+        @if (entradaForm.controls['quantity'].invalid && entradaForm.controls['quantity'].touched) {
+          <div class="error">
+            Ingresa una cantidad válida (≥1).
+          </div>
+        }
+      </div>
+      <div class="form-group">
+        <label>Unidad</label>
+        <input type="text" formControlName="unit" placeholder="unidad, caja, paquete..." />
+      </div>
+      <div class="form-group">
+        <label>Lote</label>
+        <input type="text" formControlName="lot" (input)="onLoteChange()" placeholder="Ingrese el lote (ej: 1234, 5678, etc.)" />
+        <small class="form-hint">
+          💡 Puede ingresar cualquier lote. Cada entrada con diferente lote se guardará como registro separado.
+        </small>
+        @if (productoSeleccionado && (productoSeleccionado.batch || productoSeleccionado.lote)) {
+          <small class="form-hint">
+            Lote del catálogo: <strong>{{ productoSeleccionado.batch || productoSeleccionado.lote }}</strong> (solo referencia)
+          </small>
+        }
+        @if (esLotePrincipal) {
+          <small class="form-hint" style="color: #28a745; font-weight: 600;">
+            ✓ Este es el lote principal del catálogo. Usará la fecha de vencimiento del catálogo.
+          </small>
+        }
+        @if (productoSeleccionado && !esLotePrincipal && entradaForm.get('lot')?.value?.trim()) {
+          <small class="form-hint" style="color: #ff9800; font-weight: 600;">
+            ⚠ Este es un lote nuevo. **Debe especificar una fecha de vencimiento.**
+          </small>
+        }
+      </div>
+      @if (!esLotePrincipal) {
+        <div class="form-group">
+          <label>Fecha de Vencimiento del Lote <span style="color: #ff9800;">*</span></label>
+          <input type="date" formControlName="expiration_date" />
+          <small class="form-hint">
+            💡 Especifique la fecha de vencimiento de este lote nuevo.
+          </small>
+          @if (entradaForm.controls['expiration_date'].invalid && entradaForm.controls['expiration_date'].touched && !esLotePrincipal) {
+            <div class="error">
+              La fecha de vencimiento es obligatoria para lotes nuevos.
+            </div>
+          }
+        </div>
+      }
+      <div class="form-group">
+        <label>Proveedor *</label>
+        <select formControlName="supplier_id">
+          <option value="">Seleccione un proveedor</option>
+          @for (s of proveedores; track s) {
+            <option [value]="s.id">{{ s.name }}</option>
+          }
+        </select>
+        @if (entradaForm.controls['supplier_id'].invalid && entradaForm.controls['supplier_id'].touched) {
+          <div class="error">
+            Selecciona un proveedor.
+          </div>
+        }
+      </div>
+      <div class="form-group">
+        <label>Ubicación Interna *</label>
+        <input type="text" formControlName="ubicacion_interna" placeholder="Ej: Almacén A-3" />
+        @if (entradaForm.controls['ubicacion_interna'].invalid && entradaForm.controls['ubicacion_interna'].touched) {
+          <div class="error">
+            Ingresa una ubicación interna válida.
+          </div>
+        }
+      </div>
+      <div class="form-group">
+        <label>Stock Mínimo *</label>
+        <input type="number" formControlName="min_stock" placeholder="Ej: 10" min="0" />
+        @if (entradaForm.controls['min_stock'].invalid && entradaForm.controls['min_stock'].touched) {
+          <div class="error">
+            Ingresa un stock mínimo válido (≥0).
+          </div>
+        }
+      </div>
+      <div class="form-group">
+        <label>Usuario</label>
+        <input
+          type="text"
+          [value]="currentUser?.name || 'Cargando...'"
+          readonly
+          class="readonly-input"
+          />
+          <input type="hidden" formControlName="user_id" />
+        </div>
+        <div class="form-group">
+          <label>Almacén (Warehouse)</label>
+          <select formControlName="warehouse_id">
+            <option value="">Seleccione un Almacén</option>
+            @for (w of warehouses; track w) {
+              <option [value]="w.id">{{ w.name }}</option>
+            }
+          </select>
+          <button type="button" class="btn-small" (click)="abrirModalAlmacen()">
+            + Crear nuevo almacén
           </button>
         </div>
-
-        <div class="scanner-divider" *ngIf="scannerSupported">
-          <span>O</span>
-        </div>
-
-        <div *ngIf="scannerSupported" class="scanner-camera-section">
-          <button
-            type="button"
-            (click)="isScanning ? stopScanning() : startCameraScanning()"
-            class="btn-camera"
-            [class.scanning]="isScanning">
-            <i class="fa-solid" [class.fa-camera]="!isScanning" [class.fa-stop]="isScanning"></i>
-            {{ isScanning ? 'Detener Cámara' : 'Iniciar Cámara' }}
-          </button>
-
-          <div #scannerContainer class="scanner-container" *ngIf="isScanning">
-            <div class="scan-area-overlay"></div>
-          </div>
-        </div>
-
-        <div *ngIf="!scannerSupported" class="scanner-warning">
-          <i class="fa-solid fa-exclamation-triangle"></i>
-          <span>El escáner de cámara no está disponible. Use el modo manual.</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label>Producto *</label>
-      <select formControlName="product_id" (change)="onProductoChange()">
-        <option value="">Seleccione un producto</option>
-        <option *ngFor="let p of productos" [value]="p.id">{{ p.name }}</option>
-      </select>
-      <div class="error" *ngIf="entradaForm.controls['product_id'].invalid && entradaForm.controls['product_id'].touched">
-        Selecciona un producto.
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label>Cantidad *</label>
-      <input type="number" formControlName="quantity" placeholder="Ej: 50" min="1" />
-      <div class="error" *ngIf="entradaForm.controls['quantity'].invalid && entradaForm.controls['quantity'].touched">
-        Ingresa una cantidad válida (≥1).
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label>Unidad</label>
-      <input type="text" formControlName="unit" placeholder="unidad, caja, paquete..." />
-    </div>
-
-    <div class="form-group">
-      <label>Lote</label>
-      <input type="text" formControlName="lot" (input)="onLoteChange()" placeholder="Ingrese el lote (ej: 1234, 5678, etc.)" />
-      <small class="form-hint">
-        💡 Puede ingresar cualquier lote. Cada entrada con diferente lote se guardará como registro separado.
-      </small>
-      <small class="form-hint" *ngIf="productoSeleccionado && (productoSeleccionado.batch || productoSeleccionado.lote)">
-        Lote del catálogo: <strong>{{ productoSeleccionado.batch || productoSeleccionado.lote }}</strong> (solo referencia)
-      </small>
-      <small class="form-hint" *ngIf="esLotePrincipal" style="color: #28a745; font-weight: 600;">
-        ✓ Este es el lote principal del catálogo. Usará la fecha de vencimiento del catálogo.
-      </small>
-      <small class="form-hint" *ngIf="productoSeleccionado && !esLotePrincipal && entradaForm.get('lot')?.value?.trim()" style="color: #ff9800; font-weight: 600;">
-        ⚠ Este es un lote nuevo. **Debe especificar una fecha de vencimiento.**
-      </small>
-    </div>
-
-    <div class="form-group" *ngIf="!esLotePrincipal">
-      <label>Fecha de Vencimiento del Lote <span style="color: #ff9800;">*</span></label>
-      <input type="date" formControlName="expiration_date" />
-      <small class="form-hint">
-        💡 Especifique la fecha de vencimiento de este lote nuevo.
-      </small>
-      <div class="error" *ngIf="entradaForm.controls['expiration_date'].invalid && entradaForm.controls['expiration_date'].touched && !esLotePrincipal">
-        La fecha de vencimiento es obligatoria para lotes nuevos.
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label>Proveedor *</label>
-      <select formControlName="supplier_id">
-        <option value="">Seleccione un proveedor</option>
-        <option *ngFor="let s of proveedores" [value]="s.id">{{ s.name }}</option>
-      </select>
-      <div class="error" *ngIf="entradaForm.controls['supplier_id'].invalid && entradaForm.controls['supplier_id'].touched">
-        Selecciona un proveedor.
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label>Ubicación Interna *</label>
-      <input type="text" formControlName="ubicacion_interna" placeholder="Ej: Almacén A-3" />
-      <div class="error" *ngIf="entradaForm.controls['ubicacion_interna'].invalid && entradaForm.controls['ubicacion_interna'].touched">
-        Ingresa una ubicación interna válida.
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label>Stock Mínimo *</label>
-      <input type="number" formControlName="min_stock" placeholder="Ej: 10" min="0" />
-      <div class="error" *ngIf="entradaForm.controls['min_stock'].invalid && entradaForm.controls['min_stock'].touched">
-        Ingresa un stock mínimo válido (≥0).
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label>Usuario</label>
-      <input
-        type="text"
-        [value]="currentUser?.name || 'Cargando...'"
-        readonly
-        class="readonly-input"
-      />
-      <input type="hidden" formControlName="user_id" />
-    </div>
-
-
-    <div class="form-group">
-      <label>Almacén (Warehouse)</label>
-      <select formControlName="warehouse_id">
-        <option value="">Seleccione un Almacén</option>
-        <option *ngFor="let w of warehouses" [value]="w.id">{{ w.name }}</option>
-      </select>
-
-      <button type="button" class="btn-small" (click)="abrirModalAlmacen()">
-        + Crear nuevo almacén
-      </button>
-    </div>
-
-
-    <button type="submit" class="btn-submit" [disabled]="saving || entradaForm.invalid">
-      {{ saving ? 'Guardando...' : '✅ Guardar Entrada' }}
-    </button>
-
-  </form>
-
-</div>
-
-<div *ngIf="mostrarModalAlmacen" class="modal-overlay" (click)="cerrarModalAlmacen()">
-  <div class="modal-content" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h3>🆕 Crear nuevo almacén</h3>
-      <button type="button" class="btn-cerrar-modal" (click)="cerrarModalAlmacen()">×</button>
-    </div>
-
-    <div class="modal-body">
-      <form [formGroup]="warehouseForm" (ngSubmit)="crearWarehouse()">
-        <div class="form-group">
-          <label>Nombre *</label>
-          <input
-            type="text"
-            formControlName="name"
-            placeholder="Ej: Bodega Central"
-            class="form-control"
-          />
-          <div class="error" *ngIf="warehouseForm.controls['name'].invalid && warehouseForm.controls['name'].touched">
-            El nombre es obligatorio.
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label>Dirección *</label>
-          <input
-            type="text"
-            formControlName="address"
-            placeholder="Ej: Calle 45 #23-56"
-            class="form-control"
-          />
-          <div class="error" *ngIf="warehouseForm.controls['address'].invalid && warehouseForm.controls['address'].touched">
-            La dirección es obligatoria.
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label>Capacidad *</label>
-          <input
-            type="text"
-            formControlName="capacity"
-            placeholder="Ej: 5000 m³"
-            class="form-control"
-          />
-          <div class="error" *ngIf="warehouseForm.controls['capacity'].invalid && warehouseForm.controls['capacity'].touched">
-            La capacidad es obligatoria.
-          </div>
-        </div>
-
-        <div class="modal-footer">
-          <button type="button" class="btn-cancelar" (click)="cerrarModalAlmacen()">Cancelar</button>
-          <button type="submit" class="btn-guardar" [disabled]="warehouseForm.invalid || saving">
-            {{ saving ? 'Guardando...' : 'Guardar Almacén' }}
-          </button>
-        </div>
+        <button type="submit" class="btn-submit" [disabled]="saving || entradaForm.invalid">
+          {{ saving ? 'Guardando...' : '✅ Guardar Entrada' }}
+        </button>
       </form>
-    </div>
+    }
+
   </div>
-</div>
+
+  @if (mostrarModalAlmacen) {
+    <div class="modal-overlay" (click)="cerrarModalAlmacen()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>🆕 Crear nuevo almacén</h3>
+          <button type="button" class="btn-cerrar-modal" (click)="cerrarModalAlmacen()">×</button>
+        </div>
+        <div class="modal-body">
+          <form [formGroup]="warehouseForm" (ngSubmit)="crearWarehouse()">
+            <div class="form-group">
+              <label>Nombre *</label>
+              <input
+                type="text"
+                formControlName="name"
+                placeholder="Ej: Bodega Central"
+                class="form-control"
+                />
+                @if (warehouseForm.controls['name'].invalid && warehouseForm.controls['name'].touched) {
+                  <div class="error">
+                    El nombre es obligatorio.
+                  </div>
+                }
+              </div>
+              <div class="form-group">
+                <label>Dirección *</label>
+                <input
+                  type="text"
+                  formControlName="address"
+                  placeholder="Ej: Calle 45 #23-56"
+                  class="form-control"
+                  />
+                  @if (warehouseForm.controls['address'].invalid && warehouseForm.controls['address'].touched) {
+                    <div class="error">
+                      La dirección es obligatoria.
+                    </div>
+                  }
+                </div>
+                <div class="form-group">
+                  <label>Capacidad *</label>
+                  <input
+                    type="text"
+                    formControlName="capacity"
+                    placeholder="Ej: 5000 m³"
+                    class="form-control"
+                    />
+                    @if (warehouseForm.controls['capacity'].invalid && warehouseForm.controls['capacity'].touched) {
+                      <div class="error">
+                        La capacidad es obligatoria.
+                      </div>
+                    }
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn-cancelar" (click)="cerrarModalAlmacen()">Cancelar</button>
+                    <button type="submit" class="btn-guardar" [disabled]="warehouseForm.invalid || saving">
+                      {{ saving ? 'Guardando...' : 'Guardar Almacén' }}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        }

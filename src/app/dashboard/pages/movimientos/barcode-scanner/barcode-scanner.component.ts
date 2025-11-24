@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ProductosService } from '../../../../services/productos/products.service';
@@ -11,7 +11,7 @@ declare var Quagga: any;
 @Component({
   selector: 'app-barcode-scanner',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   templateUrl: './barcode-scanner.component.html',
   styleUrls: ['./barcode-scanner.component.css']
 })

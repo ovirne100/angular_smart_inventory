@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { Producto } from '../../../../interfaces/producto';
 import { SuppliersService } from '../../../../services/proveedores/suppliers.service';
@@ -9,7 +9,7 @@ import { environment } from '../../../../../environments/environment';
 @Component({
   selector: 'app-asociar-producto',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   templateUrl: './asociar-producto.component.html',
   styleUrls: ['./asociar-producto.component.css']
 })

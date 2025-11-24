@@ -105,6 +105,6 @@ export const routes: Routes = [
   },
   // Redirecciones
   // 👇 solo esta redirección
-  { path: '', redirectTo: '/dashboard/inicio', pathMatch: 'full' },
-  { path: '**', redirectTo: '/dashboard/inicio' }
+  { path: '', redirectTo: '/register', pathMatch: 'full' },
+  { path: '**', redirectTo: '/register' }
 ];

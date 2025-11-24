@@ -1,7 +1,7 @@
 
 import { Component, EventEmitter, Output, OnInit } from '@angular/core';
 import { NgForm, FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+
 import { ProductosService } from '../../services/productos/products.service';
 import { CategoriesService, Category } from '../../services/categories/categories.service';
 import { UnitsService, Unit } from '../../services/units/units.service';
@@ -11,7 +11,7 @@ import { Producto } from '../../interfaces/producto';
 @Component({
   selector: 'app-crear-producto',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   templateUrl: './crear-producto.component.html',
   styleUrls: ['./crear-producto.component.css']
 })

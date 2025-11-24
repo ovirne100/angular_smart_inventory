@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { SuppliersService } from '../../../../services/proveedores/suppliers.service';
 import { Proveedor } from '../../../../interfaces/producto';
@@ -7,7 +7,7 @@ import { Proveedor } from '../../../../interfaces/producto';
 @Component({
   selector: 'app-editar-proveedor',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   templateUrl: './editar-proveedor.component.html',
   styleUrls: ['./editar-proveedor.component.css']
 })

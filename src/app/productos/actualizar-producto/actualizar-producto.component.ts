@@ -1,13 +1,13 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+
 import { Producto } from '../../interfaces/producto';
 import { ProductosService } from '../../services/productos/products.service';
 
 @Component({
   selector: 'app-actualizar-producto',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   templateUrl: './actualizar-producto.component.html',
 })
 export class ActualizarProductoComponent implements OnInit {

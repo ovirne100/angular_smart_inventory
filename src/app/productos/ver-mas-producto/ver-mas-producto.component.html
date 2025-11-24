@@ -6,32 +6,42 @@
       <p><strong>Nombre:</strong> {{ producto.name }}</p>
       <p><strong>Unidad:</strong> {{ obtenerNombreUnidad(producto.unit_measurement) || 'N/A' }}</p>
 
-      <p *ngIf="producto.expiration_date">
-        <strong>Fecha de vencimiento Principal:</strong> {{ producto.expiration_date }}
-      </p>
+      @if (producto.expiration_date) {
+        <p>
+          <strong>Fecha de vencimiento Principal:</strong> {{ producto.expiration_date }}
+        </p>
+      }
 
       <p><strong>Código de barras:</strong> {{ producto.codigo_de_barras || producto.reference || 'N/A' }}</p>
       <p><strong>Categoría:</strong> {{ producto.categoria?.name || producto.category_id || 'N/A' }}</p>
     </div>
 
     <!-- Lotes de Inventario -->
-    <div class="lotes-inventario-detalle" *ngIf="lotesInventario.length > 0">
-      <h3><i class="fa-solid fa-boxes"></i> Lotes en Inventario ({{ lotesInventario.length }})</h3>
-      <div class="lotes-list-detalle">
-        <div *ngFor="let lote of lotesInventario" class="lote-item-detalle">
-          <div class="lote-info-detalle">
-            <p><strong>Lote:</strong> {{ lote.lot }}</p>
-            <p *ngIf="lote.expiration_date">
-              <strong><i class="fa-solid fa-calendar"></i> Vence:</strong> {{ formatearFecha(lote.expiration_date) }}
-            </p>
-          </div>
+    @if (lotesInventario.length > 0) {
+      <div class="lotes-inventario-detalle">
+        <h3><i class="fa-solid fa-boxes"></i> Lotes en Inventario ({{ lotesInventario.length }})</h3>
+        <div class="lotes-list-detalle">
+          @for (lote of lotesInventario; track lote) {
+            <div class="lote-item-detalle">
+              <div class="lote-info-detalle">
+                <p><strong>Lote:</strong> {{ lote.lot }}</p>
+                @if (lote.expiration_date) {
+                  <p>
+                    <strong><i class="fa-solid fa-calendar"></i> Vence:</strong> {{ formatearFecha(lote.expiration_date) }}
+                  </p>
+                }
+              </div>
+            </div>
+          }
         </div>
       </div>
-    </div>
+    }
 
-    <div class="lotes-inventario-detalle" *ngIf="lotesInventario.length === 0">
-      <p class="sin-lotes">No hay lotes registrados en inventario para este producto.</p>
-    </div>
+    @if (lotesInventario.length === 0) {
+      <div class="lotes-inventario-detalle">
+        <p class="sin-lotes">No hay lotes registrados en inventario para este producto.</p>
+      </div>
+    }
 
     <button class="btn cancelar" (click)="cerrarModal()">Cerrar</button>
   </div>

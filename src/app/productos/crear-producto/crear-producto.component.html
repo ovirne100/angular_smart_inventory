@@ -9,207 +9,245 @@
     <form #form="ngForm" (ngSubmit)="guardarProducto(form)" class="form-producto">
       <div class="form-grid">
         <div info-img>
-        <!-- Campos del producto -->
-        <div class="form-group">
-          <label for="name"><i class="fa-solid fa-tag"></i> Nombre del Producto *</label>
-          <input type="text" id="name" name="name" ngModel placeholder="Ej: Laptop Dell Inspiron" required class="form-input"/>
-        </div>
+          <!-- Campos del producto -->
+          <div class="form-group">
+            <label for="name"><i class="fa-solid fa-tag"></i> Nombre del Producto *</label>
+            <input type="text" id="name" name="name" ngModel placeholder="Ej: Laptop Dell Inspiron" required class="form-input"/>
+          </div>
 
-        <div class="form-group">
-          <label for="codigo_de_barras"><i class="fa-solid fa-barcode"></i> Código de Barras *</label>
-          <input type="text" id="codigo_de_barras" name="codigo_de_barras" ngModel placeholder="Ej: 7703038010067" required class="form-input"/>
-          <small class="form-hint" style="display: block; margin-top: 0.5rem; color: #666; font-size: 0.875rem;">
-            💡 Este código se usará para escanear el producto al registrar entradas/salidas al inventario
-          </small>
-        </div>
+          <div class="form-group">
+            <label for="codigo_de_barras"><i class="fa-solid fa-barcode"></i> Código de Barras *</label>
+            <input type="text" id="codigo_de_barras" name="codigo_de_barras" ngModel placeholder="Ej: 7703038010067" required class="form-input"/>
+            <small class="form-hint" style="display: block; margin-top: 0.5rem; color: #666; font-size: 0.875rem;">
+              💡 Este código se usará para escanear el producto al registrar entradas/salidas al inventario
+            </small>
+          </div>
 
-        <div class="form-group">
-          <label for="unit"><i class="fa-solid fa-ruler"></i> Unidad de Medida *</label>
-          <div class="category-select-container">
-            <div class="category-input-wrapper">
-              <input type="text" id="unit_search" name="unit_search"
-                     (input)="filtrarUnidades($event)"
-                     (focus)="onFocusUnidad()"
-                     (blur)="onBlurUnidad()"
-                     placeholder="Buscar o crear unidad de medida..."
-                     class="form-input category-search"
-                     [value]="unidadSeleccionada ? '' : ''"
-                     autocomplete="off"/>
-              <button type="button" class="btn-mini" (click)="crearUnidadRapida()" title="Crear nueva unidad de medida">
-                <i class="fa-solid fa-plus"></i> Nueva
+          <div class="form-group">
+            <label for="unit"><i class="fa-solid fa-ruler"></i> Unidad de Medida *</label>
+            <div class="category-select-container">
+              <div class="category-input-wrapper">
+                <input type="text" id="unit_search" name="unit_search"
+                  (input)="filtrarUnidades($event)"
+                  (focus)="onFocusUnidad()"
+                  (blur)="onBlurUnidad()"
+                  placeholder="Buscar o crear unidad de medida..."
+                  class="form-input category-search"
+                  [value]="unidadSeleccionada ? '' : ''"
+                  autocomplete="off"/>
+                  <button type="button" class="btn-mini" (click)="crearUnidadRapida()" title="Crear nueva unidad de medida">
+                    <i class="fa-solid fa-plus"></i> Nueva
+                  </button>
+                </div>
+
+                @if (mostrarDropdownUnidad && (unidadesFiltradas.length > 0 || unidades.length > 0)) {
+                  <div class="category-dropdown">
+                    @if (unidadesFiltradas.length > 0) {
+                      <div>
+                        @for (unidad of unidadesFiltradas; track unidad) {
+                          <div
+                            class="category-option"
+                            (click)="seleccionarUnidad(unidad)">
+                            <span class="category-name">{{ unidad.name }}</span>
+                            @if (unidad.abbreviation) {
+                              <span class="category-id">({{ unidad.abbreviation }})</span>
+                            }
+                          </div>
+                        }
+                      </div>
+                    }
+                    @if (unidadesFiltradas.length === 0 && unidades.length > 0) {
+                      <div>
+                        @for (unidad of unidades; track unidad) {
+                          <div
+                            class="category-option"
+                            (click)="seleccionarUnidad(unidad)">
+                            <span class="category-name">{{ unidad.name }}</span>
+                            @if (unidad.abbreviation) {
+                              <span class="category-id">({{ unidad.abbreviation }})</span>
+                            }
+                          </div>
+                        }
+                      </div>
+                    }
+                  </div>
+                }
+
+                @if (unidadSeleccionada) {
+                  <div class="selected-category">
+                    <span class="selected-name">{{ unidadSeleccionada.name }}</span>
+                    @if (unidadSeleccionada.abbreviation) {
+                      <span class="selected-id">({{ unidadSeleccionada.abbreviation }})</span>
+                    }
+                    <button type="button" class="clear-category" (click)="limpiarUnidad()">
+                      <i class="fa-solid fa-times"></i>
+                    </button>
+                  </div>
+                }
+
+                <input type="hidden" name="unit" [ngModel]="unidadSeleccionada?.abbreviation || unidadSeleccionada?.name" required/>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="category_id"><i class="fa-solid fa-folder"></i> Categoría *</label>
+              <div class="category-select-container">
+                <div class="category-input-wrapper">
+                  <input type="text" id="category_search" name="category_search" ngModel
+                    (input)="filtrarCategorias($event)"
+                    (focus)="mostrarDropdown = categoriasFiltradas.length > 0"
+                    placeholder="Buscar o crear categoría..."
+                    class="form-input category-search"
+                    [value]="categoriaSeleccionada ? '' : ''"/>
+                    <button type="button" class="btn-mini" (click)="crearCategoriaRapida()" title="Crear nueva categoría">
+                      <i class="fa-solid fa-plus"></i> Nueva
+                    </button>
+                  </div>
+
+                  @if (categoriasFiltradas.length > 0 && mostrarDropdown) {
+                    <div class="category-dropdown">
+                      @for (categoria of categoriasFiltradas; track categoria) {
+                        <div
+                          class="category-option"
+                          (click)="seleccionarCategoria(categoria)">
+                          <span class="category-id">{{ categoria.id }}</span>
+                          <span class="category-name">{{ categoria.name }}</span>
+                        </div>
+                      }
+                    </div>
+                  }
+
+                  @if (categoriaSeleccionada) {
+                    <div class="selected-category">
+                      <span class="selected-id">{{ categoriaSeleccionada.id }}</span>
+                      <span class="selected-name">{{ categoriaSeleccionada.name }}</span>
+                      <button type="button" class="clear-category" (click)="limpiarCategoria()">
+                        <i class="fa-solid fa-times"></i>
+                      </button>
+                    </div>
+                  }
+
+                  <input type="hidden" name="category_id" [ngModel]="categoriaSeleccionada?.id" required/>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="image">Imagen del producto</label>
+                <input type="file" (change)="onFileSelected($event)" accept="image/*" />
+              </div>
+              @if (previewImage) {
+                <div class="form-group">
+                  <label>Vista previa:</label>
+                  <img [src]="previewImage" alt="Preview de imagen" style="max-width: 150px; max-height: 150px; border-radius: 8px;"/>
+                </div>
+              }
+            </div>
+
+            <!-- 🔽 Botones movidos aquí -->
+            <div class="form-actions">
+              <button type="button" class="btn-cancelar" (click)="cancelarCreacion()">
+                <i class="fa-solid fa-times"></i> Cancelar
+              </button>
+              <button type="submit" class="btn-guardar" [disabled]="form.invalid">
+                <i class="fa-solid fa-save"></i> Crear Producto
               </button>
             </div>
+          </div>
+        </form>
+      </div>
+    </div>
 
-            <div class="category-dropdown" *ngIf="mostrarDropdownUnidad && (unidadesFiltradas.length > 0 || unidades.length > 0)">
-              <div *ngIf="unidadesFiltradas.length > 0">
-                <div *ngFor="let unidad of unidadesFiltradas"
-                     class="category-option"
-                     (click)="seleccionarUnidad(unidad)">
-                  <span class="category-name">{{ unidad.name }}</span>
-                  <span class="category-id" *ngIf="unidad.abbreviation">({{ unidad.abbreviation }})</span>
-                </div>
-              </div>
-              <div *ngIf="unidadesFiltradas.length === 0 && unidades.length > 0">
-                <div *ngFor="let unidad of unidades"
-                     class="category-option"
-                     (click)="seleccionarUnidad(unidad)">
-                  <span class="category-name">{{ unidad.name }}</span>
-                  <span class="category-id" *ngIf="unidad.abbreviation">({{ unidad.abbreviation }})</span>
-                </div>
+    <!-- Modal para crear nueva categoría -->
+    @if (mostrarModalCategoria) {
+      <div class="modal-overlay" (click)="cerrarModalCategoria()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h3><i class="fa-solid fa-folder-plus"></i> Crear Nueva Categoría</h3>
+            <button type="button" class="modal-close" (click)="cerrarModalCategoria()">
+              <i class="fa-solid fa-times"></i>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label for="nuevaCategoriaNombre">Nombre de la categoría *</label>
+              <input
+                type="text"
+                id="nuevaCategoriaNombre"
+                [(ngModel)]="nuevaCategoriaNombre"
+                placeholder="Ej: Electrónicos, Ropa, etc."
+                class="form-input"
+                (keyup.enter)="guardarNuevaCategoria()"
+                autofocus/>
               </div>
             </div>
+            <div class="modal-footer">
+              <button type="button" class="btn-cancelar" (click)="cerrarModalCategoria()" [disabled]="creandoCategoria">
+                Cancelar
+              </button>
+              <button type="button" class="btn-guardar" (click)="guardarNuevaCategoria()" [disabled]="creandoCategoria || !nuevaCategoriaNombre.trim()">
+                @if (!creandoCategoria) {
+                  <i class="fa-solid fa-save"></i>
+                }
+                @if (creandoCategoria) {
+                  <i class="fa-solid fa-spinner fa-spin"></i>
+                }
+                {{ creandoCategoria ? 'Creando...' : 'Crear Categoría' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      }
 
-            <div class="selected-category" *ngIf="unidadSeleccionada">
-              <span class="selected-name">{{ unidadSeleccionada.name }}</span>
-              <span class="selected-id" *ngIf="unidadSeleccionada.abbreviation">({{ unidadSeleccionada.abbreviation }})</span>
-              <button type="button" class="clear-category" (click)="limpiarUnidad()">
+      <!-- Modal para crear nueva unidad de medida -->
+      @if (mostrarModalUnidad) {
+        <div class="modal-overlay" (click)="cerrarModalUnidad()">
+          <div class="modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+              <h3><i class="fa-solid fa-ruler-combined"></i> Crear Nueva Unidad de Medida</h3>
+              <button type="button" class="modal-close" (click)="cerrarModalUnidad()">
                 <i class="fa-solid fa-times"></i>
               </button>
             </div>
-
-            <input type="hidden" name="unit" [ngModel]="unidadSeleccionada?.abbreviation || unidadSeleccionada?.name" required/>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="category_id"><i class="fa-solid fa-folder"></i> Categoría *</label>
-          <div class="category-select-container">
-            <div class="category-input-wrapper">
-              <input type="text" id="category_search" name="category_search" ngModel
-                     (input)="filtrarCategorias($event)"
-                     (focus)="mostrarDropdown = categoriasFiltradas.length > 0"
-                     placeholder="Buscar o crear categoría..."
-                     class="form-input category-search"
-                     [value]="categoriaSeleccionada ? '' : ''"/>
-              <button type="button" class="btn-mini" (click)="crearCategoriaRapida()" title="Crear nueva categoría">
-                <i class="fa-solid fa-plus"></i> Nueva
-              </button>
-            </div>
-
-            <div class="category-dropdown" *ngIf="categoriasFiltradas.length > 0 && mostrarDropdown">
-              <div *ngFor="let categoria of categoriasFiltradas"
-                   class="category-option"
-                   (click)="seleccionarCategoria(categoria)">
-                <span class="category-id">{{ categoria.id }}</span>
-                <span class="category-name">{{ categoria.name }}</span>
+            <div class="modal-body">
+              <div class="form-group">
+                <label for="nuevaUnidadNombre">Nombre de la unidad *</label>
+                <input
+                  type="text"
+                  id="nuevaUnidadNombre"
+                  [(ngModel)]="nuevaUnidadNombre"
+                  placeholder="Ej: Kilogramo, Litro, Caja, etc."
+                  class="form-input"
+                  (keyup.enter)="guardarNuevaUnidad()"
+                  autofocus/>
+                </div>
+                <div class="form-group">
+                  <label for="nuevaUnidadAbreviatura">Abreviatura (opcional)</label>
+                  <input
+                    type="text"
+                    id="nuevaUnidadAbreviatura"
+                    [(ngModel)]="nuevaUnidadAbreviatura"
+                    placeholder="Ej: kg, l, caja"
+                    class="form-input"
+                    (keyup.enter)="guardarNuevaUnidad()"/>
+                    <small style="display: block; margin-top: 0.5rem; color: #666; font-size: 0.875rem;">
+                      Si no se especifica, se usará el nombre en minúsculas como abreviatura
+                    </small>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn-cancelar" (click)="cerrarModalUnidad()" [disabled]="creandoUnidad">
+                    Cancelar
+                  </button>
+                  <button type="button" class="btn-guardar" (click)="guardarNuevaUnidad()" [disabled]="creandoUnidad || !nuevaUnidadNombre.trim()">
+                    @if (!creandoUnidad) {
+                      <i class="fa-solid fa-save"></i>
+                    }
+                    @if (creandoUnidad) {
+                      <i class="fa-solid fa-spinner fa-spin"></i>
+                    }
+                    {{ creandoUnidad ? 'Creando...' : 'Crear Unidad' }}
+                  </button>
+                </div>
               </div>
             </div>
-
-            <div class="selected-category" *ngIf="categoriaSeleccionada">
-              <span class="selected-id">{{ categoriaSeleccionada.id }}</span>
-              <span class="selected-name">{{ categoriaSeleccionada.name }}</span>
-              <button type="button" class="clear-category" (click)="limpiarCategoria()">
-                <i class="fa-solid fa-times"></i>
-              </button>
-            </div>
-
-            <input type="hidden" name="category_id" [ngModel]="categoriaSeleccionada?.id" required/>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="image">Imagen del producto</label>
-          <input type="file" (change)="onFileSelected($event)" accept="image/*" />
-        </div>
-        <div class="form-group" *ngIf="previewImage">
-          <label>Vista previa:</label>
-          <img [src]="previewImage" alt="Preview de imagen" style="max-width: 150px; max-height: 150px; border-radius: 8px;"/>
-        </div>
-      </div>
-
-        <!-- 🔽 Botones movidos aquí -->
-        <div class="form-actions">
-          <button type="button" class="btn-cancelar" (click)="cancelarCreacion()">
-            <i class="fa-solid fa-times"></i> Cancelar
-          </button>
-          <button type="submit" class="btn-guardar" [disabled]="form.invalid">
-            <i class="fa-solid fa-save"></i> Crear Producto
-          </button>
-        </div>
-      </div>
-    </form>
-  </div>
-</div>
-
-<!-- Modal para crear nueva categoría -->
-<div class="modal-overlay" *ngIf="mostrarModalCategoria" (click)="cerrarModalCategoria()">
-  <div class="modal-content" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h3><i class="fa-solid fa-folder-plus"></i> Crear Nueva Categoría</h3>
-      <button type="button" class="modal-close" (click)="cerrarModalCategoria()">
-        <i class="fa-solid fa-times"></i>
-      </button>
-    </div>
-    <div class="modal-body">
-      <div class="form-group">
-        <label for="nuevaCategoriaNombre">Nombre de la categoría *</label>
-        <input
-          type="text"
-          id="nuevaCategoriaNombre"
-          [(ngModel)]="nuevaCategoriaNombre"
-          placeholder="Ej: Electrónicos, Ropa, etc."
-          class="form-input"
-          (keyup.enter)="guardarNuevaCategoria()"
-          autofocus/>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn-cancelar" (click)="cerrarModalCategoria()" [disabled]="creandoCategoria">
-        Cancelar
-      </button>
-      <button type="button" class="btn-guardar" (click)="guardarNuevaCategoria()" [disabled]="creandoCategoria || !nuevaCategoriaNombre.trim()">
-        <i class="fa-solid fa-save" *ngIf="!creandoCategoria"></i>
-        <i class="fa-solid fa-spinner fa-spin" *ngIf="creandoCategoria"></i>
-        {{ creandoCategoria ? 'Creando...' : 'Crear Categoría' }}
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal para crear nueva unidad de medida -->
-<div class="modal-overlay" *ngIf="mostrarModalUnidad" (click)="cerrarModalUnidad()">
-  <div class="modal-content" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h3><i class="fa-solid fa-ruler-combined"></i> Crear Nueva Unidad de Medida</h3>
-      <button type="button" class="modal-close" (click)="cerrarModalUnidad()">
-        <i class="fa-solid fa-times"></i>
-      </button>
-    </div>
-    <div class="modal-body">
-      <div class="form-group">
-        <label for="nuevaUnidadNombre">Nombre de la unidad *</label>
-        <input
-          type="text"
-          id="nuevaUnidadNombre"
-          [(ngModel)]="nuevaUnidadNombre"
-          placeholder="Ej: Kilogramo, Litro, Caja, etc."
-          class="form-input"
-          (keyup.enter)="guardarNuevaUnidad()"
-          autofocus/>
-      </div>
-      <div class="form-group">
-        <label for="nuevaUnidadAbreviatura">Abreviatura (opcional)</label>
-        <input
-          type="text"
-          id="nuevaUnidadAbreviatura"
-          [(ngModel)]="nuevaUnidadAbreviatura"
-          placeholder="Ej: kg, l, caja"
-          class="form-input"
-          (keyup.enter)="guardarNuevaUnidad()"/>
-        <small style="display: block; margin-top: 0.5rem; color: #666; font-size: 0.875rem;">
-          Si no se especifica, se usará el nombre en minúsculas como abreviatura
-        </small>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn-cancelar" (click)="cerrarModalUnidad()" [disabled]="creandoUnidad">
-        Cancelar
-      </button>
-      <button type="button" class="btn-guardar" (click)="guardarNuevaUnidad()" [disabled]="creandoUnidad || !nuevaUnidadNombre.trim()">
-        <i class="fa-solid fa-save" *ngIf="!creandoUnidad"></i>
-        <i class="fa-solid fa-spinner fa-spin" *ngIf="creandoUnidad"></i>
-        {{ creandoUnidad ? 'Creando...' : 'Crear Unidad' }}
-      </button>
-    </div>
-  </div>
-</div>
+          }

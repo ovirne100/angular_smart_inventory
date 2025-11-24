@@ -1,6 +1,6 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
+
 import { AuthService, User } from '../services/auth.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../environments/environment';
@@ -11,9 +11,8 @@ import { environment } from '../../environments/environment';
   imports: [
     RouterOutlet,
     RouterLink,
-    RouterLinkActive,
-    CommonModule
-  ],
+    RouterLinkActive
+],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
