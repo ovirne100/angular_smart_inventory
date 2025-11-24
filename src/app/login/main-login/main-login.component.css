@@ -9,6 +9,35 @@ body {
   background-color: #121212;
   color: #fff;
 }
+
+/* Mensaje de alerta cuando viene desde correo */
+.alerta-mensaje {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 15px 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  animation: slideDown 0.5s ease-out;
+}
+
+.alerta-mensaje p {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 #loginForm{
     gap: 1em;
     text-align: center;
@@ -149,4 +178,26 @@ input{
 
 .btn:hover {
   background-color: #d4ac0d;
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 1rem;
+  }
+  .right {
+    width: 100%;
+    max-width: 100%;
+    padding: 1.25rem;
+  }
+  .left h1 {
+    font-size: 2rem;
+  }
+  .logo img {
+    width: 140px;
+  }
+}
+
+/* Smooth mobile scrolling */
+.container {
+  -webkit-overflow-scrolling: touch;
 }

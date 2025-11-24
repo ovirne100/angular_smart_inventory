@@ -1,0 +1,51 @@
+<div class="modal-backdrop">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Asociar producto a {{ proveedor?.name }}</h3>
+      <button class="close" (click)="cancelar.emit()">×</button>
+    </div>
+
+    <form (ngSubmit)="guardarProducto()">
+      <!-- Producto -->
+      <label>Producto</label>
+      <select [(ngModel)]="nuevoProducto.product_id" name="producto" required (change)="onProductoSeleccionado()">
+        <option [ngValue]="null">-- Selecciona --</option>
+        @for (p of productos; track p) {
+          <option [ngValue]="p.id">{{ p.name }}</option>
+        }
+      </select>
+
+      <!-- Costo -->
+      <label>Costo unitario</label>
+      <input
+        type="number"
+        [(ngModel)]="nuevoProducto.unit_cost"
+        name="unit_cost"
+        required
+        />
+
+        <!-- Código de barras (solo lectura) -->
+        <label>Código de barras</label>
+        <input
+          type="text"
+          [(ngModel)]="nuevoProducto.supplier_reference"
+          name="supplier_reference"
+          readonly
+          />
+
+          <!-- Lote (solo lectura) -->
+          <label>Lote</label>
+          <input
+            type="text"
+            [(ngModel)]="nuevoProducto.batch"
+            name="batch"
+            readonly
+            />
+
+            <div class="modal-footer">
+              <button type="submit">Guardar</button>
+              <button type="button" (click)="cancelar.emit()">Cancelar</button>
+            </div>
+          </form>
+        </div>
+      </div>

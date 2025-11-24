@@ -1,1 +1,41 @@
-<p>movimientos works!</p>
+<div class="movimientos-container">
+  <h2>📦 Registro de Entradas y Salidas</h2>
+  <p class="subtitle">Control de movimientos del inventario</p>
+
+  <!-- Contadores -->
+  <div class="counters">
+    <div class="counter entradas">
+      <h3>📥 Entradas</h3>
+      <p class="big">{{ entriesCount }}</p>
+      <p>{{ entriesQuantity }} unidades</p>
+      <p>Última: {{ lastEntryDate || 'N/A' }}</p>
+    </div>
+
+    <div class="counter salidas">
+      <h3>📤 Salidas</h3>
+      <p class="big">{{ outputsCount }}</p>
+      <p>{{ outputsQuantity }} unidades</p>
+      <p>Última: {{ lastOutputDate || 'N/A' }}</p>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <nav class="tabs">
+    <a [routerLink]="['/dashboard/movimientos/entradas']"
+       routerLinkActive="active"
+       [ngClass]="{'entradas-tab': isActive('/dashboard/movimientos/entradas')}">
+       📥 Entradas
+    </a>
+
+    <a [routerLink]="['/dashboard/movimientos/salidas']"
+       routerLinkActive="active"
+       [ngClass]="{'salidas-tab': isActive('/dashboard/movimientos/salidas')}">
+       📤 Salidas
+    </a>
+  </nav>
+
+  <!-- Contenido dinámico -->
+  <div class="content-box">
+    <router-outlet></router-outlet>
+  </div>
+</div>

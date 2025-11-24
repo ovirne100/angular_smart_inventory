@@ -1,0 +1,15 @@
+.btn-menu{
+  position: static;
+  margin-bottom: 10px;
+  background: #dc3545;
+}
+h4{
+      margin-bottom: 5px;
+}
+
+.producto-item{
+  margin-top: 30px;
+}
+.producto-details{
+  display: grid;
+}

@@ -1,1 +1,183 @@
+<!-- Sidebar Moderno y Responsive -->
+<aside class="sidebar" [class.collapsed]="collapsed" [class.mobile-open]="mobileOpen">
+  <!-- Header del Sidebar -->
+  <div class="sidebar-header">
+    @if (!collapsed) {
+      <div class="sidebar-brand">
+        <div class="brand-icon">
+          <i class="fa-solid fa-warehouse"></i>
+        </div>
+        <div class="brand-text">
+          <h3>SmartInventory</h3>
+          <span>Dashboard</span>
+        </div>
+      </div>
+    }
+    <button class="sidebar-toggle" (click)="toggleSidebar()">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+  </div>
 
+  <!-- Navegación Principal -->
+  <nav class="sidebar-nav">
+    <ul class="nav-list">
+      <!-- Dashboard -->
+      <li class="nav-item">
+        <a routerLink="/dashboard/inicio"
+          class="nav-link"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{exact: true}">
+          <i class="fa-solid fa-home"></i>
+          <span class="nav-text">Inicio</span>
+          @if (!collapsed) {
+            <span class="nav-badge">Dashboard</span>
+          }
+        </a>
+      </li>
+
+      <!-- Productos -->
+      <li class="nav-item">
+        <a routerLink="/dashboard/productos"
+          class="nav-link"
+          routerLinkActive="active">
+          <i class="fa-solid fa-boxes"></i>
+          <span class="nav-text">Productos</span>
+          @if (!collapsed && productCount > 0) {
+            <span class="nav-badge">{{ productCount }}</span>
+          }
+        </a>
+      </li>
+
+      <!-- Proveedores -->
+      <li class="nav-item">
+        <a routerLink="/dashboard/proveedores"
+          class="nav-link"
+          routerLinkActive="active">
+          <i class="fa-solid fa-truck"></i>
+          <span class="nav-text">Proveedores</span>
+          @if (!collapsed && supplierCount > 0) {
+            <span class="nav-badge">{{ supplierCount }}</span>
+          }
+        </a>
+      </li>
+
+      <!-- Relaciones Producto-Proveedor -->
+      <li class="nav-item">
+        <a routerLink="/dashboard/product-suppliers"
+          class="nav-link"
+          routerLinkActive="active">
+          <i class="fa-solid fa-link"></i>
+          <span class="nav-text">Relaciones</span>
+          @if (!collapsed) {
+            <span class="nav-badge">P-P</span>
+          }
+        </a>
+      </li>
+
+      <!-- Movimientos -->
+      <li class="nav-item">
+        <a routerLink="/dashboard/movimientos"
+          class="nav-link"
+          routerLinkActive="active">
+          <i class="fa-solid fa-exchange-alt"></i>
+          <span class="nav-text">Movimientos</span>
+          @if (!collapsed && movementCount > 0) {
+            <span class="nav-badge">{{ movementCount }}</span>
+          }
+        </a>
+      </li>
+
+      <!-- Informes -->
+      <li class="nav-item">
+        <a routerLink="/dashboard/informes"
+          class="nav-link"
+          routerLinkActive="active">
+          <i class="fa-solid fa-chart-bar"></i>
+          <span class="nav-text">Informes</span>
+          @if (!collapsed) {
+            <span class="nav-badge new">Nuevo</span>
+          }
+        </a>
+      </li>
+
+      <!-- Alertas -->
+      <li class="nav-item">
+        <a routerLink="/dashboard/alertas"
+          class="nav-link"
+          routerLinkActive="active">
+          <i class="fa-solid fa-bell"></i>
+          <span class="nav-text">Alertas</span>
+          @if (!collapsed && alertCount > 0) {
+            <span class="nav-badge alert">{{ alertCount }}</span>
+          }
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Sección de Herramientas -->
+  @if (!collapsed) {
+    <div class="sidebar-tools">
+      <div class="tools-header">
+        <h4>Herramientas</h4>
+      </div>
+      <ul class="tools-list">
+        <li class="tool-item">
+          <button class="tool-btn" (click)="exportData()">
+            <i class="fa-solid fa-download"></i>
+            <span>Exportar</span>
+          </button>
+        </li>
+        <li class="tool-item">
+          <button class="tool-btn" (click)="importData()">
+            <i class="fa-solid fa-upload"></i>
+            <span>Importar</span>
+          </button>
+        </li>
+        <li class="tool-item">
+          <button class="tool-btn" (click)="backupData()">
+            <i class="fa-solid fa-database"></i>
+            <span>Respaldo</span>
+          </button>
+        </li>
+      </ul>
+    </div>
+  }
+
+  <!-- Información del Sistema -->
+  @if (!collapsed) {
+    <div class="sidebar-info">
+      <div class="system-status">
+        <div class="status-indicator online"></div>
+        <span>Sistema Online</span>
+      </div>
+      <div class="system-version">
+        <span>v2.1.0</span>
+      </div>
+    </div>
+  }
+
+  <!-- Footer del Sidebar -->
+  <div class="sidebar-footer">
+    @if (!collapsed) {
+      <div class="user-info">
+        <div class="user-avatar">
+          <img src="assets/default-avatar.png" alt="Usuario">
+        </div>
+        <div class="user-details">
+          <span class="user-name">Admin User</span>
+          <span class="user-role">Administrador</span>
+        </div>
+      </div>
+    }
+    <button class="logout-btn" (click)="logout()" [title]="collapsed ? 'Cerrar Sesión' : ''">
+      <i class="fa-solid fa-sign-out-alt"></i>
+      @if (!collapsed) {
+        <span>Cerrar Sesión</span>
+      }
+    </button>
+  </div>
+</aside>
+
+<!-- Overlay para móvil -->
+<div class="sidebar-overlay" [class.active]="mobileOpen" (click)="closeMobileSidebar()"></div>

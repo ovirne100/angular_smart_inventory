@@ -14,30 +14,56 @@ export class NabvarComponent {
 */
 // src/app/nabvar/nabvar.component.ts
 
-import { CommonModule } from '@angular/common';
+
 import { Component, OnInit } from '@angular/core';
-import { Router, NavigationEnd, RouterLink } from '@angular/router';
+import { Router, NavigationEnd, RouterLink, RouterLinkActive } from '@angular/router';
 import { filter } from 'rxjs/operators';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-nabvar',
   templateUrl: './nabvar.component.html',
   styleUrls: ['./nabvar.component.css'],
-  standalone:true,
-  imports: [CommonModule, RouterLink] // esto me sirve para que la ruta de ingresar en register no aparesca en login
+  standalone: true,
+  imports: [RouterLink, RouterLinkActive]
 })
 export class NabvarComponent implements OnInit {
-  showLoginLink: boolean = true; // El valor inicial, por defecto se muestra
+  showLoginLink: boolean = false;
 
-  constructor(private router: Router) {}
+  // Pila de historial interno
+  private routeHistory: string[] = [];
+
+  constructor(private router: Router, private location: Location) {}
 
   ngOnInit() {
-    // Suscríbete a los eventos del router para saber cuándo cambia la URL
-    this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd)
-    ).subscribe(() => {
-      // Si la URL actual es '/login', oculta el enlace
-      this.showLoginLink = this.router.url !== '/login';
-    });
+    this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe((event: NavigationEnd) => {
+        const url = event.urlAfterRedirects;
+        this.routeHistory.push(url);
+        // Opcional: limitar la longitud de la pila para no crecer mucho
+        if (this.routeHistory.length > 50) {
+          this.routeHistory.shift();
+        }
+
+        // Mostrar botón INGRESAR solo en /register
+        this.showLoginLink = (url === '/register');
+      });
+  }
+
+  goBack() {
+    // Remover la ruta actual de la pila
+    this.routeHistory.pop();
+
+    // La ruta anterior en la pila
+    const previous = this.routeHistory.pop();
+
+    if (previous) {
+      // Navegar hacia la ruta anterior
+      this.router.navigateByUrl(previous);
+    } else {
+      console.log('No hay ruta anterior en la pila');
+    }
   }
 }
+

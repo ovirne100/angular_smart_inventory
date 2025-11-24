@@ -1,1 +1,130 @@
-<p>proveedores works!</p>
+<!-- ===================== MODALES ===================== -->
+@if (mostrarCrear) {
+  <app-crear-proveedor
+    (cancelar)="cancelarCrear()"
+    (proveedorCreado)="onProveedorCreado()">
+  </app-crear-proveedor>
+}
+
+@if (mostrarEditar && proveedorEnEdicion) {
+  <app-editar-proveedor
+    [proveedor]="proveedorEnEdicion"
+    (cancelar)="cancelarEditar()"
+    (proveedorActualizado)="onProveedorActualizado($event)">
+  </app-editar-proveedor>
+}
+
+<!-- ===================== HEADER ===================== -->
+@if (!mostrarCrear && !mostrarEditar) {
+  <div class="proveedores-header">
+    <h2>Gestión de Proveedores</h2>
+    <button class="btn-crear-principal" (click)="abrirCrear()">
+      <i class="fa-solid fa-plus"></i>
+      Crear Nuevo Proveedor
+    </button>
+  </div>
+}
+
+<!-- ===================== LISTA DE PROVEEDORES ===================== -->
+@if (!mostrarCrear && !mostrarEditar) {
+  <div class="proveedores-container">
+    <!-- Búsqueda -->
+    <div class="search-section">
+      <input
+        [(ngModel)]="search"
+        (ngModelChange)="filter()"
+        placeholder="Buscar proveedor..."
+        class="search-input"
+        />
+      </div>
+      <!-- Mensaje cuando no hay proveedores -->
+      @if (proveedores.length === 0) {
+        <div class="no-proveedores">
+          <div class="no-proveedores-content">
+            <i class="fa-solid fa-truck"></i>
+            <h3>No hay proveedores registrados</h3>
+            <p>Comienza agregando tu primer proveedor</p>
+          </div>
+        </div>
+      }
+      <!-- Lista de proveedores existentes -->
+      @if (proveedores.length > 0) {
+        <div class="proveedores-lista">
+          @for (supplier of proveedores; track supplier) {
+            <div class="proveedor-item">
+              <div class="proveedor-info">
+                <div class="proveedor-header">
+                  <h3>{{ supplier.name }}</h3>
+                  <span class="proveedor-id">ID: {{ supplier.id }}</span>
+                </div>
+                <div class="proveedor-details">
+                  @if (supplier.email) {
+                    <div class="detail-row">
+                      <span class="detail-label">
+                        <i class="fa-solid fa-envelope"></i> Email:
+                      </span>
+                      <span class="detail-value">{{ supplier.email }}</span>
+                    </div>
+                  }
+                  @if (supplier.phone) {
+                    <div class="detail-row">
+                      <span class="detail-label">
+                        <i class="fa-solid fa-phone"></i> Teléfono:
+                      </span>
+                      <span class="detail-value">{{ supplier.phone }}</span>
+                    </div>
+                  }
+                  @if (supplier.address) {
+                    <div class="detail-row">
+                      <span class="detail-label">
+                        <i class="fa-solid fa-map-marker-alt"></i> Dirección:
+                      </span>
+                      <span class="detail-value">{{ supplier.address }}</span>
+                    </div>
+                  }
+                </div>
+              </div>
+              <!-- Botones de acciones de proveedor -->
+              <div class="acciones">
+                <button class="btn ver" (click)="verProductos(supplier)" title="Ver productos">
+                  <i class="fa-solid fa-eye"></i>
+                  <span>Productos</span>
+                </button>
+                <button class="btn actualizar" (click)="abrirEditar(supplier)" title="Editar proveedor">
+                  <i class="fa-solid fa-edit"></i>
+                  <span>Editar</span>
+                </button>
+                <button class="btn eliminar" (click)="eliminarProveedor(supplier)" title="Eliminar proveedor">
+                  <i class="fa-solid fa-trash"></i>
+                  <span>Eliminar</span>
+                </button>
+              </div>
+            </div>
+            } <!-- Fin proveedor-item -->
+          </div>
+          } <!-- Fin proveedores-lista -->
+        </div>
+        } <!-- Fin proveedores-container -->
+
+        <!-- ===================== PANEL DE PRODUCTOS (COMPONENTE HIJO) ===================== -->
+        @if (proveedorSeleccionado) {
+          <app-product-suppliers
+            [proveedorId]="proveedorSeleccionado.id"
+            [proveedorSeleccionado]="proveedorSeleccionado"
+            [productos]="todosLosProductos"
+            [modoModal]="true"
+            [autoAbrir]="true"
+            (cerrar)="proveedorSeleccionado = undefined"
+            (productoEliminado)="eliminarProductoDelProveedor($event)">
+          </app-product-suppliers>
+        }
+
+        <!-- ===================== MODAL PARA ASOCIAR PRODUCTO ===================== -->
+        @if (mostrarAsociar) {
+          <app-asociar-producto
+            [proveedor]="proveedorSeleccionado"
+            [productos]="todosLosProductos"
+            (asociado)="asociarProductoDesdeModal($event)"
+            (cancelar)="cancelarAsociar()">
+          </app-asociar-producto>
+        }

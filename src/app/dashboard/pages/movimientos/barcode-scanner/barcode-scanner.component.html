@@ -1,0 +1,196 @@
+<div class="barcode-scanner-container">
+  <div class="scanner-header">
+    <h2>
+      <i class="fa-solid fa-barcode"></i>
+      Escanear Código de Barras
+    </h2>
+    <p class="subtitle">Escanea o ingresa el código de barras para registrar productos al inventario</p>
+    <div class="info-box">
+      <i class="fa-solid fa-info-circle"></i>
+      <p><strong>Importante:</strong> El producto debe estar registrado en el catálogo con su código de barras en el campo "Referencia".
+    Al escanear, se buscará el producto en el catálogo y luego podrás registrarlo al inventario.</p>
+  </div>
+</div>
+
+<!-- Mensajes -->
+@if (successMessage || errorMessage) {
+  <div class="messages">
+    @if (successMessage) {
+      <div class="alert alert-success">
+        <i class="fa-solid fa-check-circle"></i>
+        <div [innerHTML]="successMessage"></div>
+      </div>
+    }
+    @if (errorMessage) {
+      <div class="alert alert-danger">
+        <i class="fa-solid fa-exclamation-circle"></i>
+        <div [innerHTML]="errorMessage"></div>
+        @if (errorMessage.includes('No se encontró')) {
+          <div class="error-actions">
+            <button (click)="irACatalogo()" class="btn-link">
+              <i class="fa-solid fa-box"></i>
+              Ir al Catálogo de Productos
+            </button>
+          </div>
+        }
+      </div>
+    }
+  </div>
+}
+
+<!-- Input manual -->
+<div class="manual-input-section">
+  <div class="input-group">
+    <label for="manualBarcode">
+      <i class="fa-solid fa-keyboard"></i>
+      Ingresar código manualmente
+    </label>
+    <div class="input-wrapper">
+      <input
+        type="text"
+        id="manualBarcode"
+        [(ngModel)]="manualInput"
+        (keypress)="onKeyPress($event)"
+        placeholder="Ingresa el código de barras aquí..."
+        class="barcode-input"
+        [disabled]="loading || isScanning"
+        />
+        <button
+          type="button"
+          (click)="buscarManual()"
+          class="btn-search"
+          [disabled]="loading || isScanning || !manualInput.trim()"
+          >
+          <i class="fa-solid fa-search"></i>
+          Buscar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Escáner de cámara -->
+  @if (scannerSupported) {
+    <div class="camera-section">
+      <div class="camera-controls">
+        @if (!isScanning) {
+          <button
+            (click)="startScanning()"
+            class="btn-scan"
+            [disabled]="loading"
+            >
+            <i class="fa-solid fa-camera"></i>
+            Iniciar Escaneo
+          </button>
+        }
+        @if (isScanning) {
+          <button
+            (click)="stopScanning()"
+            class="btn-stop"
+            >
+            <i class="fa-solid fa-stop"></i>
+            Detener Escaneo
+          </button>
+        }
+      </div>
+      <!-- Contenedor para QuaggaJS -->
+      @if (isScanning) {
+        <div class="video-container">
+          <div #videoElement id="interactive" class="scanner-viewport"></div>
+          <div class="scanner-overlay">
+            <div class="scanner-frame"></div>
+            <p class="scanner-hint">Apunta la cámara al código de barras</p>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Mensaje si no hay soporte de escáner -->
+  @if (!scannerSupported && !isScanning) {
+    <div class="no-support-message">
+      <i class="fa-solid fa-info-circle"></i>
+      <p>Tu navegador no soporta escaneo automático. Usa el campo de entrada manual arriba.</p>
+    </div>
+  }
+
+  <!-- Loading -->
+  @if (loading) {
+    <div class="loading-overlay">
+      <div class="spinner"></div>
+      <p>Buscando producto...</p>
+    </div>
+  }
+
+  <!-- Producto encontrado -->
+  @if (productoEncontrado && !loading) {
+    <div class="product-found">
+      <div class="product-card">
+        <div class="product-header">
+          <h3>
+            <i class="fa-solid fa-check-circle"></i>
+            Producto Encontrado
+          </h3>
+        </div>
+        <div class="product-info">
+          @if (productoEncontrado.image_url) {
+            <div class="product-image">
+              <img [src]="productoEncontrado.image_url" [alt]="productoEncontrado.name" />
+            </div>
+          }
+          <div class="product-details">
+            <h4>{{ productoEncontrado.name }}</h4>
+            <div class="detail-row">
+              <span class="label">
+                <i class="fa-solid fa-barcode"></i>
+                Código de Barras:
+              </span>
+              <span class="value" style="font-weight: 600; color: #ffbf00;">{{ productoEncontrado.reference || 'Sin código' }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">
+                <i class="fa-solid fa-folder"></i>
+                Categoría:
+              </span>
+              <span class="value">{{ productoEncontrado.categoria?.name || 'Sin categoría' }}</span>
+            </div>
+            @if (productoEncontrado.unit_measurement) {
+              <div class="detail-row">
+                <span class="label">
+                  <i class="fa-solid fa-ruler"></i>
+                  Unidad:
+                </span>
+                <span class="value">{{ productoEncontrado.unit_measurement }}</span>
+              </div>
+            }
+            @if (productoEncontrado.batch) {
+              <div class="detail-row">
+                <span class="label">
+                  <i class="fa-solid fa-layer-group"></i>
+                  Lote Principal:
+                </span>
+                <span class="value">{{ productoEncontrado.batch }}</span>
+              </div>
+            }
+          </div>
+        </div>
+        <div class="product-actions">
+          <button
+            (click)="registrarAlInventario()"
+            class="btn-register"
+            >
+            <i class="fa-solid fa-plus-circle"></i>
+            Registrar al Inventario
+          </button>
+          <button
+            (click)="limpiar()"
+            class="btn-clear"
+            >
+            <i class="fa-solid fa-times"></i>
+            Limpiar
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>
+

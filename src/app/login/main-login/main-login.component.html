@@ -16,6 +16,13 @@
   <div class="right">
     <h2>Iniciar Sesión</h2>
 
+    <!-- Mensaje cuando viene desde una alerta -->
+    @if (returnUrl && returnUrl.includes('alertas')) {
+      <div class="alerta-mensaje">
+        <p>🔔 Para ver la alerta, por favor inicia sesión</p>
+      </div>
+    }
+
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" id="loginForm" autocomplete="off">
 
       <input type="text" name="fake-username" style="display:none;" autocomplete="username">
@@ -31,7 +38,7 @@
 
       <button type="submit" class="ir">INGRESAR</button>
     </form>
-    
+
     <div class="social-icons">
       <i class="fab fa-google"></i>
       <i class="fab fa-facebook"></i>

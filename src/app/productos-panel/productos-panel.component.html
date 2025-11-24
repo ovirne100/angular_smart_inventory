@@ -1,0 +1,66 @@
+<div class="productos-panel">
+  <div class="productos-header">
+    <h3>Productos de {{ proveedorSeleccionado?.name || 'Proveedor' }}</h3>
+
+    <div class="header-actions">
+      <button class="btn-asociar" (click)="onAbrirAsociar()">
+        <i class="fa-solid fa-plus"></i> Asociar producto
+      </button>
+
+      <button class="btn-cerrar" (click)="onCerrar()">
+        <i class="fa-solid fa-circle-xmark"></i> Cerrar
+      </button>
+    </div>
+  </div>
+
+  <!-- Mensaje si no hay productos -->
+  @if (productosProveedor.length === 0) {
+    <div class="no-productos">
+      <p>Este proveedor no tiene productos asociados</p>
+    </div>
+  }
+
+  <!-- Lista de productos -->
+  @if (productosProveedor.length > 0) {
+    <div class="productos-lista">
+      @for (producto of productosProveedor; track trackByProductId($index, producto)) {
+        <div
+          class="producto-item"
+          >
+          <!-- Imagen del producto -->
+          <div class="producto-imagen">
+            <img
+              [src]="producto.image_url || (producto.image ? 'http://127.0.0.1:8000/storage/' + producto.image : '/assets/no-image.png')"
+              [alt]="producto.name"
+              (error)="$event.target.src = '/assets/no-image.png'"
+              />
+            </div>
+            <!-- Información del producto -->
+            <div class="producto-info">
+              <h4>{{ producto.name }}</h4>
+              <p><strong>Referencia:</strong> {{ producto.reference }}</p>
+              <p><strong>Lote:</strong> {{ producto.batch }}</p>
+              <div class="producto-details">
+                <!-- Pivot seguro -->
+                @if (producto.pivot; as pivot) {
+                  <span class="costo">
+                    <strong>Costo:</strong> ${{ +pivot.unit_cost | number:'1.0-2' }}
+                  </span>
+                  @if (pivot.supplier_reference) {
+                    <span class="referencia">
+                      <strong>Ref. proveedor:</strong> {{ pivot.supplier_reference }}
+                    </span>
+                  }
+                }
+              </div>
+              <!-- Botón eliminar -->
+              <button class="btn-menu" (click)="onEliminar(producto)" title="Eliminar producto">
+                <i class="fa-solid fa-trash"></i>
+                <span>Eliminar</span>
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>

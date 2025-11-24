@@ -1,40 +1,121 @@
-<header>
-  
+<div class="dashboard-container">
+  <h1 class="title">Panel de Inventario</h1>
 
-    <div class="cabesera">  
-          <button class="home-btn">
-  <i class="fas fa-house"></i>
-</button>  
-<h1>Inicio</h1>
+  <div class="cards-grid">
+
+    <!-- Tarjeta: Producto con más stock -->
+    <div class="card cyan">
+      <div class="icon">📦</div>
+      <div class="content">
+        <h2>Producto con más stock</h2>
+        <p class="value">{{ stats.productoStock?.nombre || '—' }}</p>
+        <small>{{ stats.productoStock?.cantidad || 0 | number }} und</small>
+      </div>
     </div>
-</header>
 
-<main>
-    <div class="contend">
-        <div class="yellow">
-            <p>Producto con mas salidas del mes en curso</p>
-            <div class="contend2">
-            <div class="price">
-                <p><strong>600</strong>und</p> <br><p> Boligrafos </p>
-            </div>
-            <div class="feccha"><p><strong>29\06\2025</strong></p></div>
-            </div>
-        </div>
+    <!-- Tarjeta: Producto con más salida -->
+    <div class="card pink">
+      <div class="icon">🚚</div>
+      <div class="content">
+        <h2>Producto con más salida</h2>
+        <p class="value">{{ stats.productoSalida?.nombre || '—' }}</p>
+        <small>{{ stats.productoSalida?.cantidad || 0 | number }} und</small>
+      </div>
+    </div>
 
-        <div class="blue">
-            <p>total salidas en curso</p>
-            <div class="contend3">
-            <div class="price3">
-                <p><strong>1.842</strong>und</p> <br><p> Respeto al mes anterior </p> <br><p>+15%</p>
-            </div>
+    <!-- Tarjeta: Comparación mensual con gráfica -->
+    <div class="card violet chart-card">
+      <div class="content">
+        <div class="chart-header">
+          <div class="chart-title">
+            <h2>Comparativa Mes Anterior</h2>
+            <p class="chart-subtitle">Entradas y salidas del mes actual frente al mes pasado</p>
+          </div>
+          <div class="legend-pills">
+            <span class="pill actual">
+              <i class="fa-solid fa-calendar-check"></i>
+              <strong>Mes Actual</strong>
+            </span>
+            <span class="pill previous">
+              <i class="fa-solid fa-calendar-days"></i>
+              <strong>Mes Anterior</strong>
+            </span>
+            <span class="pill variation">
+              <i class="fa-solid fa-chart-line"></i>
+              <strong>Variación %</strong>
+            </span>
+          </div>
         </div>
+        <div class="chart-container">
+          <canvas baseChart
+                  [data]="barChartData"
+                  [type]="barChartType"
+                  [options]="barChartOptions"
+                  [plugins]="comparisonPlugins">
+          </canvas>
+        </div>
+        <div class="insight-grid">
+          <div class="insight-card">
+            <div class="insight-header">
+              <span class="insight-label">
+                <i class="fa-solid fa-arrow-down"></i> Entradas
+              </span>
+              <span class="insight-tag actual">
+                <i class="fa-solid fa-calendar-check"></i> Mes Actual
+              </span>
+            </div>
+            <div class="insight-body">
+              <span class="insight-value">{{ stats.entradasMesActual || 0 | number }}</span>
+              <span class="insight-meta">
+                vs {{ stats.entradasMesAnterior || 0 | number }} el mes anterior
+              </span>
+              <span class="trend insight-delta"
+                    [class]="getTendenciaClass(stats.entradasMesActual || 0, stats.entradasMesAnterior || 0)">
+                <i class="fa-solid"
+                   [ngClass]="{
+                     'fa-arrow-up': (stats.entradasMesActual || 0) > (stats.entradasMesAnterior || 0),
+                     'fa-arrow-down': (stats.entradasMesActual || 0) < (stats.entradasMesAnterior || 0),
+                     'fa-equals': (stats.entradasMesActual || 0) === (stats.entradasMesAnterior || 0)
+                   }"></i>
+                {{ calcularPorcentajeCambio(stats.entradasMesActual || 0, stats.entradasMesAnterior || 0) }}%
+                <span class="insight-delta-detail">
+                  {{ (stats.entradasMesActual || 0) - (stats.entradasMesAnterior || 0) | number }} und
+                </span>
+              </span>
+            </div>
+          </div>
+          <div class="insight-card">
+            <div class="insight-header">
+              <span class="insight-label">
+                <i class="fa-solid fa-arrow-up"></i> Salidas
+              </span>
+              <span class="insight-tag actual">
+                <i class="fa-solid fa-calendar-check"></i> Mes Actual
+              </span>
+            </div>
+            <div class="insight-body">
+              <span class="insight-value">{{ stats.salidasMesActual || 0 | number }}</span>
+              <span class="insight-meta">
+                vs {{ stats.salidasMesAnterior || 0 | number }} el mes anterior
+              </span>
+              <span class="trend insight-delta"
+                    [class]="getTendenciaClass(stats.salidasMesActual || 0, stats.salidasMesAnterior || 0)">
+                <i class="fa-solid"
+                   [ngClass]="{
+                     'fa-arrow-up': (stats.salidasMesActual || 0) > (stats.salidasMesAnterior || 0),
+                     'fa-arrow-down': (stats.salidasMesActual || 0) < (stats.salidasMesAnterior || 0),
+                     'fa-equals': (stats.salidasMesActual || 0) === (stats.salidasMesAnterior || 0)
+                   }"></i>
+                {{ calcularPorcentajeCambio(stats.salidasMesActual || 0, stats.salidasMesAnterior || 0) }}%
+                <span class="insight-delta-detail">
+                  {{ (stats.salidasMesActual || 0) - (stats.salidasMesAnterior || 0) | number }} und
+                </span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
 </div>
-        <div class="coffe">
-            <p>Total devoluciones mes en curso</p>
-            <div class="contend4">
-            <div class="price4">
-                <p><strong>600</strong>und</p> <br><p> Respeto al mes anterior</p> <br> <p>+15%</p>
-            </div>
-        </div>
-    </div>
-

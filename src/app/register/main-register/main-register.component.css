@@ -54,6 +54,7 @@ input{
     justify-content: center;
 }
 .container {
+  width: 100%;
   display: flex;
   min-height: 100vh;
   padding: 2rem;
@@ -108,7 +109,7 @@ input{
   background-color: #1e1e1e;
   padding: 2rem;
   border-radius: 12px;
-  box-shadow: 0 0 20px rgba(241, 196, 15, 0.3);
+     box-shadow: 0 0 20px #f5c70e;
 }
 
 .right h2 {
@@ -204,7 +205,7 @@ input{
     border-radius: 10px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 5.0);
 
-    
+
   }
   .logo_navbar img {
     width: 150px;
@@ -224,4 +225,26 @@ input{
     align-items: center;
     text-align: center;
   }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 1rem;
+  }
+  .right {
+    width: 100%;
+    max-width: 100%;
+    padding: 1.25rem;
+  }
+  .left h1 {
+    font-size: 2rem;
+  }
+  .logo img {
+    width: 140px;
+  }
+}
+
+/* Smooth mobile scrolling */
+.container {
+  -webkit-overflow-scrolling: touch;
 }

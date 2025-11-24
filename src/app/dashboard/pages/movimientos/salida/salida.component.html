@@ -1,0 +1,162 @@
+<div class="salida-container">
+
+  <!-- Header -->
+  <div class="header">
+    <h2>📤 Salidas de Productos</h2>
+    <button (click)="toggleForm()" class="btn-toggle">
+      {{ showForm ? '✖ Cerrar' : '➕ Nueva Salida' }}
+    </button>
+  </div>
+
+  <!-- Mensajes -->
+  @if (successMessage || errorMessage || warningMessage) {
+    <div class="messages">
+      @if (successMessage) {
+        <div class="alert alert-success">{{ successMessage }}</div>
+      }
+      @if (errorMessage) {
+        <div class="alert alert-danger">{{ errorMessage }}</div>
+      }
+      @if (warningMessage) {
+        <div class="alert alert-warning">{{ warningMessage }}</div>
+      }
+    </div>
+  }
+
+  <!-- Formulario de Salida -->
+  @if (showForm) {
+    <form [formGroup]="salidaForm" (ngSubmit)="onSubmit()" class="form-box" novalidate>
+      <h3>Registrar Nueva Salida</h3>
+      <!-- Escáner de código de barras -->
+      <div class="form-group scanner-group">
+        <button type="button" (click)="toggleScanner()" class="btn-scanner" [class.active]="mostrarScanner">
+          <i class="fa-solid fa-barcode"></i>
+          {{ mostrarScanner ? 'Ocultar Escáner' : 'Escanear Código de Barras' }}
+        </button>
+        @if (mostrarScanner) {
+          <div class="scanner-content">
+            <!-- Input manual -->
+            <div class="scanner-input-container">
+              <input
+                type="text"
+                [(ngModel)]="codigoBarrasInput"
+                (keyup.enter)="buscarProductoPorCodigo()"
+                (input)="onCodigoInputChange()"
+                placeholder="Ingrese el código de barras manualmente"
+                class="scanner-input"
+                [disabled]="escaneando">
+                <button
+                  type="button"
+                  (click)="buscarProductoPorCodigo()"
+                  class="btn-buscar"
+                  [disabled]="escaneando || !codigoBarrasInput || codigoBarrasInput.trim().length === 0">
+                  @if (!escaneando) {
+                    <i class="fa-solid fa-search"></i>
+                  }
+                  @if (escaneando) {
+                    <i class="fa-solid fa-spinner fa-spin"></i>
+                  }
+                  {{ escaneando ? 'Buscando...' : 'Buscar' }}
+                </button>
+              </div>
+              <!-- Separador -->
+              @if (scannerSupported) {
+                <div class="scanner-divider">
+                  <span>O</span>
+                </div>
+              }
+              <!-- Cámara -->
+              @if (scannerSupported) {
+                <div class="scanner-camera-section">
+                  <button
+                    type="button"
+                    (click)="isScanning ? stopScanning() : startCameraScanning()"
+                    class="btn-camera"
+                    [class.scanning]="isScanning">
+                    <i class="fa-solid" [class.fa-camera]="!isScanning" [class.fa-stop]="isScanning"></i>
+                    {{ isScanning ? 'Detener Cámara' : 'Iniciar Cámara' }}
+                  </button>
+                  <div #scannerContainer class="scanner-container" [style.display]="isScanning ? 'block' : 'none'">
+                    <!-- QuaggaJS renderizará aquí -->
+                  </div>
+                </div>
+              }
+              @if (!scannerSupported) {
+                <div class="scanner-warning">
+                  <i class="fa-solid fa-exclamation-triangle"></i>
+                  <span>El escáner de cámara no está disponible. Use el modo manual.</span>
+                </div>
+              }
+            </div>
+          }
+        </div>
+        <div class="form-group">
+          <label>Producto *</label>
+          <select formControlName="product_id" (change)="onProductoChange()">
+            <option value="">Seleccione un producto</option>
+            @for (p of productos; track p) {
+              <option [value]="p.id">{{ p.name }}</option>
+            }
+          </select>
+          @if (salidaForm.controls['product_id'].invalid && salidaForm.controls['product_id'].touched) {
+            <div class="error">
+              Selecciona un producto.
+            </div>
+          }
+        </div>
+        <div class="form-group">
+          <label>Cantidad *</label>
+          <input type="number" formControlName="quantity" placeholder="Ej: 10" min="1" (input)="onCantidadChange()">
+          @if (salidaForm.controls['quantity'].invalid && salidaForm.controls['quantity'].touched) {
+            <div class="error">
+              Ingresa una cantidad válida (≥1).
+            </div>
+          }
+          @if (!validacionInventario.disponible && validacionInventario.mensajeError) {
+            <div class="error">
+              {{ validacionInventario.mensajeError }}
+            </div>
+          }
+          @if (validacionInventario.disponible && validacionInventario.mensajeError === '') {
+            <div class="success">
+              ✅ Cantidad disponible
+            </div>
+          }
+          @if (productoSeleccionado && validacionInventario.cantidadDisponible > 0) {
+            <small class="form-hint">
+              Stock disponible: <strong>{{ validacionInventario.cantidadDisponible }}</strong>
+            </small>
+          }
+        </div>
+        <div class="form-group">
+          <label>Unidad</label>
+          <input type="text" formControlName="unit" placeholder="unidad, caja, paquete...">
+        </div>
+        <div class="form-group">
+          <label>Lote</label>
+          <input type="text" formControlName="lot" placeholder="Ej: 1011" (input)="onLoteChange()">
+          <small class="form-hint">Si no se especifica lote, se sumará el stock de todos los lotes disponibles.</small>
+          @if (productoSeleccionado && lotesDisponibles.length === 0) {
+            <small class="form-hint">
+              ⚠️ Este producto no tiene lotes disponibles en inventario
+            </small>
+          }
+        </div>
+        <div class="form-group">
+          @if (productoSeleccionado && lotesDisponibles.length === 0) {
+            <small class="form-hint">
+              ⚠️ Este producto no tiene lotes registrados en entradas. Debe registrar una entrada primero.
+            </small>
+          }
+        </div>
+        <div class="form-group">
+          <label>Motivo</label>
+          <input type="text" formControlName="motivo" placeholder="Ej: venta, traslado, consumo interno...">
+        </div>
+        <button type="submit" class="btn-submit" [disabled]="saving || salidaForm.invalid || !validacionInventario.disponible || !validacionInventario.loteValido">
+          {{ saving ? 'Guardando...' : '✅ Guardar Salida' }}
+        </button>
+      </form>
+    }
+
+  </div>
