@@ -1,17 +1,3 @@
-.btn-menu {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background: #ffbf00;
-  border: none;
-  padding: 10px 15px;
-  border-radius: 8px;
-  font-size: 1.2rem;
-  font-weight: bold;
-}
-
-
-
 .container {
   display: flex;
   width: 100%;
@@ -265,6 +251,12 @@
 
 
 @media (max-width:768px) {
+  .sidebar{
+    width: 100%;
+  }
+  .footer{
+    display: block;
+  }
 
     .inicio{
         display: flex;
@@ -514,6 +506,103 @@
 .btn-cancelar:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+/* Footer del Sidebar - oculto por defecto en desktop */
+.sidebar-footer {
+  display: none;
+}
+
+/* Footer visible solo en móvil */
+@media (max-width: 768px) {
+  .sidebar-footer {
+    display: block;
+    background: black;
+    color: #fff;
+    padding: 2rem 1rem;
+    margin-top: 2rem;
+    border-radius: 12px;
+  }
+
+  .user-info{
+    margin-top: 80px;
+  }
+
+  .sidebar-footer .footer-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    text-align: center;
+  }
+
+  .sidebar-footer .footer-section1 h3 {
+    color: #ffbf00;
+    font-size: 1.5rem;
+    margin: 0 0 0.5rem 0;
+  }
+
+  .sidebar-footer .footer-section1 p {
+    color: #aaa;
+    font-size: 0.9rem;
+    margin: 0;
+  }
+
+  .sidebar-footer .footer-section2 h4,
+  .sidebar-footer .footer-section3 h4 {
+    color: #ffbf00;
+    font-size: 1.1rem;
+    margin: 0 0 0.75rem 0;
+  }
+
+  .sidebar-footer .footer-section2 ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+  }
+
+  .sidebar-footer .footer-section2 ul li a {
+    color: #ccc;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.3s ease;
+    cursor: pointer;
+  }
+
+  .sidebar-footer .footer-section2 ul li a:hover {
+    color: #ffbf00;
+    text-decoration: underline;
+  }
+
+  .sidebar-footer .footer-icons {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+  }
+
+  .sidebar-footer .footer-icons i {
+    font-size: 1.5rem;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .sidebar-footer .footer-icons i:hover {
+    color: #ffbf00;
+    transform: scale(1.2);
+  }
+
+  .sidebar-footer .footer-bottom {
+    text-align: center;
+    padding-top: 1.5rem;
+    margin-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    color: #888;
+    font-size: 0.8rem;
+  }
 }
 
 

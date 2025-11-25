@@ -70,3 +70,8 @@ li {
   margin-bottom: 0.35rem;
 }
 
+@media (max-width: 768px) {
+  .page-hero{
+    margin-top: 50px;
+  }
+}

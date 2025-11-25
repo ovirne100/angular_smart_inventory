@@ -84,6 +84,40 @@
       </div>
 
     </section>
+
+    <!-- Footer para móvil dentro del sidebar -->
+    <footer class="sidebar-footer">
+      <div class="footer-container">
+        <div class="footer-section1">
+          <h3>Smart Inventory</h3>
+          <p>Controlando el presente, planificando el futuro.</p>
+        </div>
+
+        <div class="footer-section2">
+          <h4>Enlaces</h4>
+          <ul>
+            <li><a (click)="navegarConScroll('/dashboard/inicio')">Inicio</a></li>
+            <li><a (click)="navegarConScroll('/servicios')">Servicios</a></li>
+            <li><a (click)="navegarConScroll('/contacto')">Contacto</a></li>
+            <li><a (click)="navegarConScroll('/ayuda')">Ayuda</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-section3">
+          <h4>Síguenos</h4>
+          <div class="footer-icons">
+            <i class="fab fa-facebook-f"></i>
+            <i class="fab fa-twitter"></i>
+            <i class="fab fa-linkedin-in"></i>
+            <i class="fab fa-instagram"></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        &copy; 2025 Smart Inventory. Todos los derechos reservados.
+      </div>
+    </footer>
   </aside>
 
   <!-- Contenido dinámico -->
@@ -92,11 +126,6 @@
   </main>
 
 </div>
-
-<!-- Botón para volver a abrir el menú en móvil -->
-<button *ngIf="isMobile && !showSidebar" (click)="mostrarMenu()" class="btn-menu">
-  ☰ Menú
-</button>
 
 <!-- Modal para subir imagen de avatar -->
 <div *ngIf="mostrarModalAvatar" class="modal-overlay-avatar" (click)="cerrarModalAvatar()">

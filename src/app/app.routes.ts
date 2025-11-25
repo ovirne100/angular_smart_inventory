@@ -1,32 +1,3 @@
-/*import { Routes } from '@angular/router';
-import { MainLoginComponent } from './login/main-login/main-login.component';
-import { MainRegisterComponent } from './register/main-register/main-register.component';
-import { ServiciosComponent } from './pages/servicios/servicios.component';
-import { ContactoComponent } from './pages/contacto/contacto.component';
-import { AyudaComponent } from './pages/ayuda/ayuda.component';
-import { ServiciosComponent } from './pages/servicios/servicios.component';
-import { ContactoComponent } from './pages/contacto/contacto.component';
-import { AyudaComponent } from './pages/ayuda/ayuda.component';
-import { ServiciosComponent } from './pages/servicios/servicios.component';
-import { ContactoComponent } from './pages/contacto/contacto.component';
-import { AyudaComponent } from './pages/ayuda/ayuda.component';
-import { ServiciosComponent } from './pages/servicios/servicios.component';
-import { ContactoComponent } from './pages/contacto/contacto.component';
-import { AyudaComponent } from './pages/ayuda/ayuda.component';
-import { ServiciosComponent } from './pages/servicios/servicios.component';
-import { ContactoComponent } from './pages/contacto/contacto.component';
-import { AyudaComponent } from './pages/ayuda/ayuda.component';
-
-export const routes: Routes = [
-  { path: 'register', component: MainRegisterComponent },
-  { path: 'login', component: MainLoginComponent },
-  { path: '', redirectTo: 'register', pathMatch: 'full' },
-  { path: '**', redirectTo: 'register' }
-
-
-];
-*/
-
 import { Routes } from '@angular/router';
 
 // Login y Register publicas

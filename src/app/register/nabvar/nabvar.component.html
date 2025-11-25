@@ -1,16 +1,26 @@
 <div class="navbar">
     <nav>
+      <!-- Logo siempre visible -->
       <a (click)="goBack()" class="logo-link" role="button">
         <img src="/logo-smartinventory.png" alt="logo de la empresa" class="logo_empresa">
       </a>
 
-        <div class="menu">
-            <ul>
-                <li><a routerLink="/servicios" routerLinkActive="active-link">SERVICIOS</a></li>
-                <li><a routerLink="/contacto" routerLinkActive="active-link">CONTACTO</a></li>
-                <li><a routerLink="/ayuda" routerLinkActive="active-link">AYUDA</a></li>
-            </ul>
-        </div>
-<a *ngIf="showLoginLink" [routerLink]="['/login']" class="ir button-like">INGRESAR</a>
+      <!-- Enlaces de navegación -->
+      <div class="menu">
+        <ul>
+          <li><a routerLink="/servicios" routerLinkActive="active-link">SERVICIOS</a></li>
+          <li><a routerLink="/contacto" routerLinkActive="active-link">CONTACTO</a></li>
+          <li><a routerLink="/ayuda" routerLinkActive="active-link">AYUDA</a></li>
+        </ul>
+      </div>
+
+      <!-- Botón de menú (aparece en móvil cuando estamos en dashboard o páginas externas) -->
+      <button *ngIf="mostrarBotonMenu && isMobile" class="btn-menu" (click)="abrirMenuDashboard()" title="Ir al menú principal">
+        <i class="fa-solid fa-bars"></i>
+        <span>MENÚ</span>
+      </button>
+
+      <!-- Botón INGRESAR -->
+      <a *ngIf="showLoginLink" [routerLink]="['/login']" class="ir button-like">INGRESAR</a>
     </nav>
 </div>
