@@ -5,21 +5,172 @@
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.05);
 }
 
-/* Títulos */
-h2 {
+/* ===== HEADER CON FECHA ===== */
+.movimientos-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.header-info h2 {
   font-size: 1.6rem;
   font-weight: 700;
   margin-bottom: 5px;
   color: #111827;
+  margin: 0;
 }
 
-.subtitle {
+.header-info .subtitle {
   font-size: 1rem;
-  margin-bottom: 20px;
+  margin: 0.5rem 0 0 0;
   color: #6b7280;
 }
 
-/* Contadores */
+.fecha-actual {
+  display: flex;
+  align-items: center;
+}
+
+.fecha-box {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: linear-gradient(135deg, #ffbf00, #ff8c00);
+  padding: 0.75rem 1.25rem;
+  border-radius: 12px;
+  color: white;
+  box-shadow: 0 4px 12px rgba(255, 191, 0, 0.3);
+}
+
+.fecha-box i {
+  font-size: 1.5rem;
+}
+
+.fecha-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.fecha-info .mes {
+  font-size: 0.85rem;
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+.fecha-info .dia {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+/* ===== FILTROS DE TIEMPO ===== */
+.filtros-tiempo {
+  background: white;
+  padding: 1rem;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.filtro-label {
+  font-weight: 600;
+  color: #374151;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.filtro-label i {
+  color: #6b7280;
+}
+
+.filtro-botones {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  flex: 1;
+}
+
+.filtro-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 1rem;
+  border: 2px solid #e5e7eb;
+  background: white;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filtro-btn:hover {
+  border-color: #ffbf00;
+  background: #fffbeb;
+  color: #b45309;
+}
+
+.filtro-btn.active {
+  background: linear-gradient(135deg, #ffbf00, #ff8c00);
+  color: white;
+  border-color: #ff8c00;
+  box-shadow: 0 2px 8px rgba(255, 140, 0, 0.3);
+}
+
+.filtro-btn i {
+  font-size: 0.9rem;
+}
+
+.filtro-limpiar {
+  border-color: #d1d5db;
+  background: #f3f4f6;
+}
+
+.filtro-limpiar:hover {
+  border-color: #9ca3af;
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.filtro-limpiar.active {
+  background: #374151;
+  color: white;
+  border-color: #374151;
+  box-shadow: 0 2px 8px rgba(55, 65, 81, 0.3);
+}
+
+/* ===== PERÍODO SELECCIONADO ===== */
+.periodo-seleccionado {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+  border: 1px solid #a7f3d0;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  color: #065f46;
+}
+
+.periodo-seleccionado i {
+  color: #10b981;
+}
+
+.periodo-seleccionado strong {
+  color: #047857;
+}
+
+/* ===== CONTADORES ===== */
 .counters {
   display: flex;
   gap: 20px;
@@ -32,7 +183,7 @@ h2 {
   min-width: 220px;
   background: #ffffff;
   border-radius: 14px;
-  padding: 16px;
+  padding: 1.25rem;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
   text-align: center;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -44,24 +195,68 @@ h2 {
 }
 
 .counter h3 {
-  margin-bottom: 10px;
-  font-size: 1.1rem;
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
   font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.counter h3 i {
+  font-size: 1.1rem;
 }
 
 .counter .big {
-  font-size: 2rem;
-  font-weight: bold;
-  color: #eff31d;
-  margin: 5px 0;
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin: 0.5rem 0;
+}
+
+.counter .unidades {
+  font-size: 0.95rem;
+  color: #4b5563;
+  margin: 0.25rem 0;
+  font-weight: 500;
+}
+
+.counter .ultima-fecha {
+  font-size: 0.8rem;
+  color: #6b7280;
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.counter .ultima-fecha i {
+  font-size: 0.75rem;
 }
 
 .entradas {
   border-top: 4px solid #10b981;
 }
 
+.entradas h3 {
+  color: #059669;
+}
+
+.entradas .big {
+  color: #10b981;
+}
+
 .salidas {
   border-top: 4px solid #ef4444;
+}
+
+.salidas h3 {
+  color: #dc2626;
+}
+
+.salidas .big {
+  color: #ef4444;
 }
 
 /* Tabs */
@@ -124,27 +319,70 @@ h2 {
     font-size: 0.95rem;
     padding: 8px 12px;
   }
+
+  .filtro-botones {
+    justify-content: flex-start;
+  }
 }
 
 @media (max-width: 768px) {
   .movimientos-container {
     padding: 15px;
   }
-  .subtitle{
-    margin-top: 30px;
-    font-weight: bold;
-    font-size: 17px;
-    color: black;
+
+  .movimientos-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
   }
-  h2 {
+
+  .header-info h2 {
     font-size: 1.4rem;
-  }
-  .movimientos-container h2{
     margin-top: 60px;
-    font-size: 30px;
   }
-  .subtitle {
-    font-size: 0.9rem;
+
+  .header-info .subtitle {
+    margin-top: 0.5rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #374151;
+  }
+
+  .fecha-actual {
+    justify-content: center;
+  }
+
+  .fecha-box {
+    width: 100%;
+    justify-content: center;
+    padding: 1rem;
+  }
+
+  .filtros-tiempo {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .filtro-label {
+    justify-content: center;
+  }
+
+  .filtro-botones {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+
+  .filtro-btn {
+    justify-content: center;
+    padding: 0.75rem 0.5rem;
+    font-size: 0.8rem;
+  }
+
+  .periodo-seleccionado {
+    justify-content: center;
+    text-align: center;
   }
 
   .counters {
@@ -154,6 +392,10 @@ h2 {
 
   .counter {
     min-width: 100%;
+  }
+
+  .counter .big {
+    font-size: 2rem;
   }
 
   .tabs {
@@ -169,16 +411,50 @@ h2 {
 }
 
 @media (max-width: 480px) {
-  h2 {
+  .header-info h2 {
     font-size: 1.2rem;
   }
 
-  .counter .big {
-    font-size: 1.6rem;
+  .fecha-box {
+    padding: 0.75rem;
   }
 
-  .subtitle {
+  .fecha-box i {
+    font-size: 1.2rem;
+  }
+
+  .fecha-info .mes {
+    font-size: 0.75rem;
+  }
+
+  .fecha-info .dia {
+    font-size: 0.95rem;
+  }
+
+  .filtro-btn {
+    font-size: 0.75rem;
+    padding: 0.6rem 0.4rem;
+  }
+
+  .filtro-btn i {
+    font-size: 0.8rem;
+  }
+
+  .counter .big {
+    font-size: 1.8rem;
+  }
+
+  .counter .unidades {
     font-size: 0.85rem;
+  }
+
+  .counter .ultima-fecha {
+    font-size: 0.75rem;
+  }
+
+  .periodo-seleccionado {
+    font-size: 0.8rem;
+    padding: 0.6rem 0.75rem;
   }
 
   .content-box {

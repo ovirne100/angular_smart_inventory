@@ -1,21 +1,72 @@
 <div class="movimientos-container">
-  <h2>📦 Registro de Entradas y Salidas</h2>
-  <p class="subtitle">Control de movimientos del inventario</p>
+  <!-- Header con fecha actual -->
+  <div class="movimientos-header">
+    <div class="header-info">
+      <h2>📦 Registro de Entradas y Salidas</h2>
+      <p class="subtitle">Control de movimientos del inventario</p>
+    </div>
+    <div class="fecha-actual">
+      <div class="fecha-box">
+        <i class="fa-solid fa-calendar-days"></i>
+        <div class="fecha-info">
+          <span class="mes">{{ mesActual }}</span>
+          <span class="dia">{{ diaActual }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtros de tiempo -->
+  <div class="filtros-tiempo">
+    <span class="filtro-label"><i class="fa-solid fa-filter"></i> Filtrar por:</span>
+    <div class="filtro-botones">
+      <button 
+        class="filtro-btn" 
+        [class.active]="filtroActivo === 'semana'"
+        (click)="filtrarPorTiempo('semana')">
+        <i class="fa-solid fa-calendar-week"></i> Esta Semana
+      </button>
+      <button 
+        class="filtro-btn" 
+        [class.active]="filtroActivo === 'mes'"
+        (click)="filtrarPorTiempo('mes')">
+        <i class="fa-solid fa-calendar"></i> Este Mes
+      </button>
+      <button 
+        class="filtro-btn" 
+        [class.active]="filtroActivo === 'anio'"
+        (click)="filtrarPorTiempo('anio')">
+        <i class="fa-solid fa-calendar-alt"></i> Este Año
+      </button>
+      <button 
+        class="filtro-btn filtro-limpiar" 
+        [class.active]="filtroActivo === 'todos'"
+        (click)="filtrarPorTiempo('todos')">
+        <i class="fa-solid fa-list"></i> Todos
+      </button>
+    </div>
+  </div>
+
+  <!-- Indicador de período seleccionado -->
+  <div class="periodo-seleccionado" *ngIf="filtroActivo !== 'todos'">
+    <i class="fa-solid fa-clock"></i>
+    <span>Mostrando: <strong>{{ textoFiltro }}</strong></span>
+  </div>
 
   <!-- Contadores -->
   <div class="counters">
     <div class="counter entradas">
-      <h3>📥 Entradas</h3>
+      <h3><i class="fa-solid fa-box-archive"></i> Entradas</h3>
       <p class="big">{{ entriesCount }}</p>
-      <p>{{ entriesQuantity }} unidades</p>
-      <p>Última: {{ lastEntryDate || 'N/A' }}</p>
+      <p class="unidades">{{ entriesQuantity }} unidades</p>
+      <p class="ultima-fecha"><i class="fa-regular fa-clock"></i> Última: {{ lastEntryDate || 'N/A' }}</p>
     </div>
 
     <div class="counter salidas">
-      <h3>📤 Salidas</h3>
+      <h3><i class="fa-solid fa-box-archive"></i> Salidas</h3>
       <p class="big">{{ outputsCount }}</p>
-      <p>{{ outputsQuantity }} unidades</p>
-      <p>Última: {{ lastOutputDate || 'N/A' }}</p>
+      <p class="unidades">{{ outputsQuantity }} unidades</p>
+      <p class="ultima-fecha"><i class="fa-regular fa-clock"></i> Última: {{ lastOutputDate || 'N/A' }}</p>
     </div>
   </div>
 

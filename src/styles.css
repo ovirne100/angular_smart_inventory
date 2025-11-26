@@ -329,10 +329,11 @@ input.ng-invalid.ng-touched {
 .info-img{
   display: flex;
   align-items: center;
-  gap: 1em;
+
 }
 .info-img img{
-  width: 120px;
+  width: 85px;
+  height: 95px;
 }
 
 /* Small screens: stack layout */
