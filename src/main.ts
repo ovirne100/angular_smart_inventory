@@ -12,12 +12,15 @@ bootstrapApplication(AppComponent, {
     provideZoneChangeDetection(),provideHttpClient(
       withInterceptors([AuthInterceptor]) // 👈 registra aquí el interceptor
     ),
-    
+
     // HttpClient global
     importProvidersFrom(
       FormsModule,
       ReactiveFormsModule,
-      RouterModule.forRoot(routes, {bindToComponentInputs: true}) // para binding directo con standalone
+      RouterModule.forRoot(routes, {
+        bindToComponentInputs: true, // para binding directo con standalone
+        scrollPositionRestoration: 'top' // scroll automático al top en cada navegación
+      })
     )
   ]
 });

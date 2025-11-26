@@ -106,3 +106,8 @@ button[type='submit']:hover {
   box-shadow: 0 15px 30px rgba(99, 102, 241, 0.3);
 }
 
+@media (max-width: 768px) {
+  .page-hero{
+    margin-top: 50px;
+  }
+}

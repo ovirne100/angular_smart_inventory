@@ -463,6 +463,13 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
+  padding-top: 6em; /* Espacio para el navbar fijo */
+}
+
+@media (max-width: 768px) {
+  body {
+    padding-top: 8em; /* Más espacio en móvil por el navbar con wrap */
+  }
 }
 
 /* Tipografía */
@@ -812,25 +819,4 @@ a:hover {
   }
 }
 
-.btn-menu {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background: linear-gradient(135deg, #ffbf00, #ff8c00);
-  color: #fff;
-  border: none;
-  padding: 12px 18px;
-  border-radius: 8px;
-  font-weight: bold;
-  font-size: 1.1rem;
-  cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-  transition: all 0.3s ease;
-  z-index: 99999; /* 👈 Esto lo saca encima de todo */
-}
-
-.btn-menu:hover {
-  transform: scale(1.05);
-  background: linear-gradient(135deg, #ff8c00, #ffbf00);
-}
 

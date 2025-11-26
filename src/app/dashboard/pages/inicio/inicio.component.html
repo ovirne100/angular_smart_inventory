@@ -9,7 +9,24 @@
       <div class="content">
         <h2>Producto con más stock</h2>
         <p class="value">{{ stats.productoStock?.nombre || '—' }}</p>
-        <small>{{ stats.productoStock?.cantidad || 0 | number }} und</small>
+        <div class="stats-details">
+          <div class="stat-item">
+            <span class="stat-label">Stock actual:</span>
+            <span class="stat-value">{{ stats.productoStock?.cantidad || 0 | number }} und</span>
+          </div>
+          <div class="stat-item" *ngIf="stats.productoStock?.total_entradas">
+            <span class="stat-label">Total entradas:</span>
+            <span class="stat-value">{{ stats.productoStock?.total_entradas || 0 | number }} und</span>
+          </div>
+          <div class="stat-item" *ngIf="stats.productoStock?.total_salidas">
+            <span class="stat-label">Total salidas:</span>
+            <span class="stat-value">{{ stats.productoStock?.total_salidas || 0 | number }} und</span>
+          </div>
+          <div class="stat-item" *ngIf="stats.productoStock?.veces_salio">
+            <span class="stat-label">Veces que salió:</span>
+            <span class="stat-value">{{ stats.productoStock?.veces_salio || 0 | number }} veces</span>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -17,9 +34,18 @@
     <div class="card pink">
       <div class="icon">🚚</div>
       <div class="content">
-        <h2>Producto con más salida</h2>
+        <h2>Producto con más salidas</h2>
         <p class="value">{{ stats.productoSalida?.nombre || '—' }}</p>
-        <small>{{ stats.productoSalida?.cantidad || 0 | number }} und</small>
+        <div class="stats-details">
+          <div class="stat-item">
+            <span class="stat-label">Cantidad total salida:</span>
+            <span class="stat-value">{{ stats.productoSalida?.cantidad_total || stats.productoSalida?.cantidad || 0 | number }} und</span>
+          </div>
+          <div class="stat-item" *ngIf="stats.productoSalida?.veces_salio">
+            <span class="stat-label">Número de veces que salió:</span>
+            <span class="stat-value">{{ stats.productoSalida?.veces_salio || 0 | number }} veces</span>
+          </div>
+        </div>
       </div>
     </div>
 
