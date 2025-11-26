@@ -227,6 +227,31 @@ export class UnitsService {
       u.name.toLowerCase().includes(termLower) ||
       u.abbreviation?.toLowerCase().includes(termLower)
     );
-  }
+   }
+
+   /**
+ * Obtener las unidades asociadas a un producto específico
+ * (compatible con tu entrada.component.ts)
+ */
+getProductUnits(productId: number): Observable<Unit[]> {
+  return this.http.get<any>(`${this.apiUrl}/product/${productId}`, {
+    headers: this.getAuthHeaders()
+  }).pipe(
+    map(response => {
+      const unitsArray = response.data || response || [];
+      return unitsArray.length > 0 ? unitsArray : this.defaultUnits;
+    }),
+    catchError(() => {
+      // Si falla, devuelve unidades default o localStorage
+      const stored = localStorage.getItem(this.storageKey);
+      if (stored) {
+        const units = JSON.parse(stored);
+        return of(units.length > 0 ? units : this.defaultUnits);
+      }
+      return of(this.defaultUnits);
+    })
+  );
+}
+
 }
 

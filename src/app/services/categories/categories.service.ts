@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, of, catchError, map, switchMap, throwError } from 'rxjs';
-import { API_CONFIG, getApiUrl } from '../../config/api.config';
+import { environment } from '../../../environments/environment';
 
 export interface Category {
   id: number;
@@ -12,7 +12,8 @@ export interface Category {
   providedIn: 'root'
 })
 export class CategoriesService {
-  private apiUrl = API_CONFIG.BASE_URL;
+  // Usar la URL del environment (sin duplicar /api)
+  private apiUrl = `${environment.apiUrl}/categories`;
 
   // Categorías predefinidas del frontend
   private frontendCategories: Category[] = [
@@ -49,7 +50,9 @@ export class CategoriesService {
     { id: 31, name: 'Aseo' },
   ];
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    console.log('🔗 CategoriesService usando URL:', this.apiUrl);
+  }
 
   private getAuthHeaders(): HttpHeaders {
     const token = localStorage.getItem('token');
@@ -62,14 +65,20 @@ export class CategoriesService {
 
   // Obtener categorías del backend
   getCategories(): Observable<Category[]> {
-    return this.http.get<any>(getApiUrl(API_CONFIG.ENDPOINTS.CATEGORIES), { headers: this.getAuthHeaders() }).pipe(
-      map(response => response.data || response),
-      catchError(this.handleError)
+    console.log('📡 Obteniendo categorías desde:', this.apiUrl);
+    return this.http.get<any>(this.apiUrl, { headers: this.getAuthHeaders() }).pipe(
+      map(response => {
+        console.log('✅ Categorías recibidas del backend:', response);
+        return response.data || response;
+      }),
+      catchError(error => {
+        console.warn('⚠️ Error al obtener categorías del backend, usando fallback:', error);
+        return of(this.frontendCategories);
+      })
     );
   }
 
   // Crear nueva categoría en el backend
-  // Usa el endpoint POST /api/categories para crear una categoría individual
   createCategory(name: string): Observable<Category> {
     const nombreLimpio = name.trim();
 
@@ -77,13 +86,12 @@ export class CategoriesService {
       return throwError(() => new Error('El nombre de la categoría no puede estar vacío'));
     }
 
-    // Usar el endpoint normal para crear categorías individuales
-    const url = getApiUrl(API_CONFIG.ENDPOINTS.CATEGORIES);
     const payload = { name: nombreLimpio };
+    console.log('📤 Creando categoría:', payload);
 
-    return this.http.post<any>(url, payload, { headers: this.getAuthHeaders() }).pipe(
+    return this.http.post<any>(this.apiUrl, payload, { headers: this.getAuthHeaders() }).pipe(
       map(response => {
-        // Manejar diferentes formatos de respuesta del backend
+        console.log('✅ Categoría creada:', response);
         const categoria = response.data || response.category || response;
 
         if (!categoria || !categoria.id) {
@@ -96,12 +104,8 @@ export class CategoriesService {
         } as Category;
       }),
       catchError((error) => {
-        // Solo mostrar error si no es un error de conexión (status 0)
-        if (error.status !== 0) {
-          console.error('Error al crear categoría:', error);
-        }
+        console.error('❌ Error al crear categoría:', error);
 
-        // Manejar errores de validación del backend
         if (error.error?.errors?.name) {
           const errorMessage = Array.isArray(error.error.errors.name)
             ? error.error.errors.name[0]
@@ -112,7 +116,6 @@ export class CategoriesService {
           }));
         }
 
-        // Manejar otros errores
         const errorMessage = error.error?.message || error.message || 'Error desconocido al crear la categoría';
         return throwError(() => ({
           message: errorMessage,
@@ -121,8 +124,6 @@ export class CategoriesService {
       })
     );
   }
-
-
 
   // Obtener categorías del frontend (para usar en el formulario)
   getFrontendCategories(): Category[] {
@@ -141,19 +142,31 @@ export class CategoriesService {
 
   // Inicializar categorías en el backend
   initializeCategories(): Observable<any> {
-    return this.http.post(getApiUrl(API_CONFIG.ENDPOINTS.CATEGORIES_INIT), {
+    const initUrl = `${environment.apiUrl}/categories/initialize`;
+    console.log('🚀 Inicializando categorías en:', initUrl);
+    
+    return this.http.post(initUrl, {
       categories: this.frontendCategories
     }, { headers: this.getAuthHeaders() }).pipe(
-      catchError(this.handleError)
+      map(response => {
+        console.log('✅ Categorías inicializadas:', response);
+        return response;
+      }),
+      catchError(error => {
+        console.warn('⚠️ Error al inicializar categorías:', error);
+        return of({
+          success: false,
+          message: 'Error al inicializar categorías',
+          data: this.frontendCategories
+        });
+      })
     );
   }
 
-
   // Manejar errores de manera elegante
   private handleError = (error: HttpErrorResponse): Observable<any> => {
-    // Si el backend no está disponible (status 0 = conexión rechazada), usar fallback silenciosamente
     if (error.status === 0) {
-      // No mostrar error en consola para errores de conexión, ya que hay fallback
+      console.log('🔌 Backend no disponible, usando categorías locales');
       return of({
         success: false,
         message: 'Backend no disponible, usando categorías locales',
@@ -161,14 +174,12 @@ export class CategoriesService {
       });
     }
 
-    // Para otros errores (404, 500, etc.), mostrar advertencia
     if (error.status >= 500) {
       console.warn('⚠️ Error del servidor en CategoriesService:', error.status);
     } else if (error.status !== 404) {
       console.warn('⚠️ Error en CategoriesService:', error.status, error.message);
     }
 
-    // Si el backend no está disponible, devolver las categorías del frontend
     if (error.status >= 500) {
       return of({
         success: false,
@@ -177,7 +188,6 @@ export class CategoriesService {
       });
     }
 
-    // Para otros errores, devolver el error
     return of({
       success: false,
       message: error.error?.message || 'Error desconocido',
