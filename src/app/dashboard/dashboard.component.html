@@ -1,191 +1,195 @@
 <div class="container">
 
   <!-- Sidebar solo visible si showSidebar = true -->
-  <aside class="sidebar" *ngIf="showSidebar">
-    <!-- Información del usuario -->
-    <div class="user-info" *ngIf="currentUser">
-      <div class="user-avatar" [title]="getFullName()" (click)="abrirModalAvatar()">
-        <img *ngIf="getAvatarUrl()" [src]="getAvatarUrl()" alt="Avatar" class="avatar-image">
-        <span *ngIf="!getAvatarUrl()" class="avatar-text">{{ getInitials() }}</span>
-        <div class="avatar-overlay">
-          <i class="fa-solid fa-camera"></i>
+  @if (showSidebar) {
+    <aside class="sidebar">
+      <!-- Información del usuario -->
+      @if (currentUser) {
+        <div class="user-info">
+          <div class="user-avatar" [title]="getFullName()" (click)="abrirModalAvatar()">
+            @if (getAvatarUrl()) {
+              <img [src]="getAvatarUrl()" alt="Avatar" class="avatar-image">
+            }
+            @if (!getAvatarUrl()) {
+              <span class="avatar-text">{{ getInitials() }}</span>
+            }
+            <div class="avatar-overlay">
+              <i class="fa-solid fa-camera"></i>
+            </div>
+          </div>
+          <div class="user-details">
+            <h3>{{ getFullName() }}</h3>
+            <p class="user-role">{{ getUserRole() }}</p>
+            <p class="user-email">{{ currentUser.email }}</p>
+          </div>
+          <button class="logout-btn" (click)="logout()" title="Cerrar sesión">
+            <i class="fa-solid fa-sign-out-alt"></i>
+          </button>
         </div>
-      </div>
-      <div class="user-details">
-        <h3>{{ getFullName() }}</h3>
-        <p class="user-role">{{ getUserRole() }}</p>
-        <p class="user-email">{{ currentUser.email }}</p>
-      </div>
-      <button class="logout-btn" (click)="logout()" title="Cerrar sesión">
-        <i class="fa-solid fa-sign-out-alt"></i>
-      </button>
-    </div>
-
-    <section class="menu">
-
-      <div class="inicio">
-        <a routerLink="/dashboard/inicio" routerLinkActive="active" (click)="navegar()">
-          <i class="fa-solid fa-house"></i>
-          <div>
-            <h1>Inicio</h1>
-            <p>Aqui podras tener un pequeño resumen de tu inventario</p>
-          </div>
-        </a>
-      </div>
-
-      <div class="inicio">
-        <a routerLink="/dashboard/productos" routerLinkActive="active" (click)="navegar()">
-          <i class="fa-solid fa-box"></i>
-          <div>
-            <h1>Productos</h1>
-            <p>Por medio de esta opcion podras gestionar tus productos</p>
-          </div>
-        </a>
-      </div>
-
-      <div class="inicio">
-        <a routerLink="/dashboard/alertas" routerLinkActive="active" (click)="navegar()">
-          <i class="fa-solid fa-triangle-exclamation"></i>
-          <div>
-            <h1>Alertas</h1>
-            <p>Información sobre alertas preventivas y críticas de tus productos</p>
-          </div>
-        </a>
-      </div>
-
-      <div class="inicio">
-        <a routerLink="/dashboard/movimientos" routerLinkActive="active" (click)="navegar()">
-          <i class="fa-solid fa-right-left"></i>
-          <div>
-            <h1>Movimientos</h1>
-            <p>Información sobre todos los movimientos realizados</p>
-          </div>
-        </a>
-      </div>
-
-      <div class="inicio">
-        <a routerLink="/dashboard/proveedores" routerLinkActive="active" (click)="navegar()">
-          <i class="fa-solid fa-truck"></i>
-          <div>
-            <h1>Proveedores</h1>
-            <p>Mejor conexión con proveedores y automatización de pedidos según stock</p>
-          </div>
-        </a>
-      </div>
-
-      <div class="inicio">
-        <a routerLink="/dashboard/informes" routerLinkActive="active" (click)="navegar()">
-          <i class="fa-solid fa-file-lines"></i>
-          <div>
-            <h1>Informes</h1>
-            <p>Redacción y consulta de informes de actividades</p>
-          </div>
-        </a>
-      </div>
-
-    </section>
-
-    <!-- Footer para móvil dentro del sidebar -->
-    <footer class="sidebar-footer">
-      <div class="footer-container">
-        <div class="footer-section1">
-          <h3>Smart Inventory</h3>
-          <p>Controlando el presente, planificando el futuro.</p>
+      }
+      <section class="menu">
+        <div class="inicio">
+          <a routerLink="/dashboard/inicio" routerLinkActive="active" (click)="navegar()">
+            <i class="fa-solid fa-house"></i>
+            <div>
+              <h1>Inicio</h1>
+              <p>Aqui podras tener un pequeño resumen de tu inventario</p>
+            </div>
+          </a>
         </div>
-
-        <div class="footer-section2">
-          <h4>Enlaces</h4>
-          <ul>
-            <li><a (click)="navegarConScroll('/dashboard/inicio')">Inicio</a></li>
-            <li><a (click)="navegarConScroll('/servicios')">Servicios</a></li>
-            <li><a (click)="navegarConScroll('/contacto')">Contacto</a></li>
-            <li><a (click)="navegarConScroll('/ayuda')">Ayuda</a></li>
-          </ul>
+        <div class="inicio">
+          <a routerLink="/dashboard/productos" routerLinkActive="active" (click)="navegar()">
+            <i class="fa-solid fa-box"></i>
+            <div>
+              <h1>Productos</h1>
+              <p>Por medio de esta opcion podras gestionar tus productos</p>
+            </div>
+          </a>
         </div>
-
-        <div class="footer-section3">
-          <h4>Síguenos</h4>
-          <div class="footer-icons">
-            <i class="fab fa-facebook-f"></i>
-            <i class="fab fa-twitter"></i>
-            <i class="fab fa-linkedin-in"></i>
-            <i class="fab fa-instagram"></i>
+        <div class="inicio">
+          <a routerLink="/dashboard/alertas" routerLinkActive="active" (click)="navegar()">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <div>
+              <h1>Alertas</h1>
+              <p>Información sobre alertas preventivas y críticas de tus productos</p>
+            </div>
+          </a>
+        </div>
+        <div class="inicio">
+          <a routerLink="/dashboard/movimientos" routerLinkActive="active" (click)="navegar()">
+            <i class="fa-solid fa-right-left"></i>
+            <div>
+              <h1>Movimientos</h1>
+              <p>Información sobre todos los movimientos realizados</p>
+            </div>
+          </a>
+        </div>
+        <div class="inicio">
+          <a routerLink="/dashboard/proveedores" routerLinkActive="active" (click)="navegar()">
+            <i class="fa-solid fa-truck"></i>
+            <div>
+              <h1>Proveedores</h1>
+              <p>Mejor conexión con proveedores y automatización de pedidos según stock</p>
+            </div>
+          </a>
+        </div>
+        <div class="inicio">
+          <a routerLink="/dashboard/informes" routerLinkActive="active" (click)="navegar()">
+            <i class="fa-solid fa-file-lines"></i>
+            <div>
+              <h1>Informes</h1>
+              <p>Redacción y consulta de informes de actividades</p>
+            </div>
+          </a>
+        </div>
+      </section>
+      <!-- Footer para móvil dentro del sidebar -->
+      <footer class="sidebar-footer">
+        <div class="footer-container">
+          <div class="footer-section1">
+            <h3>Smart Inventory</h3>
+            <p>Controlando el presente, planificando el futuro.</p>
+          </div>
+          <div class="footer-section2">
+            <h4>Enlaces</h4>
+            <ul>
+              <li><a (click)="navegarConScroll('/dashboard/inicio')">Inicio</a></li>
+              <li><a (click)="navegarConScroll('/servicios')">Servicios</a></li>
+              <li><a (click)="navegarConScroll('/contacto')">Contacto</a></li>
+              <li><a (click)="navegarConScroll('/ayuda')">Ayuda</a></li>
+            </ul>
+          </div>
+          <div class="footer-section3">
+            <h4>Síguenos</h4>
+            <div class="footer-icons">
+              <i class="fab fa-facebook-f"></i>
+              <i class="fab fa-twitter"></i>
+              <i class="fab fa-linkedin-in"></i>
+              <i class="fab fa-instagram"></i>
+            </div>
           </div>
         </div>
-      </div>
-
-      <div class="footer-bottom">
-        &copy; 2025 Smart Inventory. Todos los derechos reservados.
-      </div>
-    </footer>
-  </aside>
+        <div class="footer-bottom">
+          &copy; 2025 Smart Inventory. Todos los derechos reservados.
+        </div>
+      </footer>
+    </aside>
+  }
 
   <!-- Contenido dinámico -->
-  <main class="main" *ngIf="!isMobile || !showSidebar">
-    <router-outlet></router-outlet>
-  </main>
+  @if (!isMobile || !showSidebar) {
+    <main class="main">
+      <router-outlet></router-outlet>
+    </main>
+  }
 
 </div>
 
 <!-- Modal para subir imagen de avatar -->
-<div *ngIf="mostrarModalAvatar" class="modal-overlay-avatar" (click)="cerrarModalAvatar()">
-  <div class="modal-avatar" (click)="$event.stopPropagation()">
-    <div class="modal-avatar-header">
-      <h3><i class="fa-solid fa-user-circle"></i> Cambiar Foto de Perfil</h3>
-      <button class="btn-cerrar-modal" (click)="cerrarModalAvatar()">
-        <i class="fa-solid fa-times"></i>
-      </button>
-    </div>
-    
-    <div class="modal-avatar-body">
-      <!-- Preview de la imagen actual -->
-      <div class="avatar-preview-container">
-        <div class="avatar-preview-large">
-          <img *ngIf="getAvatarUrl() && !previewImagen" [src]="getAvatarUrl()" alt="Avatar actual" class="preview-image">
-          <img *ngIf="previewImagen" [src]="previewImagen" alt="Nueva imagen" class="preview-image">
-          <span *ngIf="!getAvatarUrl() && !previewImagen" class="preview-initials">{{ getInitials() }}</span>
+@if (mostrarModalAvatar) {
+  <div class="modal-overlay-avatar" (click)="cerrarModalAvatar()">
+    <div class="modal-avatar" (click)="$event.stopPropagation()">
+      <div class="modal-avatar-header">
+        <h3><i class="fa-solid fa-user-circle"></i> Cambiar Foto de Perfil</h3>
+        <button class="btn-cerrar-modal" (click)="cerrarModalAvatar()">
+          <i class="fa-solid fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-avatar-body">
+        <!-- Preview de la imagen actual -->
+        <div class="avatar-preview-container">
+          <div class="avatar-preview-large">
+            @if (getAvatarUrl() && !previewImagen) {
+              <img [src]="getAvatarUrl()" alt="Avatar actual" class="preview-image">
+            }
+            @if (previewImagen) {
+              <img [src]="previewImagen" alt="Nueva imagen" class="preview-image">
+            }
+            @if (!getAvatarUrl() && !previewImagen) {
+              <span class="preview-initials">{{ getInitials() }}</span>
+            }
+          </div>
+        </div>
+        <!-- Input para seleccionar archivo -->
+        <div class="file-input-container">
+          <label for="avatar-file-input" class="file-input-label">
+            <i class="fa-solid fa-upload"></i>
+            Seleccionar Imagen
+          </label>
+          <input
+            type="file"
+            id="avatar-file-input"
+            accept="image/*"
+            (change)="onFileSelected($event)"
+            class="file-input">
+            <p class="file-hint">Formatos permitidos: JPG, PNG, GIF. Tamaño máximo: 5MB</p>
+          </div>
+          <!-- Botones de acción -->
+          <div class="modal-avatar-actions">
+            <button
+              class="btn-subir"
+              (click)="subirImagen()"
+              [disabled]="!imagenSeleccionada || subiendoImagen">
+              <i class="fa-solid fa-upload"></i>
+              {{ subiendoImagen ? 'Subiendo...' : 'Subir Imagen' }}
+            </button>
+            @if (getAvatarUrl()) {
+              <button
+                class="btn-eliminar"
+                (click)="eliminarImagen()"
+                [disabled]="subiendoImagen">
+                <i class="fa-solid fa-trash"></i>
+                Eliminar Imagen
+              </button>
+            }
+            <button
+              class="btn-cancelar"
+              (click)="cerrarModalAvatar()"
+              [disabled]="subiendoImagen">
+              Cancelar
+            </button>
+          </div>
         </div>
       </div>
-
-      <!-- Input para seleccionar archivo -->
-      <div class="file-input-container">
-        <label for="avatar-file-input" class="file-input-label">
-          <i class="fa-solid fa-upload"></i>
-          Seleccionar Imagen
-        </label>
-        <input 
-          type="file" 
-          id="avatar-file-input" 
-          accept="image/*" 
-          (change)="onFileSelected($event)"
-          class="file-input">
-        <p class="file-hint">Formatos permitidos: JPG, PNG, GIF. Tamaño máximo: 5MB</p>
-      </div>
-
-      <!-- Botones de acción -->
-      <div class="modal-avatar-actions">
-        <button 
-          class="btn-subir" 
-          (click)="subirImagen()" 
-          [disabled]="!imagenSeleccionada || subiendoImagen">
-          <i class="fa-solid fa-upload"></i>
-          {{ subiendoImagen ? 'Subiendo...' : 'Subir Imagen' }}
-        </button>
-        <button 
-          *ngIf="getAvatarUrl()" 
-          class="btn-eliminar" 
-          (click)="eliminarImagen()"
-          [disabled]="subiendoImagen">
-          <i class="fa-solid fa-trash"></i>
-          Eliminar Imagen
-        </button>
-        <button 
-          class="btn-cancelar" 
-          (click)="cerrarModalAvatar()"
-          [disabled]="subiendoImagen">
-          Cancelar
-        </button>
-      </div>
     </div>
-  </div>
-</div>
+  }

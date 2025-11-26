@@ -14,7 +14,7 @@ export class NabvarComponent {
 */
 // src/app/nabvar/nabvar.component.ts
 
-import { CommonModule } from '@angular/common';
+
 import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { Router, NavigationEnd, RouterLink, RouterLinkActive } from '@angular/router';
 import { filter } from 'rxjs/operators';
@@ -25,7 +25,7 @@ import { Location } from '@angular/common';
   templateUrl: './nabvar.component.html',
   styleUrls: ['./nabvar.component.css'],
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive]
+  imports: [RouterLink, RouterLinkActive]
 })
 export class NabvarComponent implements OnInit, OnDestroy {
   showLoginLink: boolean = false;

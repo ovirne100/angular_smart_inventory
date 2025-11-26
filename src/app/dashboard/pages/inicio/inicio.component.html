@@ -14,18 +14,24 @@
             <span class="stat-label">Stock actual:</span>
             <span class="stat-value">{{ stats.productoStock?.cantidad || 0 | number }} und</span>
           </div>
-          <div class="stat-item" *ngIf="stats.productoStock?.total_entradas">
-            <span class="stat-label">Total entradas:</span>
-            <span class="stat-value">{{ stats.productoStock?.total_entradas || 0 | number }} und</span>
-          </div>
-          <div class="stat-item" *ngIf="stats.productoStock?.total_salidas">
-            <span class="stat-label">Total salidas:</span>
-            <span class="stat-value">{{ stats.productoStock?.total_salidas || 0 | number }} und</span>
-          </div>
-          <div class="stat-item" *ngIf="stats.productoStock?.veces_salio">
-            <span class="stat-label">Veces que salió:</span>
-            <span class="stat-value">{{ stats.productoStock?.veces_salio || 0 | number }} veces</span>
-          </div>
+          @if (stats.productoStock?.total_entradas) {
+            <div class="stat-item">
+              <span class="stat-label">Total entradas:</span>
+              <span class="stat-value">{{ stats.productoStock?.total_entradas || 0 | number }} und</span>
+            </div>
+          }
+          @if (stats.productoStock?.total_salidas) {
+            <div class="stat-item">
+              <span class="stat-label">Total salidas:</span>
+              <span class="stat-value">{{ stats.productoStock?.total_salidas || 0 | number }} und</span>
+            </div>
+          }
+          @if (stats.productoStock?.veces_salio) {
+            <div class="stat-item">
+              <span class="stat-label">Veces que salió:</span>
+              <span class="stat-value">{{ stats.productoStock?.veces_salio || 0 | number }} veces</span>
+            </div>
+          }
         </div>
       </div>
     </div>
@@ -41,10 +47,12 @@
             <span class="stat-label">Cantidad total salida:</span>
             <span class="stat-value">{{ stats.productoSalida?.cantidad_total || stats.productoSalida?.cantidad || 0 | number }} und</span>
           </div>
-          <div class="stat-item" *ngIf="stats.productoSalida?.veces_salio">
-            <span class="stat-label">Número de veces que salió:</span>
-            <span class="stat-value">{{ stats.productoSalida?.veces_salio || 0 | number }} veces</span>
-          </div>
+          @if (stats.productoSalida?.veces_salio) {
+            <div class="stat-item">
+              <span class="stat-label">Número de veces que salió:</span>
+              <span class="stat-value">{{ stats.productoSalida?.veces_salio || 0 | number }} veces</span>
+            </div>
+          }
         </div>
       </div>
     </div>
@@ -74,10 +82,10 @@
         </div>
         <div class="chart-container">
           <canvas baseChart
-                  [data]="barChartData"
-                  [type]="barChartType"
-                  [options]="barChartOptions"
-                  [plugins]="comparisonPlugins">
+            [data]="barChartData"
+            [type]="barChartType"
+            [options]="barChartOptions"
+            [plugins]="comparisonPlugins">
           </canvas>
         </div>
         <div class="insight-grid">
@@ -96,7 +104,7 @@
                 vs {{ stats.entradasMesAnterior || 0 | number }} el mes anterior
               </span>
               <span class="trend insight-delta"
-                    [class]="getTendenciaClass(stats.entradasMesActual || 0, stats.entradasMesAnterior || 0)">
+                [class]="getTendenciaClass(stats.entradasMesActual || 0, stats.entradasMesAnterior || 0)">
                 <i class="fa-solid"
                    [ngClass]="{
                      'fa-arrow-up': (stats.entradasMesActual || 0) > (stats.entradasMesAnterior || 0),
@@ -125,7 +133,7 @@
                 vs {{ stats.salidasMesAnterior || 0 | number }} el mes anterior
               </span>
               <span class="trend insight-delta"
-                    [class]="getTendenciaClass(stats.salidasMesActual || 0, stats.salidasMesAnterior || 0)">
+                [class]="getTendenciaClass(stats.salidasMesActual || 0, stats.salidasMesAnterior || 0)">
                 <i class="fa-solid"
                    [ngClass]="{
                      'fa-arrow-up': (stats.salidasMesActual || 0) > (stats.salidasMesAnterior || 0),
