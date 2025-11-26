@@ -6,7 +6,7 @@ const config: CapacitorConfig = {
   "webDir": "dist/proyecto/browser",
    server: {
     cleartext: true, // CRÍTICO para HTTP
-    androidScheme: 'http'
+    androidScheme: 'https'
   }
 
 };

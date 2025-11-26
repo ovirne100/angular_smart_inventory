@@ -1,4 +1,5 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://api.midominio.com/api'
+  apiUrl:  'https://smartinventori-production.up.railway.app/api'
+
 };

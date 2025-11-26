@@ -1,6 +1,7 @@
 <!-- Navbar Profesional y Responsive -->
 <nav class="navbar">
   <div class="navbar-container">
+
     <!-- Logo y título -->
     <div class="navbar-brand">
       <div class="brand-logo">
@@ -21,30 +22,35 @@
             <span>Inicio</span>
           </a>
         </li>
+
         <li class="nav-item">
           <a routerLink="/dashboard/productos" class="nav-link" routerLinkActive="active">
             <i class="fa-solid fa-boxes"></i>
             <span>Productos</span>
           </a>
         </li>
+
         <li class="nav-item">
           <a routerLink="/dashboard/proveedores" class="nav-link" routerLinkActive="active">
             <i class="fa-solid fa-truck"></i>
             <span>Proveedores</span>
           </a>
         </li>
+
         <li class="nav-item">
           <a routerLink="/dashboard/movimientos" class="nav-link" routerLinkActive="active">
             <i class="fa-solid fa-exchange-alt"></i>
             <span>Movimientos</span>
           </a>
         </li>
+
         <li class="nav-item">
           <a routerLink="/dashboard/informes" class="nav-link" routerLinkActive="active">
             <i class="fa-solid fa-chart-bar"></i>
             <span>Informes</span>
           </a>
         </li>
+
         <li class="nav-item">
           <a routerLink="/dashboard/alertas" class="nav-link" routerLinkActive="active">
             <i class="fa-solid fa-bell"></i>
@@ -56,6 +62,7 @@
 
     <!-- Controles del usuario -->
     <div class="navbar-controls">
+
       <!-- Búsqueda global -->
       <div class="search-container">
         <div class="search-box">
@@ -79,28 +86,35 @@
         <div class="user-avatar">
           <img src="assets/default-avatar.png" alt="Usuario" class="avatar-img">
         </div>
+
         <div class="user-info">
           <span class="user-name">Usuario Admin</span>
           <span class="user-role">Administrador</span>
         </div>
+
         <div class="user-menu">
           <button class="user-menu-btn" (click)="toggleUserMenu()">
             <i class="fa-solid fa-chevron-down"></i>
           </button>
+
           <div class="user-dropdown" [class.active]="userMenuOpen">
             <a href="#" class="dropdown-item">
               <i class="fa-solid fa-user"></i>
               Mi Perfil
             </a>
+
             <a href="#" class="dropdown-item">
               <i class="fa-solid fa-cog"></i>
               Configuración
             </a>
+
             <a href="#" class="dropdown-item">
               <i class="fa-solid fa-question-circle"></i>
               Ayuda
             </a>
+
             <hr class="dropdown-divider">
+
             <a href="#" class="dropdown-item logout" (click)="logout()">
               <i class="fa-solid fa-sign-out-alt"></i>
               Cerrar Sesión
@@ -119,5 +133,8 @@
   </div>
 
   <!-- Overlay para móvil -->
-  <div class="navbar-overlay" [class.active]="menuOpen" (click)="closeMenu()"></div>
+  <div class="navbar-overlay" 
+       [class.active]="menuOpen" 
+       (click)="closeMenu()">
+  </div>
 </nav>
