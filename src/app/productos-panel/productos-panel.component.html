@@ -27,7 +27,7 @@
       <!-- Imagen del producto -->
       <div class="producto-imagen">
         <img
-          [src]="producto.image_url || (producto.image ? 'http://127.0.0.1:8000/storage/' + producto.image : '/assets/no-image.png')"
+          [src]="producto.image_url || (producto.image ? storageUrl + '/' + producto.image : '/assets/no-image.png')"
           [alt]="producto.name"
           (error)="$event.target.src = '/assets/no-image.png'"
         />

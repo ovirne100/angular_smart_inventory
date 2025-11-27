@@ -127,7 +127,7 @@
         >
           <div class="producto-imagen">
             <img
-              [src]="producto.image_url || (producto.image ? 'http://127.0.0.1:8000/storage/' + producto.image : 'assets/no-image.png')"
+              [src]="producto.image_url || (producto.image ? storageUrl + '/' + producto.image : 'assets/no-image.png')"
               [alt]="producto.name"
               loading="lazy" decoding="async" referrerpolicy="no-referrer"
               (error)="onImageError($event)"
@@ -279,7 +279,7 @@
 
           <div class="producto-imagen">
             <img
-              [src]="p.image_url || (p.image ? 'http://127.0.0.1:8000/storage/' + p.image : 'assets/no-image.png')"
+              [src]="p.image_url || (p.image ? storageUrl + '/' + p.image : 'assets/no-image.png')"
               [alt]="p.name"
               loading="lazy"
               (error)="onImageError($event)"

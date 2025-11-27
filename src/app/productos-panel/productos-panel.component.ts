@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SuppliersService } from '../services/proveedores/suppliers.service';
 import { Producto, Proveedor } from '../interfaces/producto';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-productos-panel',
@@ -17,6 +18,8 @@ export class ProductosPanelComponent {
   @Output() eliminarProducto = new EventEmitter<Producto>();
   @Output() cerrar = new EventEmitter<void>();
   @Output() abrirAsociarProducto = new EventEmitter<void>();
+
+  storageUrl = environment.storageUrl;
 
   constructor(private suppliersService: SuppliersService) {}
 

@@ -10,7 +10,7 @@ import { environment } from '../../../environments/environment';
 })
 export class ProductosService {
   private apiUrl = `${environment.apiUrl}/products`;
-  private storageUrl = 'http://127.0.0.1:8000/storage';
+  private storageUrl = environment.storageUrl || 'http://127.0.0.1:8000/storage';
 
   // Caché de productos para mejorar rendimiento
   private productosCache: Producto[] | null = null;
@@ -69,9 +69,27 @@ export class ProductosService {
         let productosArray: any[] = [];
         let paginationInfo: any = {};
 
-        // Laravel paginate devuelve: { data: [...], current_page, last_page, total, per_page }
-        if (response.data && Array.isArray(response.data.data)) {
-          // Estructura: { data: { data: [...], current_page, last_page, total, per_page } }
+        console.log('🔍 Respuesta del backend productos:', response);
+
+        // Laravel con wrapper: { status, message, data: { data: [...], current_page, ... } }
+        if (response.status === 'success' && response.data) {
+          const paginatedData = response.data;
+          if (Array.isArray(paginatedData.data)) {
+            // Estructura Laravel paginada dentro de wrapper
+            productosArray = paginatedData.data;
+            paginationInfo = {
+              current_page: paginatedData.current_page,
+              last_page: paginatedData.last_page,
+              total: paginatedData.total,
+              per_page: paginatedData.per_page
+            };
+          } else if (Array.isArray(paginatedData)) {
+            // data es directamente un array
+            productosArray = paginatedData;
+          }
+        }
+        // Laravel paginate directo: { data: [...], current_page, last_page, total, per_page }
+        else if (response.data && Array.isArray(response.data.data)) {
           productosArray = response.data.data;
           paginationInfo = {
             current_page: response.data.current_page,
@@ -92,6 +110,8 @@ export class ProductosService {
           // Estructura simple: [...]
           productosArray = response;
         }
+
+        console.log('📦 Productos extraídos:', productosArray.length);
 
         const productosMapeados: Producto[] = productosArray.map((item: any) => {
           // Detectar el proveedor desde distintas estructuras

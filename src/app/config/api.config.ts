@@ -1,6 +1,8 @@
+import { environment } from '../../environments/environment';
+
 export const API_CONFIG = {
-  // URL base del backend
-  BASE_URL: 'http://127.0.0.1:8000/api',
+  // URL base del backend (desde environment)
+  BASE_URL: environment.apiUrl,
 
   // Endpoints específicos
   ENDPOINTS: {

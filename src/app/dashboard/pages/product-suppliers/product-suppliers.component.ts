@@ -35,6 +35,9 @@ export class ProductSuppliersComponent implements OnChanges {
   // Límite de productos por proveedor
   readonly MAX_PRODUCTOS = 50;
 
+  // URL del storage
+  storageUrl = environment.storageUrl;
+
   // Paginación
   currentPage = 1;
   itemsPerPage = 12;

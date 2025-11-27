@@ -5,7 +5,7 @@ import { environment } from '../../../environments/environment';
 
 export interface AlertFilters {
   alert_type?: 'bajo_stock' | 'sin_stock';
-  status?: 'pendiente' | 'resuelta';
+  status?: 'pendiente' | 'resuelta' | 'orden_enviada';
 }
 
 export interface Alert {
@@ -13,7 +13,7 @@ export interface Alert {
   product_id: number;
   inventory_id: number;
   alert_type: 'bajo_stock' | 'sin_stock';
-  status: 'pendiente' | 'resuelta';
+  status: 'pendiente' | 'resuelta' | 'orden_enviada';
   message: string;
   date: string;
   resolved_at: string | null;
@@ -80,7 +80,7 @@ export class AlertsService {
   /**
    * 🔄 Actualizar el estado de una alerta
    */
-  updateAlertStatus(id: number, status: 'pendiente' | 'resuelta'): Observable<any> {
+  updateAlertStatus(id: number, status: 'pendiente' | 'resuelta' | 'orden_enviada'): Observable<any> {
     return this.http.put(`${this.apiUrl}/${id}/status`, { status });
   }
 }

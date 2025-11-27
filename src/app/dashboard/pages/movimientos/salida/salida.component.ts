@@ -7,6 +7,7 @@ import { MovimientosService } from '../../../../services/movimientos/movimientos
 import { AlertsService } from '../../../../services/alertas/alerts.service';
 import { ProductosService } from '../../../../services/productos/products.service';
 import { UnitsService } from '../../../../services/units/units.service';
+import { environment } from '../../../../../environments/environment';
 
 declare var Quagga: any;
 
@@ -61,7 +62,7 @@ export class SalidaComponent implements OnInit, OnDestroy {
   isScanning = false;
   scannerSupported = true;
   lastScannedCode = '';
-  private apiUrl = 'http://127.0.0.1:8000/api';
+  private apiUrl = environment.apiUrl;
   private destroy$ = new Subject<void>();
 
   constructor(

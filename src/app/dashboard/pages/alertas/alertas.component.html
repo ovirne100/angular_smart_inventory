@@ -37,9 +37,12 @@
         <p><strong>Estado:</strong>
           <span [ngClass]="{
             'estado-pendiente': alerta.status === 'pendiente',
-            'estado-resuelta': alerta.status === 'resuelta'
+            'estado-resuelta': alerta.status === 'resuelta',
+            'estado-orden-enviada': alerta.status === 'orden_enviada'
           }">
-            {{ alerta.status === 'pendiente' ? '⏳ Pendiente' : alerta.status === 'resuelta' ? '✅ Resuelta' : '⚠️ Activa' }}
+            {{ alerta.status === 'pendiente' ? '⏳ Pendiente' : 
+               alerta.status === 'resuelta' ? '✅ Resuelta' : 
+               alerta.status === 'orden_enviada' ? '📧 Orden Enviada' : '⚠️ Activa' }}
           </span>
         </p>
         <p><strong>Tipo:</strong>
@@ -59,7 +62,7 @@
         <p *ngIf="alerta.resolved_at"><strong>Resuelta:</strong> {{ alerta.resolved_at | colombiaDate:'datetime-short' }}</p>
       </div>
 
-      <button *ngIf="alerta.status !== 'resuelta' && (alerta.alert_type === 'bajo_stock' || alerta.alert_type === 'sin_stock')" class="btn-reabastecer" (click)="abrirModalOrden(alerta)">🛒 Reabastecer</button>
+      <button *ngIf="alerta.status !== 'resuelta' && alerta.status !== 'orden_enviada' && (alerta.alert_type === 'bajo_stock' || alerta.alert_type === 'sin_stock')" class="btn-reabastecer" (click)="abrirModalOrden(alerta)">🛒 Reabastecer</button>
     </div>
   </div>
 </div>

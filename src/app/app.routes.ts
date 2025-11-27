@@ -75,7 +75,7 @@ export const routes: Routes = [
     ]
   },
   // Redirecciones
-  // 👇 solo esta redirección
-  { path: '', redirectTo: '/dashboard/inicio', pathMatch: 'full' },
-  { path: '**', redirectTo: '/dashboard/inicio' }
+  // 👇 La primera pantalla es el registro
+  { path: '', redirectTo: '/register', pathMatch: 'full' },
+  { path: '**', redirectTo: '/register' }
 ];

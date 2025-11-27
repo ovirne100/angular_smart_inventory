@@ -109,7 +109,7 @@ export class ProductosComponent implements OnInit {
       next: (res: any) => {
         const nuevos = res.data || [];
         const withImages = (nuevos || []).map((p: any) => {
-          const backendBase = 'http://127.0.0.1:8000/storage/';
+          const backendBase = environment.storageUrl ? `${environment.storageUrl}/` : 'http://127.0.0.1:8000/storage/';
           const normalizedImageUrl = p.image_url || (p.image ? `${backendBase}${p.image}` : undefined);
           return { ...p, image_url: normalizedImageUrl } as Producto;
         });
@@ -223,7 +223,7 @@ export class ProductosComponent implements OnInit {
     };
 
     // Si vino un campo 'image' o 'image_url', actualizamos image_url y añadimos timestamp anti-cache
-    const backendBase = 'http://127.0.0.1:8000/storage/';
+    const backendBase = environment.storageUrl ? `${environment.storageUrl}/` : 'http://127.0.0.1:8000/storage/';
 
     // Si image o image_url son null/undefined explícitamente, significa que se eliminó la imagen
     if (productoActualizado.image === null || productoActualizado.image === undefined || 

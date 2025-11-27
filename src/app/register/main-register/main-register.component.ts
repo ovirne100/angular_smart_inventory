@@ -76,6 +76,7 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { RolesService } from '../../services/roles.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-register',
@@ -154,7 +155,7 @@ export class MainRegisterComponent {
     const formData = this.registerForm.getRawValue();
     console.log('Datos del formulario:', formData);
     
-    this.http.post('http://127.0.0.1:8000/api/register', formData)
+    this.http.post(`${environment.apiUrl}/register`, formData)
       .subscribe({
         next: () => this.router.navigate(['/login']),
         error: (err) => {

@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { Producto } from '../../interfaces/producto';
 import { ProductosService } from '../../services/productos/products.service';
 import { CategoriesService, Category } from '../../services/categories/categories.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-actualizar-producto',
@@ -167,7 +168,7 @@ export class ActualizarProductoComponent implements OnInit {
                 image_url: this.eliminarImagen
                   ? undefined
                   : (productoActualizado.image
-                    ? `http://127.0.0.1:8000/storage/${productoActualizado.image}?t=${Date.now()}`
+                    ? `${environment.storageUrl}/${productoActualizado.image}?t=${Date.now()}`
                     : productoActualizado.image_url ? `${productoActualizado.image_url}?t=${Date.now()}` : undefined),
                 image: this.eliminarImagen ? undefined : productoActualizado.image
               };
@@ -189,7 +190,7 @@ export class ActualizarProductoComponent implements OnInit {
                     image_url: this.eliminarImagen
                       ? undefined
                       : (productoCompleto.image
-                        ? `http://127.0.0.1:8000/storage/${productoCompleto.image}?t=${Date.now()}`
+                        ? `${environment.storageUrl}/${productoCompleto.image}?t=${Date.now()}`
                         : productoCompleto.image_url ? `${productoCompleto.image_url}?t=${Date.now()}` : undefined),
                     image: this.eliminarImagen ? undefined : productoCompleto.image
                   };
@@ -204,7 +205,7 @@ export class ActualizarProductoComponent implements OnInit {
                 const productoActualizado: Producto = {
                   ...res.data,
                   categoria: res.data?.categoria || (res.data?.category_id ? null : { name: 'Sin categoría' }),
-                  image_url: this.eliminarImagen ? undefined : (res.data?.image ? `http://127.0.0.1:8000/storage/${res.data.image}?t=${Date.now()}` : res.data?.image_url || undefined),
+                  image_url: this.eliminarImagen ? undefined : (res.data?.image ? `${environment.storageUrl}/${res.data.image}?t=${Date.now()}` : res.data?.image_url || undefined),
                   image: this.eliminarImagen ? undefined : res.data?.image
                 };
                   this.producto = productoActualizado;
@@ -224,7 +225,7 @@ export class ActualizarProductoComponent implements OnInit {
                     image_url: this.eliminarImagen
                       ? undefined
                       : (productoCompleto.image
-                        ? `http://127.0.0.1:8000/storage/${productoCompleto.image}?t=${Date.now()}`
+                        ? `${environment.storageUrl}/${productoCompleto.image}?t=${Date.now()}`
                         : productoCompleto.image_url ? `${productoCompleto.image_url}?t=${Date.now()}` : undefined),
                     image: this.eliminarImagen ? undefined : productoCompleto.image
                   };
@@ -238,7 +239,7 @@ export class ActualizarProductoComponent implements OnInit {
                 const productoActualizado: Producto = {
                   ...res.data,
                   categoria: res.data?.categoria || (res.data?.category_id ? null : { name: 'Sin categoría' }),
-                  image_url: this.eliminarImagen ? undefined : (res.data?.image ? `http://127.0.0.1:8000/storage/${res.data.image}?t=${Date.now()}` : res.data?.image_url || undefined),
+                  image_url: this.eliminarImagen ? undefined : (res.data?.image ? `${environment.storageUrl}/${res.data.image}?t=${Date.now()}` : res.data?.image_url || undefined),
                   image: this.eliminarImagen ? undefined : res.data?.image
                 };
                 this.producto = productoActualizado;

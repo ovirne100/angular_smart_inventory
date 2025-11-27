@@ -429,22 +429,22 @@ export class AlertasComponent implements OnInit {
       next: (response) => {
         console.log('Orden creada exitosamente:', response);
         
-        // Marcar la alerta como pendiente después de crear la orden
+        // Marcar la alerta como "orden_enviada" después de crear la orden
         if (this.alertaSeleccionada?.id) {
-          this.alertsService.updateAlertStatus(this.alertaSeleccionada.id, 'pendiente').subscribe({
+          this.alertsService.updateAlertStatus(this.alertaSeleccionada.id, 'orden_enviada').subscribe({
             next: () => {
-              console.log('✅ Alerta marcada como pendiente');
+              console.log('✅ Alerta marcada como orden_enviada');
             },
             error: (err) => {
-              console.error('⚠️ Error al marcar alerta como pendiente:', err);
+              console.error('⚠️ Error al marcar alerta como orden_enviada:', err);
               // No mostramos error al usuario, solo en consola
             }
           });
         }
         
         const mensaje = this.proveedorEmail 
-          ? `Orden de reabastecimiento creada exitosamente. Se enviará un correo a ${this.proveedorEmail}`
-          : 'Orden de reabastecimiento creada exitosamente.';
+          ? `✅ Orden de reabastecimiento enviada exitosamente al proveedor (${this.proveedorEmail})`
+          : '✅ Orden de reabastecimiento creada exitosamente.';
         alert(mensaje);
         this.cerrarModalOrden();
         // Recargar las alertas para actualizar el estado

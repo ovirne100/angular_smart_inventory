@@ -3,11 +3,12 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class RolesService {
   // Usar la misma URL base que AuthService
-  private apiUrl = 'http://127.0.0.1:8000/api/roles-public';
+  private apiUrl = `${environment.apiUrl}/roles-public`;
 
   constructor(private http: HttpClient) {}
 

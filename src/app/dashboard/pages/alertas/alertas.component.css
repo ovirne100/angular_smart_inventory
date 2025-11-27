@@ -204,6 +204,15 @@ h2 {
   display: inline-block;
 }
 
+.estado-orden-enviada {
+  color: #2196f3;
+  font-weight: bold;
+  background: rgba(33, 150, 243, 0.1);
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
 /* Botón resolver */
 .btn-resolver {
   width: 100%;
